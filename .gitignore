@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+
+# Production
+build/
+dist/
+out/
+
+# Misc
+.DS_Store
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.c9/
+*.sublime-workspace
+
+# OS
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Turbo
+.turbo/
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma
+prisma/generated/
+
+# Lock files (pnpm-lock.yaml is the canonical lock — ignore others)
+package-lock.json
+yarn.lock
