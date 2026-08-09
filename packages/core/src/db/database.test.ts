@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import path from 'node:path';
 import { test } from 'node:test';
-import { RepresentationGraph } from '../types.js';
+import { RepresentationGraph } from '../types/index.js';
 import {
   getAllLedgerEntries,
   getLedgerSummary,

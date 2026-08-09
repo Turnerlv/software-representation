@@ -1,7 +1,7 @@
 import assert from 'node:assert';
 import path from 'node:path';
 import { test } from 'node:test';
-import { analyzeTarget, collectFiles } from './extractor.js';
+import { analyzeTarget, collectFiles } from './extractor/index.js';
 
 test('collectFiles returns files for directory and single file', () => {
   const sampleDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'sample-app');

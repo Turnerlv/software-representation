@@ -113,3 +113,11 @@ chomp/
 2. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
 3. **Schema Compliance:** All extracted structures must adhere to the 4 ontology primitives (`Boundaries`, `Contracts`, `Relationships`, `Open Connectors`).
 4. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes.
+
+---
+
+## 8. Architecture & Boundary Rules
+
+1. **Ontology Isolation:** Core Ontology (`packages/core/src/types/ontology.ts`) must never import from Ledger, CLI tools, or external system modules.
+2. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
+3. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
