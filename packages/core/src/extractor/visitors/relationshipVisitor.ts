@@ -1,6 +1,28 @@
+// packages/core/src/extractor/visitors/relationshipVisitor.ts
+// Visitor for RELATIONSHIP primitives — known structural dependencies between units.
+
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 
+/**
+ * Inspects a single AST node and returns a RELATIONSHIP entity if it matches a known dependency pattern.
+ *
+ * Currently handled patterns:
+ * - ImportDeclaration  (static ESM imports — named, default, namespace, and side-effect)
+ *
+ * Known gaps (not yet handled — log via parser-eval-harness):
+ * - require('module')         CommonJS require calls
+ * - import('module')          Dynamic ESM imports
+ * - extends BaseClass         Class inheritance
+ * - implements Interface      Contract implementation
+ * - app.use('/prefix', router) Express router mounting
+ *
+ * @param node        The AST node to inspect.
+ * @param sourceFile  Required to extract the module specifier text.
+ * @param getEvidence Returns a populated EvidenceRecord for the given node.
+ * @param nextId      Placeholder closure — replaced by stableEntityId() in the orchestrator.
+ * @returns A StructuralEntity or null if the node does not match any RELATIONSHIP pattern.
+ */
 export function visitRelationship(
   node: ts.Node,
   sourceFile: ts.SourceFile,

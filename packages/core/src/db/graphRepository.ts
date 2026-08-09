@@ -1,3 +1,6 @@
+// packages/core/src/db/graphRepository.ts
+// Persistence layer for RepresentationGraph — save and retrieve structural entities per repository.
+
 import Database from 'better-sqlite3';
 import {
   EntityType,
@@ -6,12 +9,26 @@ import {
   StructuralEntity,
 } from '../types/index.js';
 
+/** Minimal repo metadata required to persist a RepresentationGraph. */
 export interface RepositoryInfo {
+  /** Stable kebab-case identifier derived from the repo directory name. */
   id: string;
   name: string;
+  /** Absolute path to the repo root on disk. */
   path: string;
 }
 
+/**
+ * Persists a RepresentationGraph to the database under the given repository.
+ *
+ * Strategy:
+ * - Upserts the repository row (safe to call repeatedly on re-runs).
+ * - Deletes all existing structural_entities for this repo (cascades to evidence_records).
+ * - Re-inserts all entities from the new graph in a single transaction.
+ *
+ * Entity IDs stored in the DB are namespaced as `${repoId}:${entity.id}` to prevent
+ * collisions when multiple repos are stored in the same database file.
+ */
 export function saveRepresentationGraph(
   db: Database.Database,
   repo: RepositoryInfo,
@@ -68,6 +85,15 @@ export function saveRepresentationGraph(
   saveTx();
 }
 
+/**
+ * Retrieves a previously saved RepresentationGraph for the given repository.
+ *
+ * Reconstructs the full graph from the three DB tables (repositories, structural_entities, evidence_records).
+ * Entity IDs are de-namespaced on read — the stored `${repoId}:${entity.id}` prefix is stripped
+ * so callers receive the original stable content-hash IDs.
+ *
+ * @returns The RepresentationGraph, or null if the repository has not been analyzed yet.
+ */
 export function getRepresentationGraph(
   db: Database.Database,
   repoId: string

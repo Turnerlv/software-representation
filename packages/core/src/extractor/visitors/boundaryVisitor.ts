@@ -1,6 +1,21 @@
+// packages/core/src/extractor/visitors/boundaryVisitor.ts
+// Visitor for BOUNDARY primitives — structural scopes that define where a unit begins and ends.
+
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 
+/**
+ * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
+ *
+ * Currently handled patterns:
+ * - ClassDeclaration  (named classes only)
+ * - ModuleDeclaration (namespace/module blocks)
+ *
+ * @param node      The AST node to inspect.
+ * @param getEvidence  Returns a populated EvidenceRecord for the given node.
+ * @param nextId    Closure that provides a placeholder ID — replaced by stableEntityId() in the orchestrator.
+ * @returns A StructuralEntity or null if the node does not match any BOUNDARY pattern.
+ */
 export function visitBoundary(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,

@@ -2,6 +2,23 @@ import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * Initializes the Chomp SQLite database and ensures all tables exist.
+ *
+ * Schema overview:
+ * - `repositories`             One row per analyzed repo (upserted on re-run).
+ * - `structural_entities`      One row per extracted primitive (BOUNDARY / CONTRACT / RELATIONSHIP / OPEN_CONNECTOR).
+ *                              Cascade-deleted when the parent repository is removed.
+ * - `evidence_records`         One row per entity linking back to its exact source file + line.
+ *                              Cascade-deleted when the parent entity is removed.
+ * - `extractor_coverage_ledger` Research ledger — logs unhandled AST patterns discovered during repo evaluation.
+ *
+ * All CREATE TABLE statements use IF NOT EXISTS, making this function safe to call on
+ * every startup without migration logic.
+ *
+ * @param dbPath File path for the SQLite database. Defaults to ':memory:' for tests.
+ *               Parent directory is created automatically if it does not exist.
+ */
 export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   if (dbPath !== ':memory:') {
     const dir = path.dirname(dbPath);

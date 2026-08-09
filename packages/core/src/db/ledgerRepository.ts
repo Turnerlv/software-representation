@@ -1,3 +1,8 @@
+// packages/core/src/db/ledgerRepository.ts
+// CRUD layer for the extractor_coverage_ledger table.
+// Used by agents running the parser-eval-harness and parser-builder skills to track
+// which AST patterns are missing coverage and whether they have been resolved.
+
 import Database from 'better-sqlite3';
 import { randomUUID } from 'crypto';
 import {
@@ -9,6 +14,7 @@ import {
   LogExtractionGapInput,
 } from '../types/index.js';
 
+/** Maps a raw SQLite row (snake_case columns) to a typed ExtractorCoverageEntry (camelCase). */
 function mapRowToCoverageEntry(row: any): ExtractorCoverageEntry {
   return {
     id: row.id,
@@ -28,6 +34,18 @@ function mapRowToCoverageEntry(row: any): ExtractorCoverageEntry {
   };
 }
 
+/**
+ * Logs a newly discovered AST extraction gap into the coverage ledger.
+ *
+ * Input normalization: accepts both camelCase (e.g. `patternName`) and snake_case
+ * (e.g. `pattern_name`) for every field, to accommodate agent-generated calls.
+ * camelCase takes precedence when both are provided.
+ *
+ * Status defaults to 'DISCOVERED'. ImpactLevel defaults to 'MEDIUM'.
+ * A random UUID is generated for `id` if none is provided.
+ *
+ * @throws If patternName, evidenceRepo, or evidenceFile are missing from the input.
+ */
 export function logExtractionGap(
   db: Database.Database,
   gapData: LogExtractionGapInput
@@ -95,6 +113,15 @@ export function logExtractionGap(
   return mapRowToCoverageEntry(row);
 }
 
+/**
+ * Transitions a ledger entry from any status to 'RESOLVED' and records the fix details.
+ *
+ * fixLocation and fixPatternSummary are required — RESOLVED entries must be fully traceable.
+ * testFixturePath is optional but strongly recommended.
+ *
+ * @returns The updated entry, or null if no entry with the given gapId exists.
+ * @throws If fixLocation or fixPatternSummary are missing.
+ */
 export function resolveExtractionGap(
   db: Database.Database,
   gapId: string,
@@ -142,6 +169,11 @@ export function resolveExtractionGap(
   return mapRowToCoverageEntry(row);
 }
 
+/**
+ * Returns an aggregate summary of the extractor coverage ledger.
+ * Used by `chomp ledger` to display resolution progress and breakdown by status,
+ * framework, and impact level.
+ */
 export function getLedgerSummary(db: Database.Database): LedgerSummary {
   const totalRow = db
     .prepare('SELECT COUNT(*) as count FROM extractor_coverage_ledger')
@@ -213,6 +245,10 @@ export function getLedgerSummary(db: Database.Database): LedgerSummary {
   };
 }
 
+/**
+ * Returns all ledger entries ordered by most recently created first.
+ * Used by `chomp ledger` to render the full coverage table.
+ */
 export function getAllLedgerEntries(
   db: Database.Database
 ): ExtractorCoverageEntry[] {

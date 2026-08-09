@@ -1,3 +1,6 @@
+// packages/cli/src/index.ts
+// Chomp CLI entry point. Defines the 'analyze' and 'ledger' commands using commander.
+
 import { existsSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { Command } from "commander";
@@ -11,6 +14,12 @@ import {
   StructuralEntity,
 } from "@chomp/core";
 
+/**
+ * Walks up the directory tree from startDir until it finds a directory containing
+ * pnpm-workspace.yaml. Returns that directory as the monorepo root.
+ *
+ * Falls back to startDir if no workspace root is found (e.g. running outside the monorepo).
+ */
 function findWorkspaceRoot(startDir: string): string {
   let current = startDir;
   while (current !== dirname(current)) {
@@ -22,6 +31,12 @@ function findWorkspaceRoot(startDir: string): string {
   return startDir;
 }
 
+/**
+ * Resolves the SQLite database path.
+ *
+ * If --db is passed explicitly, it is resolved relative to the invocation directory.
+ * Otherwise, defaults to the canonical workspace database at apps/backend/data/chomp.db.
+ */
 function resolveDbPath(baseDir: string, optionDb?: string): string {
   if (optionDb) {
     return resolve(baseDir, optionDb);
@@ -32,6 +47,9 @@ function resolveDbPath(baseDir: string, optionDb?: string): string {
 
 const program = new Command();
 
+// ─── analyze command ────────────────────────────────────────────────────────
+// Runs the extraction pipeline on a repo, persists the graph to SQLite,
+// and prints a summary table of all extracted structural entities.
 program
   .name("chomp")
   .description("Chomp CLI - Software Representation Engine")
@@ -92,6 +110,9 @@ program
     console.table(summaryTable);
   });
 
+// ─── ledger command ─────────────────────────────────────────────────────────
+// Reads the extractor_coverage_ledger table and prints a breakdown of
+// unhandled AST patterns by status, framework, and impact level.
 program
   .command("ledger")
   .description("Display the extractor coverage ledger from chomp.db")

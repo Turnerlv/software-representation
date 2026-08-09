@@ -1,3 +1,6 @@
+// packages/core/src/extractor/index.ts
+// Extraction orchestrator — walks source files, dispatches to visitors, and assembles the RepresentationGraph.
+
 import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
@@ -12,6 +15,15 @@ import { visitContract } from './visitors/contractVisitor.js';
 import { visitRelationship } from './visitors/relationshipVisitor.js';
 import { visitOpenConnector } from './visitors/openConnectorVisitor.js';
 
+/**
+ * Recursively collects all TypeScript and JavaScript source files under the given path.
+ *
+ * Skips node_modules, .git, dist, and build directories automatically.
+ * If targetPath points to a single file, that file is returned directly.
+ *
+ * @param targetPath  Absolute or relative path to a file or directory.
+ * @returns Sorted list of absolute file paths to analyze.
+ */
 export function collectFiles(targetPath: string): string[] {
   const absolutePath = path.resolve(targetPath);
   if (!fs.existsSync(absolutePath)) {
@@ -55,6 +67,11 @@ export function collectFiles(targetPath: string): string[] {
 /**
  * Produces a deterministic, stable 12-char hex ID for a structural entity.
  * Stable across re-runs of the same repo as long as the entity's type, file, and name don't change.
+ *
+ * Formula: SHA-256(`${type}:${filePath}:${name}`).slice(0, 12)
+ *
+ * Collision risk is negligible at 12 hex chars (48 bits of hash space) for the expected
+ * entity counts of any single repository analysis run.
  */
 function stableEntityId(filePath: string, type: string, name: string): string {
   return createHash('sha256')
@@ -63,6 +80,19 @@ function stableEntityId(filePath: string, type: string, name: string): string {
     .slice(0, 12);
 }
 
+/**
+ * Core extraction entry point. Walks every source file in targetPath and passes
+ * each AST node through all four primitive visitors in a single traversal pass.
+ *
+ * Visitor pattern:
+ * - Each visitor receives a no-op `nextId` closure. Returned entities have their IDs
+ *   replaced immediately by stableEntityId() before being pushed to the result arrays.
+ * - All four visitors are called for every node — null returns are skipped cheaply.
+ * - ts.forEachChild recurses the full AST tree depth-first.
+ *
+ * @param targetPath  Path to a file or directory to analyze.
+ * @returns A RepresentationGraph with all four primitive arrays populated.
+ */
 export function analyzeTarget(targetPath: string): RepresentationGraph {
   const files = collectFiles(targetPath);
 
