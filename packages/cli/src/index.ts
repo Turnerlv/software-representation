@@ -22,6 +22,14 @@ function findWorkspaceRoot(startDir: string): string {
   return startDir;
 }
 
+function resolveDbPath(baseDir: string, optionDb?: string): string {
+  if (optionDb) {
+    return resolve(baseDir, optionDb);
+  }
+  const workspaceRoot = findWorkspaceRoot(baseDir);
+  return resolve(workspaceRoot, "apps/backend/data/chomp.db");
+}
+
 const program = new Command();
 
 program
@@ -29,7 +37,8 @@ program
   .description("Chomp CLI - Software Representation Engine")
   .command("analyze <path>")
   .description("Analyze a TypeScript/JavaScript source file or directory")
-  .action((inputPath: string) => {
+  .option("--db <path>", "Path to SQLite database file (default: apps/backend/data/chomp.db)")
+  .action((inputPath: string, options: { db?: string }) => {
     const baseDir = process.env.INIT_CWD ?? process.cwd();
     const targetPath = resolve(baseDir, inputPath);
 
@@ -41,8 +50,7 @@ program
     console.log(`Analyzing structural entities in: ${targetPath}...`);
     const graph = analyzeTarget(targetPath);
 
-    const workspaceRoot = findWorkspaceRoot(baseDir);
-    const dbPath = resolve(workspaceRoot, "apps/backend/data/chomp.db");
+    const dbPath = resolveDbPath(baseDir, options.db);
     const db = initDatabase(dbPath);
 
     const repoInfo = {
@@ -87,13 +95,10 @@ program
 program
   .command("ledger")
   .description("Display the extractor coverage ledger from chomp.db")
-  .option("--db <path>", "Path to SQLite database file")
+  .option("--db <path>", "Path to SQLite database file (default: apps/backend/data/chomp.db)")
   .action((options: { db?: string }) => {
     const baseDir = process.env.INIT_CWD ?? process.cwd();
-    const workspaceRoot = findWorkspaceRoot(baseDir);
-    const dbPath = options.db
-      ? resolve(baseDir, options.db)
-      : resolve(workspaceRoot, "apps/backend/data/chomp.db");
+    const dbPath = resolveDbPath(baseDir, options.db);
 
     if (!existsSync(dbPath)) {
       console.log(`Database file not found at: ${dbPath}`);

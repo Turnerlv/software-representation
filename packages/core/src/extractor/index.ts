@@ -1,7 +1,7 @@
+import { createHash } from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import ts from 'typescript';
-import { createSourceFile } from '../index.js';
 import {
   EvidenceRecord,
   RepresentationGraph,
@@ -52,6 +52,17 @@ export function collectFiles(targetPath: string): string[] {
   return files;
 }
 
+/**
+ * Produces a deterministic, stable 12-char hex ID for a structural entity.
+ * Stable across re-runs of the same repo as long as the entity's type, file, and name don't change.
+ */
+function stableEntityId(filePath: string, type: string, name: string): string {
+  return createHash('sha256')
+    .update(`${type}:${filePath}:${name}`)
+    .digest('hex')
+    .slice(0, 12);
+}
+
 export function analyzeTarget(targetPath: string): RepresentationGraph {
   const files = collectFiles(targetPath);
 
@@ -60,11 +71,9 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
   const relationships: StructuralEntity[] = [];
   const openConnectors: StructuralEntity[] = [];
 
-  let entityCounter = 1;
-
   for (const filePath of files) {
     const sourceText = fs.readFileSync(filePath, 'utf8');
-    const sourceFile = createSourceFile(
+    const sourceFile = ts.createSourceFile(
       filePath,
       sourceText,
       ts.ScriptTarget.Latest,
@@ -87,41 +96,27 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
     }
 
     function visit(node: ts.Node) {
-      const boundaryEntity = visitBoundary(
-        node,
-        getEvidence,
-        () => `b_${entityCounter++}`
-      );
+      const boundaryEntity = visitBoundary(node, getEvidence, () => '');
       if (boundaryEntity) {
+        boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
         boundaries.push(boundaryEntity);
       }
 
-      const contractEntity = visitContract(
-        node,
-        getEvidence,
-        () => `c_${entityCounter++}`
-      );
+      const contractEntity = visitContract(node, getEvidence, () => '');
       if (contractEntity) {
+        contractEntity.id = stableEntityId(relativePath, contractEntity.type, contractEntity.name);
         contracts.push(contractEntity);
       }
 
-      const relationshipEntity = visitRelationship(
-        node,
-        sourceFile,
-        getEvidence,
-        () => `r_${entityCounter++}`
-      );
+      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '');
       if (relationshipEntity) {
+        relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
         relationships.push(relationshipEntity);
       }
 
-      const openConnectorEntity = visitOpenConnector(
-        node,
-        sourceFile,
-        getEvidence,
-        () => `oc_${entityCounter++}`
-      );
+      const openConnectorEntity = visitOpenConnector(node, sourceFile, getEvidence, () => '');
       if (openConnectorEntity) {
+        openConnectorEntity.id = stableEntityId(relativePath, openConnectorEntity.type, openConnectorEntity.name);
         openConnectors.push(openConnectorEntity);
       }
 

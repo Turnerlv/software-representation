@@ -70,11 +70,14 @@ The structural model is built around **3 Structural Primitives + Open Connectors
 ```
 chomp/
 ├── packages/
-│   └── core/            # AST parsers (tree-sitter / TS compiler), ontology schemas, extraction engine
+│   ├── core/            # AST parsers (TS compiler API), ontology schemas, extraction engine
+│   └── cli/             # Local CLI ('chomp analyze') for running extraction on repos
 ├── apps/
-│   ├── cli/             # Local CLI ('chomp analyze') for running extraction on repos
 │   ├── backend/         # Node.js / Express REST API, JWT auth, PostgreSQL / SQLite graph persistence
 │   └── frontend/        # Next.js Explorer UI (Interactive graph view & evidence traceability)
+├── fixtures/
+│   ├── test-repos/      # Committed minimal fixtures for unit tests
+│   └── cloned-repos/    # Git-ignored real-world repos cloned for research (not committed)
 └── .context/            # Thesis ledgers, architecture PDFs, project specs
 ```
 
@@ -121,3 +124,53 @@ chomp/
 1. **Ontology Isolation:** Core Ontology (`packages/core/src/types/ontology.ts`) must never import from Ledger, CLI tools, or external system modules.
 2. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
 3. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
+
+---
+
+## 9. Research Workflow — Cloning & Evaluating Open-Source Repos
+
+This is the standard cycle for expanding extractor coverage using real-world repositories. Each step maps to a specific skill or tool.
+
+```
+[Clone Repo] → [Run analyze] → [Inspect output] → [Eval gaps] → [Build fix] → [Re-run analyze] → [Confirm]
+```
+
+### Step-by-step
+
+**Step 1 — Clone a target repo**
+```bash
+git clone <repo-url> fixtures/cloned-repos/<repo-name>
+```
+Cloned repos are git-ignored. They never get committed.
+
+**Step 2 — Run extraction into an isolated DB**
+```bash
+# Always use --db to keep research runs isolated from the main chomp.db
+pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
+```
+
+**Step 3 — Inspect output**
+```bash
+pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
+```
+Review the console table. Note entity counts per primitive type and any obvious missing patterns.
+
+**Step 4 — Run gap analysis (invoke `parser-eval-harness` skill)**
+Point an agent at the specific files where gaps are suspected (use the framework triage strategy in the skill). The agent will log gaps into the ledger using `logExtractionGap`.
+
+**Step 5 — Build the fix (invoke `parser-builder` skill)**
+For each `HIGH` or `MEDIUM` gap: implement a new or updated visitor in `packages/core/src/extractor/visitors/`. Write a unit test. Mark the ledger entry `RESOLVED`.
+
+**Step 6 — Re-run extraction and confirm improvement**
+```bash
+pnpm test --filter @chomp/core
+pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
+pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
+```
+Verify the entity count increased and no regressions were introduced.
+
+### Rules for research sessions
+- One repo at a time. Finish the eval-build-verify loop before moving to the next.
+- All gaps, even LOW-impact ones, must be logged before closing a session.
+- Do NOT commit cloned repos or `.db` files from research runs.
+- Run `pnpm test --filter @chomp/core` before and after every visitor change.

@@ -68,10 +68,16 @@ prisma/generated/
 # Lock files (pnpm-lock.yaml is the canonical lock — ignore others)
 package-lock.json
 yarn.lock
+# Nested package-lock.json files from accidental npm install inside workspace packages
+packages/*/package-lock.json
+apps/*/package-lock.json
 
 # Cloned Target Repositories for Local Parser Tests
+# Track the README but ignore the actual cloned repos and their generated DBs
+/fixtures/cloned-repos/*/
+/fixtures/cloned-repos/*.db
+/fixtures/cloned-repos/*.db-journal
 /fixtures/test-repos/
-/fixtures/cloned-repos/
 
 # project context and instructions
 .context/
