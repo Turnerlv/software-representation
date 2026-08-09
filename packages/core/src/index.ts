@@ -34,3 +34,7 @@ export function createSourceFile(
     scriptKind,
   );
 }
+
+export * from './types.js';
+export * from './db/index.js';
+export * from './extractor.js';

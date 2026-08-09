@@ -71,7 +71,7 @@ yarn.lock
 
 # Cloned Target Repositories for Local Parser Tests
 /fixtures/test-repos/
-/cloned-repos/
+/fixtures/cloned-repos/
 
 # project context and instructions
 .context/
