@@ -4,9 +4,13 @@ import path from 'node:path';
 import { test } from 'node:test';
 import { RepresentationGraph } from '../types.js';
 import {
+  getAllLedgerEntries,
+  getLedgerSummary,
   getRepresentationGraph,
   initDatabase,
+  logExtractionGap,
   RepositoryInfo,
+  resolveExtractionGap,
   saveRepresentationGraph,
 } from './index.js';
 
@@ -20,6 +24,7 @@ test('initDatabase defaults to :memory: and creates tables', () => {
   assert.ok(tableNames.includes('repositories'));
   assert.ok(tableNames.includes('structural_entities'));
   assert.ok(tableNames.includes('evidence_records'));
+  assert.ok(tableNames.includes('extractor_coverage_ledger'));
   db.close();
 });
 
@@ -107,6 +112,90 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
   db.close();
 });
 
+test('extractor_coverage_ledger logExtractionGap, resolveExtractionGap, and getLedgerSummary', () => {
+  const db = initDatabase();
+
+  const initialSummary = getLedgerSummary(db);
+  assert.strictEqual(initialSummary.totalPatterns, 0);
+  assert.strictEqual(initialSummary.resolvedCount, 0);
+  assert.strictEqual(initialSummary.resolvedPercentage, 0);
+
+  const gap1 = logExtractionGap(db, {
+    id: 'gap-express-1',
+    patternName: 'Express App Router Mount',
+    framework: 'Express',
+    impactLevel: 'HIGH',
+    evidenceRepo: 'fixtures/cloned-repos/express-sample',
+    evidenceFile: 'src/routes/user.ts',
+    evidenceLine: 15,
+    evidenceSnippet: 'app.use("/user", userRouter);',
+  });
+
+  assert.strictEqual(gap1.id, 'gap-express-1');
+  assert.strictEqual(gap1.patternName, 'Express App Router Mount');
+  assert.strictEqual(gap1.framework, 'Express');
+  assert.strictEqual(gap1.status, 'DISCOVERED');
+  assert.strictEqual(gap1.impactLevel, 'HIGH');
+  assert.strictEqual(gap1.evidenceRepo, 'fixtures/cloned-repos/express-sample');
+  assert.strictEqual(gap1.evidenceFile, 'src/routes/user.ts');
+  assert.strictEqual(gap1.evidenceLine, 15);
+  assert.strictEqual(gap1.evidenceSnippet, 'app.use("/user", userRouter);');
+
+  const gap2 = logExtractionGap(db, {
+    pattern_name: 'NextJS Server Action',
+    framework: 'Next.js',
+    evidence_repo: 'fixtures/cloned-repos/next-sample',
+    evidence_file: 'app/actions.ts',
+  });
+
+  assert.ok(gap2.id);
+  assert.strictEqual(gap2.patternName, 'NextJS Server Action');
+  assert.strictEqual(gap2.framework, 'Next.js');
+  assert.strictEqual(gap2.status, 'DISCOVERED');
+  assert.strictEqual(gap2.impactLevel, 'MEDIUM');
+
+  let summary = getLedgerSummary(db);
+  assert.strictEqual(summary.totalPatterns, 2);
+  assert.strictEqual(summary.resolvedCount, 0);
+  assert.strictEqual(summary.resolvedPercentage, 0);
+  assert.strictEqual(summary.byStatus.DISCOVERED, 2);
+  assert.strictEqual(summary.byFramework['Express'], 1);
+  assert.strictEqual(summary.byFramework['Next.js'], 1);
+
+  const resolvedGap = resolveExtractionGap(db, 'gap-express-1', {
+    fixLocation: 'packages/core/src/extractors/express.ts:45',
+    fixPatternSummary: 'Added visitor for app.use router mounting',
+    testFixturePath: 'fixtures/unit/express.test.ts',
+  });
+
+  assert.ok(resolvedGap);
+  assert.strictEqual(resolvedGap?.status, 'RESOLVED');
+  assert.strictEqual(
+    resolvedGap?.fixLocation,
+    'packages/core/src/extractors/express.ts:45'
+  );
+  assert.strictEqual(
+    resolvedGap?.fixPatternSummary,
+    'Added visitor for app.use router mounting'
+  );
+  assert.strictEqual(
+    resolvedGap?.testFixturePath,
+    'fixtures/unit/express.test.ts'
+  );
+
+  summary = getLedgerSummary(db);
+  assert.strictEqual(summary.totalPatterns, 2);
+  assert.strictEqual(summary.resolvedCount, 1);
+  assert.strictEqual(summary.resolvedPercentage, 50);
+  assert.strictEqual(summary.byStatus.RESOLVED, 1);
+  assert.strictEqual(summary.byStatus.DISCOVERED, 1);
+
+  const entries = getAllLedgerEntries(db);
+  assert.strictEqual(entries.length, 2);
+
+  db.close();
+});
+
 test('initDatabase creates directory for file-backed database', () => {
   const testDbDir = path.join(process.cwd(), 'temp_test_data_spec');
   const testDbPath = path.join(testDbDir, 'chomp.db');
@@ -121,3 +210,4 @@ test('initDatabase creates directory for file-backed database', () => {
   db.close();
   fs.rmSync(testDbDir, { recursive: true, force: true });
 });
+
