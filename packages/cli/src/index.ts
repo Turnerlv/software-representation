@@ -13,7 +13,7 @@ program
   .command("analyze <path>")
   .description("Analyze a TypeScript source file")
   .action((inputPath: string) => {
-    const filePath = resolve(process.cwd(), inputPath);
+    const filePath = resolve(process.env.INIT_CWD ?? process.cwd(), inputPath);
     const sourceText = readFileSync(filePath, "utf8");
     const sourceFile = createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
 
