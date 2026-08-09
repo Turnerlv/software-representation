@@ -4,8 +4,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "lint": "turbo run lint"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
