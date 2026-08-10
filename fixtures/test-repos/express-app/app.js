@@ -48,3 +48,6 @@ app.get('/redirect', (req, res) => {
 });
 
 module.exports = app;
+
+app.init = function() {};
+app['delete'] = function() {};
