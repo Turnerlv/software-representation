@@ -64,4 +64,70 @@ test('analyzeTarget does NOT emit false-positive OPEN_CONNECTORs for non-allowli
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-express-test-'));
+  const tmpFile = path.join(tmpDir, 'app.ts');
 
+  fs.writeFileSync(tmpFile, [
+    "const express = require('express');",
+    "const app = express();",
+    "app.get('/api/users', (req, res) => res.json([]));"
+  ].join('\n'));
+
+  const graph = analyzeTarget(tmpFile);
+
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Express Route: GET /api/users'),
+    'Expected to extract Express GET route as CONTRACT'
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-express-mount-test-'));
+  const tmpFile = path.join(tmpDir, 'app.ts');
+
+  fs.writeFileSync(tmpFile, [
+    "const express = require('express');",
+    "const app = express();",
+    "app.use('/api/v1', require('./routes/api'));",
+    "app.use('/api/v2', someRouter);"
+  ].join('\n'));
+
+  const graph = analyzeTarget(tmpFile);
+
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Express Mount: /api/v1 -> ./routes/api'),
+    'Expected to extract Express mount with require'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Express Mount: /api/v2 -> someRouter'),
+    'Expected to extract Express mount with identifier'
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-require-test-'));
+  const tmpFile = path.join(tmpDir, 'app.ts');
+
+  fs.writeFileSync(tmpFile, [
+    "const express = require('express');",
+    "require('./init');"
+  ].join('\n'));
+
+  const graph = analyzeTarget(tmpFile);
+
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Require: express'),
+    'Expected to extract require("express")'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Require: ./init'),
+    'Expected to extract require("./init")'
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
