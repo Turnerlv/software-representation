@@ -121,7 +121,7 @@
               "OPEN_CONNECTOR": 0
             }
           },
-          "gaps_logged": 0,
+          "gaps_logged": 2,
           "gaps_resolved": 0,
           "status": "IN_PROGRESS"
         }
