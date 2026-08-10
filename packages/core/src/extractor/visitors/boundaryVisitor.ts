@@ -37,5 +37,35 @@ export function visitBoundary(
       evidence: getEvidence(node),
     };
   }
+
+  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+    let isCjsExport = false;
+    let exportName = 'default';
+    
+    const left = node.left;
+    if (ts.isPropertyAccessExpression(left)) {
+      if (ts.isIdentifier(left.expression) && left.expression.text === 'module' && left.name.text === 'exports') {
+        isCjsExport = true;
+      } else if (ts.isPropertyAccessExpression(left.expression) && ts.isIdentifier(left.expression.expression) && left.expression.expression.text === 'module' && left.expression.name.text === 'exports') {
+        isCjsExport = true;
+        exportName = left.name.text;
+      } else if (ts.isIdentifier(left.expression) && left.expression.text === 'exports') {
+        isCjsExport = true;
+        exportName = left.name.text;
+      }
+    } else if (ts.isIdentifier(left) && left.text === 'exports') {
+      isCjsExport = true;
+    }
+    
+    if (isCjsExport) {
+      return {
+        id: nextId(),
+        name: `CJS Export: ${exportName}`,
+        type: 'BOUNDARY',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
   return null;
 }
