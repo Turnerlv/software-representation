@@ -74,3 +74,70 @@ export function extractExpressRouterMount(
 
   return null;
 }
+
+export function extractExpressRouteParameter(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    if (methodName === 'param' && node.arguments.length >= 2) {
+      const firstArg = node.arguments[0];
+      let paramName = 'Unknown';
+      if (ts.isStringLiteral(firstArg)) {
+        paramName = firstArg.text;
+      } else if (ts.isArrayLiteralExpression(firstArg)) {
+        paramName = firstArg.elements
+          .filter(ts.isStringLiteral)
+          .map(e => e.text)
+          .join(', ');
+      }
+
+      return {
+        id: nextId(),
+        name: `Express Param: ${paramName}`,
+        type: 'CONTRACT',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  return null;
+}
+
+export function extractExpressContentNegotiation(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    if (methodName === 'format' && node.arguments.length === 1) {
+      const arg = node.arguments[0];
+      if (ts.isObjectLiteralExpression(arg)) {
+        const types = arg.properties
+          .map(prop => {
+            if (ts.isPropertyAssignment(prop)) {
+              if (ts.isStringLiteral(prop.name)) {
+                return prop.name.text;
+              } else if (ts.isIdentifier(prop.name)) {
+                return prop.name.text;
+              }
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        return {
+          id: nextId(),
+          name: `Express Content Negotiation: ${types.join(', ')}`,
+          type: 'CONTRACT',
+          evidence: getEvidence(node),
+        };
+      }
+    }
+  }
+
+  return null;
+}

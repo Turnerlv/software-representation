@@ -3,7 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
-import { extractExpressRoute } from '../adapters/expressAdapter.js';
+import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation } from '../adapters/expressAdapter.js';
 import { extractEventEmitterContract } from './eventEmitterVisitor.js';
 
 /**
@@ -55,6 +55,12 @@ export function visitContract(
   
   const expressRoute = extractExpressRoute(node, getEvidence, nextId);
   if (expressRoute) return expressRoute;
+
+  const expressParam = extractExpressRouteParameter(node, getEvidence, nextId);
+  if (expressParam) return expressParam;
+
+  const expressContentNegotiation = extractExpressContentNegotiation(node, getEvidence, nextId);
+  if (expressContentNegotiation) return expressContentNegotiation;
 
   const eventEmitterContract = extractEventEmitterContract(node, getEvidence, nextId);
   if (eventEmitterContract) return eventEmitterContract;
