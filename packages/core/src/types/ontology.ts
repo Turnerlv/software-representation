@@ -65,10 +65,12 @@ export interface StructuralEntity {
  * Produced by analyzeTarget() and persisted to SQLite via saveRepresentationGraph().
  */
 export interface RepresentationGraph {
-  /** Schema version for forward-compatibility checks (e.g. "1.0.0"). */
+  /** The version of the extractor (@chomp/core) that generated this graph. */
   version: string;
   /** ISO-8601 timestamp of when this graph was generated. */
   analyzedAt: string;
+  /** The Git commit SHA of the analyzed repository, if known. */
+  commitSha?: string;
   /** Extracted BOUNDARY entities (classes, modules, namespaces, CJS exports). */
   boundaries: StructuralEntity[];
   /** Extracted CONTRACT entities (interfaces, type aliases, exported functions, Express routes, event listeners). */

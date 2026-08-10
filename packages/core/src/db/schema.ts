@@ -35,7 +35,9 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       path TEXT NOT NULL,
-      analyzed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      analyzed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      extractor_version TEXT,
+      commit_sha TEXT
     );
 
     CREATE TABLE IF NOT EXISTS structural_entities (
@@ -58,7 +60,8 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       line_number INTEGER,
       snippet TEXT,
       evidence_role TEXT,
-      FOREIGN KEY (entity_id) REFERENCES structural_entities(id) ON DELETE CASCADE
+      FOREIGN KEY (entity_id) REFERENCES structural_entities(id) ON DELETE CASCADE,
+      UNIQUE(entity_id, file_path, line_number, evidence_role)
     );
 
     CREATE TABLE IF NOT EXISTS extractor_coverage_ledger (
@@ -84,6 +87,9 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) {}
+  try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) {}
 
   return db;
 }

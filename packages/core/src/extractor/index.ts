@@ -93,7 +93,11 @@ export function stableEntityId(filePath: string, type: string, name: string): st
  * @param targetPath  Path to a file or directory to analyze.
  * @returns A RepresentationGraph with all four primitive arrays populated.
  */
-export function analyzeTarget(targetPath: string): RepresentationGraph {
+export function analyzeTarget(
+  targetPath: string,
+  extractorVersion: string = '1.0.0',
+  commitSha?: string
+): RepresentationGraph {
   const files = collectFiles(targetPath);
 
   const boundaries: StructuralEntity[] = [];
@@ -172,8 +176,9 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
   }
 
   return {
-    version: '1.0.0',
+    version: extractorVersion,
     analyzedAt: new Date().toISOString(),
+    commitSha,
     boundaries,
     contracts,
     relationships,

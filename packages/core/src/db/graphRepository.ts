@@ -16,7 +16,13 @@ export interface RepositoryInfo {
   name: string;
   /** Absolute path to the repo root on disk. */
   path: string;
+  /** Version of @chomp/core that extracted this representation. */
+  extractorVersion?: string;
+  /** Git commit SHA of the repository state at extraction time. */
+  commitSha?: string;
 }
+
+import { createHash } from 'crypto';
 
 /**
  * Persists a RepresentationGraph to the database under the given repository.
@@ -36,13 +42,15 @@ export function saveRepresentationGraph(
 ): void {
   const saveTx = db.transaction(() => {
     db.prepare(`
-      INSERT INTO repositories (id, name, path, analyzed_at)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO repositories (id, name, path, analyzed_at, extractor_version, commit_sha)
+      VALUES (?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         name = excluded.name,
         path = excluded.path,
-        analyzed_at = excluded.analyzed_at
-    `).run(repo.id, repo.name, repo.path, graph.analyzedAt);
+        analyzed_at = excluded.analyzed_at,
+        extractor_version = excluded.extractor_version,
+        commit_sha = excluded.commit_sha
+    `).run(repo.id, repo.name, repo.path, graph.analyzedAt, repo.extractorVersion ?? null, repo.commitSha ?? null);
 
     db.prepare('DELETE FROM structural_entities WHERE repository_id = ?').run(
       repo.id
@@ -65,7 +73,6 @@ export function saveRepresentationGraph(
       ...graph.openConnectors,
     ];
 
-    let counter = 1;
     for (const entity of allEntities) {
       const globalEntityId = `${repo.id}:${entity.id}`;
       insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null);
@@ -73,7 +80,9 @@ export function saveRepresentationGraph(
       const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
       for (const ev of evidences) {
         if (ev) {
-          const evidenceId = `ev_${repo.id}_${entity.id}_${counter++}`;
+          const evidenceHashInput = `${globalEntityId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
+          const evidenceHash = createHash('sha256').update(evidenceHashInput).digest('hex').slice(0, 16);
+          const evidenceId = `ev_${evidenceHash}`;
           insertEvidence.run(
             evidenceId,
             globalEntityId,
@@ -104,9 +113,9 @@ export function getRepresentationGraph(
   repoId: string
 ): RepresentationGraph | null {
   const repoRow = db
-    .prepare('SELECT id, name, path, analyzed_at FROM repositories WHERE id = ?')
+    .prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories WHERE id = ?')
     .get(repoId) as
-    | { id: string; name: string; path: string; analyzed_at: string }
+    | { id: string; name: string; path: string; analyzed_at: string; extractor_version: string | null; commit_sha: string | null }
     | undefined;
 
   if (!repoRow) {
@@ -200,12 +209,18 @@ export function getRepresentationGraph(
     }
   }
 
-  return {
-    version: '1.0.0',
+  const result: RepresentationGraph = {
+    version: repoRow.extractor_version ?? '1.0.0',
     analyzedAt: repoRow.analyzed_at,
     boundaries,
     contracts,
     relationships,
     openConnectors,
   };
+
+  if (repoRow.commit_sha) {
+    result.commitSha = repoRow.commit_sha;
+  }
+
+  return result;
 }

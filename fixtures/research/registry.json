@@ -186,6 +186,16 @@
         "Added INFERRED and DETERMINISTIC status and confidence levels",
         "Updated relationshipVisitor to detect method calls and verify cross-file exports for confidence levels"
       ]
+    },
+    {
+      "id": "2026-08-10-db-provenance",
+      "date": "2026-08-10T22:58:00+08:00",
+      "summary_path": "fixtures/research/system-audits/2026-08-10-db-provenance.md",
+      "changes": [
+        "Added commitSha and extractorVersion to the RepresentationGraph and SQLite schema",
+        "Updated getRepresentationGraph and saveRepresentationGraph to handle provenance data",
+        "Modified evidence_records to use a content hash for primary key to deduplicate identical evidence records"
+      ]
     }
   ],
   "_schema": {
