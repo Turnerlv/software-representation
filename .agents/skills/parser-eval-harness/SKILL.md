@@ -26,7 +26,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
 | `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, `app.route`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`), aliased CommonJS module exports (`app.init = function()`), dynamic method assignments (`app[method] = function()`) |
 | `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router and middleware mounts (`app.use('/path', router)`, `app.use(middleware)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`), prototype mixins (e.g., `mixin(dest, src.prototype)`), inferred method calls |
-| `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`), Express responses (`res.sendFile`, `res.download`, `res.render`, `res.redirect`) |
+| `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`), Express responses (`res.sendFile`, `res.download`, `res.render`, `res.redirect`, `res.send`, `res.json`, `res.jsonp`, `res.sendStatus`) |
 
 If you see one of these patterns in the source and it IS in the `chomp analyze` output, it is working correctly — skip it.
 
@@ -105,7 +105,7 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] `twilio.messages.create(...)` / `sns.publish(...)` — notification services
 - [ ] `spawn(...)` / `exec(...)` from `child_process` — subprocess execution
 - [ ] `fs.readFile` / `fs.writeFile` on dynamic paths — filesystem I/O boundaries
-- [ ] `res.sendFile(...)` / `res.download(...)` / `res.render(...)` / `res.redirect(...)` — Express responses ✅ **Already handled by `expressAdapter.ts`**
+- [ ] `res.sendFile(...)` / `res.download(...)` / `res.render(...)` / `res.redirect(...)` / `res.send(...)` / `res.json(...)` / `res.jsonp(...)` / `res.sendStatus(...)` — Express responses ✅ **Already handled by `expressAdapter.ts`**
 
 ---
 
