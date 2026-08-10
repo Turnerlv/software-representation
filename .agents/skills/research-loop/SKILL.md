@@ -201,6 +201,12 @@ After all gaps are processed:
    <Agent fills in edge cases, surprises, deferred decisions, or patterns worth investigating next session>
    ```
 
+4b. **Reconcile Session Report File Paths:** Check the `## Gaps Discovered` and `## Build Plan` sections in `fixtures/research/sessions/<session_id>.md`. If the actual file created/modified during Stage 2 differs from the initial proposed path (e.g., `expressAdapter.ts` instead of `adapters/express/index.ts`), update those lines to reflect the exact target file path.
+
+4c. **Proactively Sync Parser Harness Documentation:** Update `.agents/skills/parser-eval-harness/SKILL.md`:
+   - In Section 1 (**What the Extractor Already Handles**), add any newly extracted AST patterns to the corresponding primitive row in the table.
+   - In Section 3 (**Pattern Checklist**), update the item for each resolved pattern to mark it with `✅ **Already handled by `<visitor/adapter filename>`**`.
+
 5. Update `registry.json`:
    - Set `entity_counts.after`
    - Set `gaps_resolved` count
