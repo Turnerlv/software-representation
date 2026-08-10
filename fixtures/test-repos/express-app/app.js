@@ -8,6 +8,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded());
 
 // Param loading
 app.param('user', (req, res, next, id) => {

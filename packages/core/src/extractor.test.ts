@@ -102,10 +102,10 @@ test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
     graph.relationships.some((r) => r.name === 'Express Mount: /users -> usersRouter'),
     'Expected to extract Express /users mount as RELATIONSHIP'
   );
-  assert.ok(
-    graph.relationships.some((r) => r.name === 'Express Mount: Root -> json()'),
-    'Expected to extract Express Root -> json() mount as RELATIONSHIP'
-  );
+    assert.ok(
+      graph.relationships.some((r) => r.name === 'Express Mount: Root -> express.json()'),
+      'Expected to extract Express Root -> express.json() mount as RELATIONSHIP'
+    );
 });
 
 test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {

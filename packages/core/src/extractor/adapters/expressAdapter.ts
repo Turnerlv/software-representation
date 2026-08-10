@@ -55,7 +55,11 @@ export function extractExpressRouterMount(
         } else if (ts.isIdentifier(targetNode.expression)) {
           target = `${targetNode.expression.text}()`;
         } else if (ts.isPropertyAccessExpression(targetNode.expression)) {
-          target = `${targetNode.expression.name.text}()`;
+          if (ts.isIdentifier(targetNode.expression.expression)) {
+            target = `${targetNode.expression.expression.text}.${targetNode.expression.name.text}()`;
+          } else {
+            target = `${targetNode.expression.name.text}()`;
+          }
         }
       } else if (ts.isIdentifier(targetNode)) {
         target = targetNode.text;
