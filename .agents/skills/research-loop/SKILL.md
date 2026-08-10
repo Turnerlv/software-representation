@@ -57,6 +57,11 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
    TSX_DISABLE_IPC=1 pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
    ```
    > **Note:** `TSX_DISABLE_IPC=1` is required to prevent an EPERM error from tsx's IPC pipe on macOS. Always include it.
+   > 
+   > **Operational Warnings:**
+   > - **Do NOT pipe** the output of `chomp analyze` (e.g., `| tail`). Doing so can cause an `EPIPE` error which silently aborts the SQLite transaction, leaving the DB un-updated.
+   > - `pnpm chomp` is explicitly mapped in `package.json`. Do not try to run `npx tsx`, `pnpm cli`, or other variants if `pnpm chomp` appears to fail initially.
+   > - The `--db` flag is mandatory. If omitted, the DB will save to a fallback path (`apps/backend/data/chomp.db`) instead of the targeted fixtures directory.
 
 4. Create a new session entry in `registry.json`:
    ```json
