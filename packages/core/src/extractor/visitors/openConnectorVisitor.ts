@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
+import { extractExpressResponseConnector } from '../adapters/expressAdapter.js';
 
 /**
  * Known HTTP / network client root identifiers.
@@ -84,6 +85,11 @@ export function visitOpenConnector(
 ): StructuralEntity | null {
   if (!ts.isCallExpression(node)) {
     return null;
+  }
+
+  const expressResponse = extractExpressResponseConnector(node, getEvidence, nextId);
+  if (expressResponse) {
+    return expressResponse;
   }
 
   const rootId = getRootIdentifier(node.expression);

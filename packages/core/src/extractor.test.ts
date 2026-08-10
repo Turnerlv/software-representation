@@ -97,6 +97,24 @@ test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
   );
 });
 
+test('analyzeTarget extracts Express Response Connectors (download, render, redirect)', () => {
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app');
+  const graph = analyzeTarget(fixtureDir);
+
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express File Response: download'),
+    'Expected to extract Express File Response: download as OPEN_CONNECTOR'
+  );
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express View Render'),
+    'Expected to extract Express View Render as OPEN_CONNECTOR'
+  );
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express Redirect'),
+    'Expected to extract Express Redirect as OPEN_CONNECTOR'
+  );
+});
+
 test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
   const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app', 'app.js');
   const graph = analyzeTarget(fixtureFile);

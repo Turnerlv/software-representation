@@ -205,19 +205,21 @@ export function extractExpressContentNegotiation(
 }
 
 /**
- * Extracts an Express file response (`res.sendFile(...)` or `res.download(...)`)
- * as an OPEN_CONNECTOR primitive entity representing a filesystem I/O boundary.
+ * Extracts an Express response boundary (file, render, redirect)
+ * as an OPEN_CONNECTOR primitive entity representing a structural boundary.
  *
  * Matches expressions like:
  * - `res.sendFile('/path/to/file')`
  * - `res.download('/path/to/file')`
+ * - `res.render('viewName')`
+ * - `res.redirect('/path')`
  *
  * @param node        The AST node to inspect.
  * @param getEvidence Callback returning an EvidenceRecord for the node.
  * @param nextId      Closure providing a placeholder entity ID.
- * @returns An OPEN_CONNECTOR StructuralEntity for the file response, or null if node does not match.
+ * @returns An OPEN_CONNECTOR StructuralEntity for the response, or null if node does not match.
  */
-export function extractExpressFileResponse(
+export function extractExpressResponseConnector(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
@@ -228,6 +230,20 @@ export function extractExpressFileResponse(
       return {
         id: nextId(),
         name: `Express File Response: ${methodName}`,
+        type: 'OPEN_CONNECTOR',
+        evidence: getEvidence(node),
+      };
+    } else if (methodName === 'render' && node.arguments.length >= 1) {
+      return {
+        id: nextId(),
+        name: `Express View Render`,
+        type: 'OPEN_CONNECTOR',
+        evidence: getEvidence(node),
+      };
+    } else if (methodName === 'redirect' && node.arguments.length >= 1) {
+      return {
+        id: nextId(),
+        name: `Express Redirect`,
         type: 'OPEN_CONNECTOR',
         evidence: getEvidence(node),
       };
