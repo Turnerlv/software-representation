@@ -24,7 +24,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 | Primitive | Currently Extracted Patterns |
 |---|---|
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
-| `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, etc. with a string path literal) |
+| `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`) |
 | `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router mounts (`app.use('/path', router)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`) |
 | `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`) |
 
@@ -75,6 +75,8 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 
 ### CONTRACT gaps (things that define a typed surface or route entry point)
 - [ ] Express `router.get('/path', handler)` / `app.post('/path', handler)` — route definitions ✅ **Already handled by `expressAdapter.ts`**
+- [ ] Express route parameters (`app.param`) ✅ **Already handled by `expressAdapter.ts`**
+- [ ] Express content negotiation (`res.format`) ✅ **Already handled by `expressAdapter.ts`**
 - [ ] NestJS `@Get('/path')`, `@Post('/path')` on a method — same idea
 - [ ] Next.js `export async function GET(request)` / `POST` etc. in `route.ts` files
 - [ ] `export const action = async (formData) => {}` — Next.js Server Actions

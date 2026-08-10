@@ -80,6 +80,14 @@ test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
     graph.contracts.some((c) => c.name === 'Express Route: GET /items'),
     'Expected to extract Express GET /items route from router as CONTRACT'
   );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Express Param: user'),
+    'Expected to extract Express Param: user as CONTRACT'
+  );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Express Content Negotiation: application/json, default'),
+    'Expected to extract Express Content Negotiation: application/json, default as CONTRACT'
+  );
 });
 
 test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
