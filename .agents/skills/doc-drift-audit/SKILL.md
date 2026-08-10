@@ -71,6 +71,11 @@ For each check below, note any mismatch. A mismatch = one issue entry.
 ### 2g. Guard Logic Assumptions
 - In `research-loop/SKILL.md` Step 2: confirm the guard compares `extractor_version` (not `pinned_commit`). If it compares `pinned_commit` alone, log it.
 
+### 2h. Operational Pitfalls
+- Ensure skills explicitly warn against piping `chomp analyze` output (e.g., `| tail`), which can cause `EPIPE` errors and prevent the DB from saving successfully.
+- Ensure skills clarify that `pnpm chomp` is the correct command, and warn against using incorrect variants like `pnpm cli analyze` or `npx tsx`.
+- Ensure skills explicitly instruct the use of the `--db` flag to avoid writing to the wrong default DB path.
+
 ---
 
 ## Stage 3 — Log Issues
