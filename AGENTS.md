@@ -115,7 +115,7 @@ chomp/
 1. **Preserve Documentation Integrity:** Maintain explicit references to line numbers and evidence sources.
 2. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
 3. **Schema Compliance:** All extracted structures must adhere to the 4 ontology primitives (`Boundaries`, `Contracts`, `Relationships`, `Open Connectors`).
-4. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes.
+4. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes. Tests must reference committed fixture files in `fixtures/test-repos/<framework>/` — never use inline `fs.writeFileSync` or temp directories. Each new framework adapter must have its own fixture directory.
 
 ---
 

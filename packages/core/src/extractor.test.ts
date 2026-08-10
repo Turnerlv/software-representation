@@ -65,69 +65,51 @@ test('analyzeTarget does NOT emit false-positive OPEN_CONNECTORs for non-allowli
 });
 
 test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-express-test-'));
-  const tmpFile = path.join(tmpDir, 'app.ts');
-
-  fs.writeFileSync(tmpFile, [
-    "const express = require('express');",
-    "const app = express();",
-    "app.get('/api/users', (req, res) => res.json([]));"
-  ].join('\n'));
-
-  const graph = analyzeTarget(tmpFile);
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app');
+  const graph = analyzeTarget(fixtureDir);
 
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Route: GET /api/users'),
-    'Expected to extract Express GET route as CONTRACT'
+    graph.contracts.some((c) => c.name === 'Express Route: GET /'),
+    'Expected to extract Express GET / route as CONTRACT'
   );
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Express Route: POST /login'),
+    'Expected to extract Express POST /login route as CONTRACT'
+  );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Express Route: GET /items'),
+    'Expected to extract Express GET /items route from router as CONTRACT'
+  );
 });
 
 test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-express-mount-test-'));
-  const tmpFile = path.join(tmpDir, 'app.ts');
-
-  fs.writeFileSync(tmpFile, [
-    "const express = require('express');",
-    "const app = express();",
-    "app.use('/api/v1', require('./routes/api'));",
-    "app.use('/api/v2', someRouter);"
-  ].join('\n'));
-
-  const graph = analyzeTarget(tmpFile);
+  const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app', 'app.js');
+  const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Express Mount: /api/v1 -> ./routes/api'),
-    'Expected to extract Express mount with require'
+    graph.relationships.some((r) => r.name === 'Express Mount: /api -> apiRouter'),
+    'Expected to extract Express /api mount as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Express Mount: /api/v2 -> someRouter'),
-    'Expected to extract Express mount with identifier'
+    graph.relationships.some((r) => r.name === 'Express Mount: /users -> usersRouter'),
+    'Expected to extract Express /users mount as RELATIONSHIP'
   );
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
 test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'chomp-require-test-'));
-  const tmpFile = path.join(tmpDir, 'app.ts');
-
-  fs.writeFileSync(tmpFile, [
-    "const express = require('express');",
-    "require('./init');"
-  ].join('\n'));
-
-  const graph = analyzeTarget(tmpFile);
+  const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app', 'app.js');
+  const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
     graph.relationships.some((r) => r.name === 'Require: express'),
-    'Expected to extract require("express")'
+    'Expected to extract require("express") as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Require: ./init'),
-    'Expected to extract require("./init")'
+    graph.relationships.some((r) => r.name === 'Require: ./routes/api'),
+    'Expected to extract require("./routes/api") as RELATIONSHIP'
   );
-
-  fs.rmSync(tmpDir, { recursive: true, force: true });
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Require: ./routes/users'),
+    'Expected to extract require("./routes/users") as RELATIONSHIP'
+  );
 });
