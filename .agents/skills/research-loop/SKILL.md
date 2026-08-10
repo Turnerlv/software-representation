@@ -241,3 +241,13 @@ After all gaps are processed:
    git push origin research/<repo-name>-<date>
    ```
    Remind the human to open a PR on GitHub with the session report path in the description.
+
+---
+
+## After the Session — Recommended Next Step
+
+Once the branch is merged, pushed, or skipped, invoke the **`doc-drift-audit`** skill.
+
+It will inspect what happened during this session — commands that needed workarounds, checklist items that are now stale, table names that were wrong — and log any issues to `fixtures/research/doc-drift-issues.md` without touching any source files.
+
+When you have a backlog of issues to flush, invoke **`doc-drift-fix`** in a clean session to apply them all to `main`.
