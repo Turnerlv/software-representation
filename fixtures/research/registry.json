@@ -211,15 +211,15 @@
               "OPEN_CONNECTOR": 87
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 83,
+              "CONTRACT": 460,
+              "RELATIONSHIP": 1415,
+              "OPEN_CONNECTOR": 114
             }
           },
           "gaps_logged": 2,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS"
+          "gaps_resolved": 2,
+          "status": "COMPLETE"
         },
         {
           "session_id": "2026-08-10-231907-express",

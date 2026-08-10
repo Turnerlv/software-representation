@@ -39,4 +39,12 @@ app.get('/download', (req, res) => {
   res.download('/tmp/file.pdf');
 });
 
+app.get('/view', (req, res) => {
+  res.render('index');
+});
+
+app.get('/redirect', (req, res) => {
+  res.redirect('/home');
+});
+
 module.exports = app;
