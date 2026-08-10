@@ -25,7 +25,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 |---|---|
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
 | `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`) |
-| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router mounts (`app.use('/path', router)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`) |
+| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router and middleware mounts (`app.use('/path', router)`, `app.use(middleware)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`) |
 | `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`) |
 
 If you see one of these patterns in the source and it IS in the `chomp analyze` output, it is working correctly — skip it.
@@ -85,7 +85,7 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] `EventEmitter.on('eventName', handler)` — event contracts ✅ **Already handled by `eventEmitterVisitor.ts`**
 
 ### RELATIONSHIP gaps (things that describe structural dependencies beyond `import`)
-- [ ] `app.use('/prefix', router)` — Express router mounting (hierarchical dependency) ✅ **Already handled by `expressAdapter.ts`**
+- [ ] `app.use('/prefix', router)` / `app.use(middleware)` — Express router and middleware mounting (hierarchical dependency) ✅ **Already handled by `expressAdapter.ts`**
 - [ ] `@Module({ imports: [OtherModule] })` — NestJS module dependency
 - [ ] `extends BaseClass` — class inheritance (currently not captured)
 - [ ] `Object.create(...)` / `Object.setPrototypeOf(...)` — prototypal inheritance ✅ **Already handled by `relationshipVisitor.ts`**
