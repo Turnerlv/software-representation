@@ -6,11 +6,11 @@
       "clone_cmd": "git clone https://github.com/expressjs/express.git fixtures/cloned-repos/express && git -C fixtures/cloned-repos/express checkout a3714473feb3d2908add734d340e7755fd85e0a3",
       "sessions": [
         {
-          "session_id": "2026-08-10-express",
-          "branch": "research/express-2026-08-10",
+          "session_id": "2026-08-10-162739-express",
+          "branch": "research/express-2026-08-10-162739",
           "date": "2026-08-10T16:27:39+08:00",
           "extractor_version": "0.0.0",
-          "report_path": "fixtures/research/sessions/2026-08-10-express.md",
+          "report_path": "fixtures/research/sessions/2026-08-10-162739-express.md",
           "entity_counts": {
             "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 82 },
             "after":  { "BOUNDARY": 0, "CONTRACT": 423, "RELATIONSHIP": 437, "OPEN_CONNECTOR": 82 }
@@ -24,8 +24,8 @@
   },
   "_schema": {
     "session": {
-      "session_id": "<YYYY-MM-DD>-<repo-name>",
-      "branch": "research/<repo-name>-<YYYY-MM-DD>",
+      "session_id": "<YYYY-MM-DD-HHMMSS>-<repo-name>",
+      "branch": "research/<repo-name>-<YYYY-MM-DD-HHMMSS>",
       "date": "<ISO date>",
       "extractor_version": "<packages/core version>",
       "report_path": "fixtures/research/sessions/<session_id>.md",
