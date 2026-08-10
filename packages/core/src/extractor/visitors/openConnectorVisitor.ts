@@ -63,6 +63,19 @@ function getRootIdentifier(expression: ts.Expression): string | null {
   return null;
 }
 
+/**
+ * Inspects a single AST node and returns an OPEN_CONNECTOR entity if it calls a known HTTP client,
+ * database driver, ORM, or message broker.
+ *
+ * Checks root object identifiers against allowlists (`HTTP_CLIENT_IDENTIFIERS` and `DB_CLIENT_IDENTIFIERS`).
+ * Prevents false positives by verifying root identifiers rather than matching arbitrary method names.
+ *
+ * @param node         The AST node to inspect.
+ * @param sourceFile   TypeScript SourceFile object used to extract expression text snippet.
+ * @param getEvidence  Returns a populated EvidenceRecord for the given node.
+ * @param nextId       Closure providing a placeholder entity ID.
+ * @returns An OPEN_CONNECTOR StructuralEntity or null if the node does not match any allowlisted client.
+ */
 export function visitOpenConnector(
   node: ts.Node,
   sourceFile: ts.SourceFile,

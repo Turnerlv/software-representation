@@ -14,12 +14,26 @@ import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorV
 /**
  * Inspects a single AST node and returns a RELATIONSHIP entity if it matches a known dependency pattern.
  *
+ * Currently handled patterns:
+ * - ImportDeclaration         (ES Module `import ... from '...'`)
+ * - CallExpression (require)   (CommonJS `require('...')`)
+ * - Express Router Mounts      (delegated to `extractExpressRouterMount`)
+ * - EventEmitter Emits         (delegated to `extractEventEmitterRelationship`)
+ * - Prototypal Inheritance     (`Object.create(...)`, `Object.setPrototypeOf(...)`)
+ * - Inferred Method Calls      (e.g. `userService.createUser()`) with 3-tier confidence classification:
+ *   - HIGH:   Root identifier matches a local ES import AND target exported method signature is verified.
+ *   - MEDIUM: Root identifier matches a local import, but target method export signature cannot be verified (or external module).
+ *   - LOW:    Root identifier does not match any local module import.
+ *
+ * Evidence chaining:
+ * - Populates multiple EvidenceRecords (`syntax-call`, `import-match`, `target-signature`) for verified inferred relationships.
+ *
  * @param node        The AST node to inspect.
  * @param sourceFile  Required to extract the module specifier text.
  * @param getEvidence Returns a populated EvidenceRecord for the given node.
  * @param nextId      Placeholder closure — replaced by stableEntityId() in the orchestrator.
- * @param repoRoot    The repository root for path resolution.
- * @param sourceId    The ID of the current enclosing boundary (e.g. file).
+ * @param repoRoot    The repository root for path resolution (defaults to empty string).
+ * @param sourceId    The ID of the current enclosing boundary file (defaults to empty string).
  * @returns A StructuralEntity or null if the node does not match any RELATIONSHIP pattern.
  */
 export function visitRelationship(

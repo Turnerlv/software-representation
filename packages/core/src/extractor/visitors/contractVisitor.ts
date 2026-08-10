@@ -10,13 +10,17 @@ import { extractEventEmitterContract } from './eventEmitterVisitor.js';
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
  *
  * Currently handled patterns:
- * - InterfaceDeclaration   (any named interface)
- * - TypeAliasDeclaration   (any named type alias)
- * - FunctionDeclaration    (named + exported only — unexported helpers are not contracts)
+ * - InterfaceDeclaration       (any named interface)
+ * - TypeAliasDeclaration       (any named type alias)
+ * - FunctionDeclaration        (named + exported only — unexported helpers are not contracts)
+ * - Express Route Definitions  (delegated to `extractExpressRoute`)
+ * - Express Route Parameters   (delegated to `extractExpressRouteParameter`)
+ * - Express Content Format     (delegated to `extractExpressContentNegotiation`)
+ * - EventEmitter Listeners     (delegated to `extractEventEmitterContract`)
  *
- * @param node      The AST node to inspect.
+ * @param node         The AST node to inspect.
  * @param getEvidence  Returns a populated EvidenceRecord for the given node.
- * @param nextId    Placeholder closure — replaced by stableEntityId() in the orchestrator.
+ * @param nextId       Placeholder closure — replaced by stableEntityId() in the orchestrator.
  * @returns A StructuralEntity or null if the node does not match any CONTRACT pattern.
  */
 export function visitContract(

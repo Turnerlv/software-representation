@@ -1,6 +1,18 @@
+// packages/core/src/extractor/visitors/eventEmitterVisitor.ts
+// Visitor functions for Node.js EventEmitter subscriber contracts and publisher relationships.
+
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 
+/**
+ * Extracts an EventEmitter subscriber call (`.on('event', fn)`, `.addListener(...)`, `.once(...)`)
+ * as a CONTRACT primitive entity.
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A CONTRACT StructuralEntity for the listener, or null if node does not match.
+ */
 export function extractEventEmitterContract(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
@@ -27,6 +39,15 @@ export function extractEventEmitterContract(
   return null;
 }
 
+/**
+ * Extracts an EventEmitter publisher call (`.emit('event', ...payload)`)
+ * as a RELATIONSHIP primitive entity.
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A RELATIONSHIP StructuralEntity for the event dispatch, or null if node does not match.
+ */
 export function extractEventEmitterRelationship(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,

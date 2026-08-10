@@ -1,3 +1,10 @@
+/**
+ * @file extractor.test.ts
+ * Suite of automated unit tests validating AST node parsing, file collection,
+ * primitive extraction (BOUNDARY, CONTRACT, RELATIONSHIP, OPEN_CONNECTOR), CommonJS/ESM
+ * handling, Express adapter rules, EventEmitter detection, and 3-tier inferred method calls.
+ */
+
 import assert from 'node:assert';
 import fs from 'node:fs';
 import os from 'node:os';

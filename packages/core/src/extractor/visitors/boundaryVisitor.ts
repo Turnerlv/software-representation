@@ -8,12 +8,13 @@ import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
  *
  * Currently handled patterns:
- * - ClassDeclaration  (named classes only)
- * - ModuleDeclaration (namespace/module blocks)
+ * - ClassDeclaration   (named classes only)
+ * - ModuleDeclaration  (namespace/module blocks)
+ * - BinaryExpression   (CommonJS module exports: `module.exports = ...`, `exports.name = ...`)
  *
- * @param node      The AST node to inspect.
+ * @param node         The AST node to inspect.
  * @param getEvidence  Returns a populated EvidenceRecord for the given node.
- * @param nextId    Closure that provides a placeholder ID — replaced by stableEntityId() in the orchestrator.
+ * @param nextId       Closure providing a placeholder ID — replaced by stableEntityId() in the orchestrator.
  * @returns A StructuralEntity or null if the node does not match any BOUNDARY pattern.
  */
 export function visitBoundary(

@@ -65,12 +65,16 @@ export interface StructuralEntity {
  * Produced by analyzeTarget() and persisted to SQLite via saveRepresentationGraph().
  */
 export interface RepresentationGraph {
-  /** Schema version for forward-compatibility checks. */
+  /** Schema version for forward-compatibility checks (e.g. "1.0.0"). */
   version: string;
   /** ISO-8601 timestamp of when this graph was generated. */
   analyzedAt: string;
+  /** Extracted BOUNDARY entities (classes, modules, namespaces, CJS exports). */
   boundaries: StructuralEntity[];
+  /** Extracted CONTRACT entities (interfaces, type aliases, exported functions, Express routes, event listeners). */
   contracts: StructuralEntity[];
+  /** Extracted RELATIONSHIP entities (imports, requires, router mounts, inheritance, inferred method calls). */
   relationships: StructuralEntity[];
+  /** Extracted OPEN_CONNECTOR entities (allowlisted HTTP client calls, DB/ORM queries, message brokers). */
   openConnectors: StructuralEntity[];
 }

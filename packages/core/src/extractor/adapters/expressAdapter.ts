@@ -1,8 +1,27 @@
+// packages/core/src/extractor/adapters/expressAdapter.ts
+// Framework-specific AST extraction adapter for Express.js route, mount, parameter, and content negotiation patterns.
+
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 
+/**
+ * Set of supported Express HTTP routing method names.
+ * Matched against method invocation identifiers (e.g. `app.get`, `router.post`).
+ */
 const EXPRESS_ROUTE_METHODS = new Set(['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all']);
 
+/**
+ * Extracts an Express route handler definition as a CONTRACT primitive entity.
+ *
+ * Matches expressions like:
+ * - `app.get('/path', handler)`
+ * - `router.post('/api/v1/users', controller.create)`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A CONTRACT StructuralEntity for the route, or null if node does not match.
+ */
 export function extractExpressRoute(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
@@ -28,6 +47,20 @@ export function extractExpressRoute(
   return null;
 }
 
+/**
+ * Extracts an Express router mount or middleware registration as a RELATIONSHIP primitive entity.
+ *
+ * Matches expressions like:
+ * - `app.use('/api', apiRouter)` -> `Express Mount: /api -> apiRouter`
+ * - `app.use(express.json())`     -> `Express Mount: Root -> express.json()`
+ * - `app.use(require('./routes'))` -> `Express Mount: Root -> ./routes`
+ *
+ * @param node        The AST node to inspect.
+ * @param sourceFile  TypeScript SourceFile object used for text extraction.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A RELATIONSHIP StructuralEntity for the mount, or null if node does not match.
+ */
 export function extractExpressRouterMount(
   node: ts.Node,
   sourceFile: ts.SourceFile,
@@ -79,6 +112,19 @@ export function extractExpressRouterMount(
   return null;
 }
 
+/**
+ * Extracts an Express route parameter trigger definition (`app.param(...)` or `router.param(...)`)
+ * as a CONTRACT primitive entity.
+ *
+ * Matches expressions like:
+ * - `app.param('user', (req, res, next, id) => { ... })`
+ * - `router.param(['id', 'page'], callback)`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A CONTRACT StructuralEntity for the route parameter, or null if node does not match.
+ */
 export function extractExpressRouteParameter(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
@@ -110,6 +156,18 @@ export function extractExpressRouteParameter(
   return null;
 }
 
+/**
+ * Extracts an Express content negotiation block (`res.format({ 'application/json': ... })`)
+ * as a CONTRACT primitive entity.
+ *
+ * Matches expressions like:
+ * - `res.format({ 'application/json': fn1, default: fn2 })`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A CONTRACT StructuralEntity for content negotiation, or null if node does not match.
+ */
 export function extractExpressContentNegotiation(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,

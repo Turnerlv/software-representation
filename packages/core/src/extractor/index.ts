@@ -116,6 +116,10 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
 
     const relativePath = path.relative(process.cwd(), filePath) || filePath;
 
+    /**
+     * Constructs a 1-indexed source evidence record for the given AST node.
+     * Truncates snippets to 80 characters and normalizes whitespace.
+     */
     function getEvidence(node: ts.Node): EvidenceRecord {
       const start = node.getStart(sourceFile);
       const { line } = sourceFile.getLineAndCharacterOfPosition(start);
@@ -129,6 +133,10 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
       };
     }
 
+    /**
+     * Traverses a single AST node through all primitive visitors in order.
+     * Replaces placeholder entity IDs with deterministic stableEntityId() before pushing to graph arrays.
+     */
     function visit(node: ts.Node) {
       const boundaryEntity = visitBoundary(node, getEvidence, () => '');
       if (boundaryEntity) {
