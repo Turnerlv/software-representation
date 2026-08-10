@@ -112,33 +112,15 @@ pnpm test --filter @chomp/core
 
 ## Research Workflow
 
-The standard loop for expanding extractor coverage against real-world repos:
+The standard loop for expanding extractor coverage against real-world repos uses the `research-loop` agent skill, tracking state in `fixtures/research/registry.json`.
 
 ```
-[Clone Repo] -> [Run analyze] -> [Eval gaps] -> [Inspect ledger] -> [Build fix] -> [Re-run] -> [Confirm]
+[Clone Repo] -> [Stage 0: Setup] -> [Stage 1: Eval gaps] -> [Stage 2: Build fixes] -> [Stage 3: Confirm & Record]
 ```
 
-```bash
-# Step 1 - Clone (repos are git-ignored)
-git clone <repo-url> fixtures/cloned-repos/<repo-name>
+Invoke the `research-loop` skill to run a guided session. The session runs on its own branch (e.g., `research/<repo-name>-<date>`).
 
-# Step 2 - Analyze into isolated DB
-# Extraction output (entities table) is printed inline
-pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
-
-# Step 3 - Gap analysis  -> parser-eval-harness skill
-# Agent inspects extraction output and logs gaps into the ledger
-
-# Step 4 - Inspect ledger (now populated with logged gaps)
-pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
-
-# Step 5 - Build fix     -> parser-builder skill
-# Step 6 - Confirm
-pnpm test --filter @chomp/core
-pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
-```
-
-See [AGENTS.md](./AGENTS.md) Section 9 for the full step-by-step rules.
+See [AGENTS.md](./AGENTS.md) Section 9 for the full rules and workflow details.
 
 ---
 

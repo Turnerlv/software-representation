@@ -129,47 +129,25 @@ chomp/
 
 ## 9. Research Workflow — Cloning & Evaluating Open-Source Repos
 
-This is the standard cycle for expanding extractor coverage using real-world repositories. Each step maps to a specific skill or tool.
+This is the standard cycle for expanding extractor coverage using real-world repositories. The process is orchestrated by the `research-loop` skill, which tracks sessions in `fixtures/research/registry.json`.
 
 ```
-[Clone Repo] → [Run analyze] → [Eval gaps] → [Inspect ledger] → [Build fix] → [Re-run analyze] → [Confirm]
+[Clone Repo] → [Stage 0: Setup] → [Stage 1: Eval gaps] → [Stage 2: Build fixes] → [Stage 3: Confirm & Record]
 ```
 
-### Step-by-step
+To run a research session:
+1. Ensure the target repo is registered in `fixtures/research/registry.json` and cloned to `fixtures/cloned-repos/<repo-name>`.
+2. Invoke the **`research-loop`** skill.
 
-**Step 1 — Clone a target repo**
-```bash
-git clone <repo-url> fixtures/cloned-repos/<repo-name>
-```
-Cloned repos are git-ignored. They never get committed.
-
-**Step 2 — Run extraction into an isolated DB**
-```bash
-# Always use --db to keep research runs isolated from the main chomp.db
-pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
-```
-
-**Step 3 — Run gap analysis (invoke `parser-eval-harness` skill)**
-Point an agent at the specific files where gaps are suspected (use the framework triage strategy in the skill). The agent will log gaps into the ledger using `logExtractionGap`.
-
-**Step 4 — Inspect ledger (now populated with logged gaps)**
-```bash
-pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
-```
-Review gap status, impact levels, and framework breakdown.
-
-**Step 5 — Build the fix (invoke `parser-builder` skill)**
-For each `HIGH` or `MEDIUM` gap: implement a new or updated visitor in `packages/core/src/extractor/visitors/`. Write a unit test. Mark the ledger entry `RESOLVED`.
-
-**Step 6 — Re-run extraction and confirm improvement**
-```bash
-pnpm test --filter @chomp/core
-pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
-pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
-```
-Verify the entity count increased and no regressions were introduced.
+The `research-loop` skill will automatically:
+- Create an isolated DB for the session
+- Branch off and manage commits for the research session
+- Invoke `parser-eval-harness` to find gaps
+- Prompt you to use `parser-builder` to build fixes for discovered gaps
+- Record final entity counts and gap metrics back to `registry.json`
 
 ### Rules for research sessions
+- The `research-loop` skill is the **only** entry point for starting a new research session. Do not run ad-hoc analyze commands against cloned repos.
 - One repo at a time. Finish the eval-build-verify loop before moving to the next.
 - All gaps, even LOW-impact ones, must be logged before closing a session.
 - Do NOT commit cloned repos or `.db` files from research runs.
