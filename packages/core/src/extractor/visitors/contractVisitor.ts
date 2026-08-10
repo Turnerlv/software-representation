@@ -5,6 +5,7 @@ import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation } from '../adapters/expressAdapter.js';
 import { extractEventEmitterContract } from './eventEmitterVisitor.js';
+import { extractCommonjsExport } from './commonjsExportVisitor.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -68,6 +69,9 @@ export function visitContract(
 
   const eventEmitterContract = extractEventEmitterContract(node, getEvidence, nextId);
   if (eventEmitterContract) return eventEmitterContract;
+
+  const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
+  if (cjsExport && cjsExport.type === 'CONTRACT') return cjsExport;
 
   return null;
 }

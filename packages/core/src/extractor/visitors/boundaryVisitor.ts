@@ -3,7 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
-
+import { extractCommonjsExport } from './commonjsExportVisitor.js';
 /**
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
  *
@@ -38,35 +38,8 @@ export function visitBoundary(
       evidence: getEvidence(node),
     };
   }
-
-  if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-    let isCjsExport = false;
-    let exportName = 'default';
-    
-    const left = node.left;
-    if (ts.isPropertyAccessExpression(left)) {
-      if (ts.isIdentifier(left.expression) && left.expression.text === 'module' && left.name.text === 'exports') {
-        isCjsExport = true;
-      } else if (ts.isPropertyAccessExpression(left.expression) && ts.isIdentifier(left.expression.expression) && left.expression.expression.text === 'module' && left.expression.name.text === 'exports') {
-        isCjsExport = true;
-        exportName = left.name.text;
-      } else if (ts.isIdentifier(left.expression) && left.expression.text === 'exports') {
-        isCjsExport = true;
-        exportName = left.name.text;
-      }
-    } else if (ts.isIdentifier(left) && left.text === 'exports') {
-      isCjsExport = true;
-    }
-    
-    if (isCjsExport) {
-      return {
-        id: nextId(),
-        name: `CJS Export: ${exportName}`,
-        type: 'BOUNDARY',
-        evidence: getEvidence(node),
-      };
-    }
-  }
+  const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
+  if (cjsExport && cjsExport.type === 'BOUNDARY') return cjsExport;
 
   return null;
 }

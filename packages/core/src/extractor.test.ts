@@ -159,6 +159,14 @@ test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
     graph.boundaries.some((b) => b.name === 'CJS Export: default'),
     'Expected to extract module.exports as BOUNDARY'
   );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'CJS Export: init'),
+    'Expected to extract app.init as CONTRACT'
+  );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Dynamic Export: app[method]'),
+    'Expected to extract dynamic method assignment as CONTRACT'
+  );
 });
 
 test('analyzeTarget extracts EventEmitter patterns', () => {
@@ -182,6 +190,10 @@ test('analyzeTarget extracts Object.create as RELATIONSHIP', () => {
   assert.ok(
     graph.relationships.some((r) => r.name === 'Inherits: http.IncomingMessage.prototype'),
     'Expected to extract Object.create as RELATIONSHIP'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Mixes: EventEmitter'),
+    'Expected to extract prototype mixin as RELATIONSHIP'
   );
 });
 

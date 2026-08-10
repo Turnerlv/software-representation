@@ -154,6 +154,26 @@ export function visitRelationship(
     };
   }
 
+  // Prototype Mixin (e.g. mixin(app, EventEmitter.prototype) or Object.assign(app, EventEmitter.prototype))
+  if (
+    ts.isCallExpression(node) &&
+    node.arguments.length >= 2 &&
+    ts.isPropertyAccessExpression(node.arguments[1]) &&
+    node.arguments[1].name.text === 'prototype'
+  ) {
+    return {
+      id: nextId(),
+      name: `Mixes: ${node.arguments[1].expression.getText(sourceFile)}`,
+      type: 'RELATIONSHIP',
+      sourceId,
+      status: 'DETERMINISTIC',
+      confidence: 'MEDIUM',
+      evidence: [
+        { ...getEvidence(node), evidenceRole: 'syntax-call' }
+      ],
+    };
+  }
+
   // Inferred Method Calls (e.g. userController.createUser())
   if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
     let rootIdentifier: ts.Identifier | null = null;
