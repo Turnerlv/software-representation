@@ -12,8 +12,18 @@
           "extractor_version": "0.0.0",
           "report_path": "fixtures/research/sessions/2026-08-10-162739-express.md",
           "entity_counts": {
-            "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 82 },
-            "after":  { "BOUNDARY": 0, "CONTRACT": 423, "RELATIONSHIP": 437, "OPEN_CONNECTOR": 82 }
+            "before": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 82
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 423,
+              "RELATIONSHIP": 437,
+              "OPEN_CONNECTOR": 82
+            }
           },
           "gaps_logged": 3,
           "gaps_resolved": 3,
@@ -26,12 +36,46 @@
           "extractor_version": "0.0.0",
           "report_path": "fixtures/research/sessions/2026-08-10-171034-express.md",
           "entity_counts": {
-            "before": { "BOUNDARY": 0, "CONTRACT": 423, "RELATIONSHIP": 437, "OPEN_CONNECTOR": 82 },
-            "after":  { "BOUNDARY": 0, "CONTRACT": 423, "RELATIONSHIP": 437, "OPEN_CONNECTOR": 82 }
+            "before": {
+              "BOUNDARY": 0,
+              "CONTRACT": 423,
+              "RELATIONSHIP": 437,
+              "OPEN_CONNECTOR": 82
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 423,
+              "RELATIONSHIP": 437,
+              "OPEN_CONNECTOR": 82
+            }
           },
           "gaps_logged": 3,
           "gaps_resolved": 3,
           "status": "COMPLETE"
+        },
+        {
+          "session_id": "2026-08-10-175537-express",
+          "branch": "research/express-2026-08-10-175537",
+          "date": "2026-08-10T17:55:37+08:00",
+          "extractor_version": "0.1.0",
+          "report_path": "fixtures/research/sessions/2026-08-10-175537-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 0,
+              "CONTRACT": 423,
+              "RELATIONSHIP": 437,
+              "OPEN_CONNECTOR": 82
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS"
         }
       ]
     }
@@ -44,8 +88,18 @@
       "extractor_version": "<packages/core version>",
       "report_path": "fixtures/research/sessions/<session_id>.md",
       "entity_counts": {
-        "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 },
-        "after":  { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 }
+        "before": {
+          "BOUNDARY": 0,
+          "CONTRACT": 0,
+          "RELATIONSHIP": 0,
+          "OPEN_CONNECTOR": 0
+        },
+        "after": {
+          "BOUNDARY": 0,
+          "CONTRACT": 0,
+          "RELATIONSHIP": 0,
+          "OPEN_CONNECTOR": 0
+        }
       },
       "gaps_logged": 0,
       "gaps_resolved": 0,
