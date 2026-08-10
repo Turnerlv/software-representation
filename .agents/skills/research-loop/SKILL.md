@@ -105,6 +105,20 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 8. Commit both `registry.json` and the session report stub to the branch:
    `research(<repo-name>): session <session_id> — setup`
 
+9. **Print to chat** — immediately after setup, output the following so the human can confirm the baseline before gap analysis begins:
+
+   > **Session `<session_id>` — Setup Complete**
+   > Branch: `research/<repo-name>-<YYYY-MM-DD-HHMMSS>`
+   >
+   > | Primitive | Before |
+   > |---|---|
+   > | BOUNDARY | `<n>` |
+   > | CONTRACT | `<n>` |
+   > | RELATIONSHIP | `<n>` |
+   > | OPEN_CONNECTOR | `<n>` |
+   >
+   > Proceeding to gap analysis...
+
 ---
 
 ## Stage 1 — Gap Analysis 🛑 HUMAN GATE
@@ -142,7 +156,9 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 5. Update `gaps_logged` in `registry.json` with the total count of DISCOVERED gaps.
 
-6. **STOP and explicitly print the full Research Brief to the chat (not just in the session file). Then ask:**
+6. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
+
+   Then ask:
    > "Gap analysis complete. Review the build plan above. Proceed to build fixes? (yes / skip / abort)"
    - `yes` → continue to Stage 2
    - `skip` → mark session `COMPLETE`, commit `registry.json`, push branch, exit
@@ -154,7 +170,14 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 For each `HIGH` or `MEDIUM` gap in the ledger (status = `DISCOVERED`), in order of impact:
 
-1. Display the gap details from the session report.
+1. **Print to chat** — output the full gap entry before asking:
+   ```
+   ### [<IMPACT>] <patternName>
+   - Evidence: <file>:<line> — <snippet>
+   - Missing primitive: <type>
+   - Proposed fix: <file>
+   - Rationale: <sentence>
+   ```
 2. **STOP and ask:**
    > "Build fix for '<patternName>'? (yes / skip)"
 3. If `yes`:
@@ -215,7 +238,9 @@ After all gaps are processed:
 6. Commit everything — session report + `registry.json` — with message:
    `research(<repo-name>): session <session_id> complete — see fixtures/research/sessions/<session_id>.md`
 
-7. **STOP and display the Outcome section to the human. Ask:**
+7. **🛑 PRINT TO CHAT — output the full Outcome section and Resolution Summary verbatim before asking anything.** The human must see the delta table and every resolved/deferred gap in the conversation without opening the session file.
+
+   Then ask:
    > "Session complete. How would you like to close this branch?"
    > - `merge` — push branch to remote (for backup), then merge into `main` locally with `--no-ff`
    > - `pr` — push branch to remote and stop; open a GitHub PR manually
