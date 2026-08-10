@@ -25,7 +25,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 |---|---|
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
 | `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`) |
-| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router and middleware mounts (`app.use('/path', router)`, `app.use(middleware)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`) |
+| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router and middleware mounts (`app.use('/path', router)`, `app.use(middleware)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`), inferred method calls |
 | `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`) |
 
 If you see one of these patterns in the source and it IS in the `chomp analyze` output, it is working correctly — skip it.
@@ -78,7 +78,7 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] Express route parameters (`app.param`) ✅ **Already handled by `expressAdapter.ts`**
 - [ ] Express content negotiation (`res.format`) ✅ **Already handled by `expressAdapter.ts`**
 - [ ] NestJS `@Get('/path')`, `@Post('/path')` on a method — same idea
-- [ ] Next.js `export async function GET(request)` / `POST` etc. in `route.ts` files
+- [ ] Next.js `export async function GET(request)` / `POST` etc. in `route.ts` files ✅ **Already handled by `contractVisitor.ts`**
 - [ ] `export const action = async (formData) => {}` — Next.js Server Actions
 - [ ] Zod/Yup/Joi schema declarations — typed validation schemas ARE contracts
 - [ ] `@ApiProperty()` / `@ApiResponse()` decorators (NestJS Swagger) — documented contracts
@@ -153,4 +153,4 @@ Before ending an eval session on a repo, confirm:
 - [ ] Every HIGH-impact gap has been logged with a line number and snippet.
 - [ ] Every MEDIUM-impact gap has been logged, even if the line number is approximate.
 - [ ] No duplicate ledger entries were created for patterns already in the ledger.
-- [ ] Run `TSX_DISABLE_IPC=1 pnpm chomp ledger` and confirm new entries appear with correct framework and status.
+- [ ] Run `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db` and confirm new entries appear with correct framework and status.
