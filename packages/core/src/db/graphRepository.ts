@@ -49,12 +49,12 @@ export function saveRepresentationGraph(
     );
 
     const insertEntity = db.prepare(`
-      INSERT INTO structural_entities (id, repository_id, name, type)
+      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type)
       VALUES (?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
-      INSERT INTO evidence_records (id, entity_id, file_path, line_number, snippet)
+      INSERT OR IGNORE INTO evidence_records (id, entity_id, file_path, line_number, snippet)
       VALUES (?, ?, ?, ?, ?)
     `);
 

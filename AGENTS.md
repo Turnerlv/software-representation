@@ -132,7 +132,7 @@ chomp/
 This is the standard cycle for expanding extractor coverage using real-world repositories. Each step maps to a specific skill or tool.
 
 ```
-[Clone Repo] → [Run analyze] → [Inspect output] → [Eval gaps] → [Build fix] → [Re-run analyze] → [Confirm]
+[Clone Repo] → [Run analyze] → [Eval gaps] → [Inspect ledger] → [Build fix] → [Re-run analyze] → [Confirm]
 ```
 
 ### Step-by-step
@@ -149,14 +149,14 @@ Cloned repos are git-ignored. They never get committed.
 pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
 ```
 
-**Step 3 — Inspect output**
+**Step 3 — Run gap analysis (invoke `parser-eval-harness` skill)**
+Point an agent at the specific files where gaps are suspected (use the framework triage strategy in the skill). The agent will log gaps into the ledger using `logExtractionGap`.
+
+**Step 4 — Inspect ledger (now populated with logged gaps)**
 ```bash
 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
 ```
-Review the console table. Note entity counts per primitive type and any obvious missing patterns.
-
-**Step 4 — Run gap analysis (invoke `parser-eval-harness` skill)**
-Point an agent at the specific files where gaps are suspected (use the framework triage strategy in the skill). The agent will log gaps into the ledger using `logExtractionGap`.
+Review gap status, impact levels, and framework breakdown.
 
 **Step 5 — Build the fix (invoke `parser-builder` skill)**
 For each `HIGH` or `MEDIUM` gap: implement a new or updated visitor in `packages/core/src/extractor/visitors/`. Write a unit test. Mark the ledger entry `RESOLVED`.

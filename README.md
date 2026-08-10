@@ -115,7 +115,7 @@ pnpm test --filter @chomp/core
 The standard loop for expanding extractor coverage against real-world repos:
 
 ```
-[Clone Repo] -> [Run analyze] -> [Inspect ledger] -> [Eval gaps] -> [Build fix] -> [Re-run] -> [Confirm]
+[Clone Repo] -> [Run analyze] -> [Eval gaps] -> [Inspect ledger] -> [Build fix] -> [Re-run] -> [Confirm]
 ```
 
 ```bash
@@ -123,12 +123,15 @@ The standard loop for expanding extractor coverage against real-world repos:
 git clone <repo-url> fixtures/cloned-repos/<repo-name>
 
 # Step 2 - Analyze into isolated DB
+# Extraction output (entities table) is printed inline
 pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
 
-# Step 3 - Inspect output
+# Step 3 - Gap analysis  -> parser-eval-harness skill
+# Agent inspects extraction output and logs gaps into the ledger
+
+# Step 4 - Inspect ledger (now populated with logged gaps)
 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db
 
-# Step 4 - Gap analysis  -> parser-eval-harness skill
 # Step 5 - Build fix     -> parser-builder skill
 # Step 6 - Confirm
 pnpm test --filter @chomp/core

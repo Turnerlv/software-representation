@@ -1,3 +1,4 @@
+#!/usr/bin/env tsx
 // packages/cli/src/index.ts
 // Chomp CLI entry point. Defines the 'analyze' and 'ledger' commands using commander.
 
