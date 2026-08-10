@@ -6,5 +6,21 @@
       "clone_cmd": "git clone https://github.com/expressjs/express.git fixtures/cloned-repos/express && git -C fixtures/cloned-repos/express checkout a3714473feb3d2908add734d340e7755fd85e0a3",
       "sessions": []
     }
+  },
+  "_schema": {
+    "session": {
+      "session_id": "<YYYY-MM-DD>-<repo-name>",
+      "branch": "research/<repo-name>-<YYYY-MM-DD>",
+      "date": "<ISO date>",
+      "extractor_version": "<packages/core version>",
+      "report_path": "fixtures/research/sessions/<session_id>.md",
+      "entity_counts": {
+        "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 },
+        "after":  { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 }
+      },
+      "gaps_logged": 0,
+      "gaps_resolved": 0,
+      "status": "IN_PROGRESS | COMPLETE"
+    }
   }
 }
