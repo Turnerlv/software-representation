@@ -222,17 +222,17 @@
           "status": "COMPLETE"
         },
         {
-          "session_id": "2026-08-10-231907-express",
-          "branch": "research/express-2026-08-10-231907",
-          "date": "2026-08-10T23:19:07+08:00",
-          "extractor_version": "0.1.6",
-          "report_path": "fixtures/research/sessions/2026-08-10-231907-express.md",
+          "session_id": "2026-08-10-233800-express",
+          "branch": "research/express-2026-08-10-233800",
+          "date": "2026-08-10T23:38:00+08:00",
+          "extractor_version": "0.1.7",
+          "report_path": "fixtures/research/sessions/2026-08-10-233800-express.md",
           "entity_counts": {
             "before": {
               "BOUNDARY": 83,
               "CONTRACT": 460,
               "RELATIONSHIP": 1415,
-              "OPEN_CONNECTOR": 87
+              "OPEN_CONNECTOR": 114
             },
             "after": {
               "BOUNDARY": 0,
