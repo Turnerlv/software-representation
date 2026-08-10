@@ -127,3 +127,17 @@ test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
     'Expected to extract module.exports as BOUNDARY'
   );
 });
+
+test('analyzeTarget extracts EventEmitter patterns', () => {
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'node-events');
+  const graph = analyzeTarget(fixtureDir);
+
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Event Listener: event'),
+    'Expected to extract EventEmitter.on as CONTRACT'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Event Emit: event'),
+    'Expected to extract EventEmitter.emit as RELATIONSHIP'
+  );
+});

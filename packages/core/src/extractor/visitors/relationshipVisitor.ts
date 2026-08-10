@@ -4,6 +4,7 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRouterMount } from '../adapters/expressAdapter.js';
+import { extractEventEmitterRelationship } from './eventEmitterVisitor.js';
 
 /**
  * Inspects a single AST node and returns a RELATIONSHIP entity if it matches a known dependency pattern.
@@ -54,6 +55,9 @@ export function visitRelationship(
 
   const expressMount = extractExpressRouterMount(node, sourceFile, getEvidence, nextId);
   if (expressMount) return expressMount;
+
+  const eventEmitterRelationship = extractEventEmitterRelationship(node, getEvidence, nextId);
+  if (eventEmitterRelationship) return eventEmitterRelationship;
 
   return null;
 }
