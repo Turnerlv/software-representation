@@ -4,7 +4,22 @@
       "url": "https://github.com/expressjs/express.git",
       "pinned_commit": "a3714473feb3d2908add734d340e7755fd85e0a3",
       "clone_cmd": "git clone https://github.com/expressjs/express.git fixtures/cloned-repos/express && git -C fixtures/cloned-repos/express checkout a3714473feb3d2908add734d340e7755fd85e0a3",
-      "sessions": []
+      "sessions": [
+        {
+          "session_id": "2026-08-10-express",
+          "branch": "research/express-2026-08-10",
+          "date": "2026-08-10T16:27:39+08:00",
+          "extractor_version": "0.0.0",
+          "report_path": "fixtures/research/sessions/2026-08-10-express.md",
+          "entity_counts": {
+            "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 82 },
+            "after":  { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS"
+        }
+      ]
     }
   },
   "_schema": {
