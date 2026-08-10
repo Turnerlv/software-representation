@@ -34,28 +34,41 @@ export function extractExpressRouterMount(
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
 ): StructuralEntity | null {
-  // Matches: app.use('/path', router) or app.use('/path', require('...'))
+  // Matches: app.use('/path', router), app.use(middleware), etc.
   if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
     const methodName = node.expression.name.text;
-    if (methodName === 'use' && node.arguments.length >= 2) {
+    if (methodName === 'use' && node.arguments.length >= 1) {
       const firstArg = node.arguments[0];
-      const secondArg = node.arguments[1];
       
-      if (ts.isStringLiteral(firstArg)) {
-        let target = 'Unknown Router';
-        if (ts.isCallExpression(secondArg) && ts.isIdentifier(secondArg.expression) && secondArg.expression.text === 'require' && ts.isStringLiteral(secondArg.arguments[0])) {
-          target = secondArg.arguments[0].text;
-        } else if (ts.isIdentifier(secondArg)) {
-          target = secondArg.text;
-        }
-        
-        return {
-          id: nextId(),
-          name: `Express Mount: ${firstArg.text} -> ${target}`,
-          type: 'RELATIONSHIP',
-          evidence: getEvidence(node),
-        };
+      let pathPrefix = 'Root';
+      let targetNode = firstArg;
+      
+      if (ts.isStringLiteral(firstArg) && node.arguments.length >= 2) {
+        pathPrefix = firstArg.text;
+        targetNode = node.arguments[1];
       }
+
+      let target = 'Unknown Middleware';
+      if (ts.isCallExpression(targetNode)) {
+        if (ts.isIdentifier(targetNode.expression) && targetNode.expression.text === 'require' && ts.isStringLiteral(targetNode.arguments[0])) {
+          target = targetNode.arguments[0].text;
+        } else if (ts.isIdentifier(targetNode.expression)) {
+          target = `${targetNode.expression.text}()`;
+        } else if (ts.isPropertyAccessExpression(targetNode.expression)) {
+          target = `${targetNode.expression.name.text}()`;
+        }
+      } else if (ts.isIdentifier(targetNode)) {
+        target = targetNode.text;
+      } else if (ts.isFunctionExpression(targetNode) || ts.isArrowFunction(targetNode)) {
+        target = 'Inline Middleware';
+      }
+      
+      return {
+        id: nextId(),
+        name: `Express Mount: ${pathPrefix} -> ${target}`,
+        type: 'RELATIONSHIP',
+        evidence: getEvidence(node),
+      };
     }
   }
 

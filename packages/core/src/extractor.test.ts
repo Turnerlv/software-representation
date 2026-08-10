@@ -94,6 +94,10 @@ test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
     graph.relationships.some((r) => r.name === 'Express Mount: /users -> usersRouter'),
     'Expected to extract Express /users mount as RELATIONSHIP'
   );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Express Mount: Root -> json()'),
+    'Expected to extract Express Root -> json() mount as RELATIONSHIP'
+  );
 });
 
 test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {
@@ -111,5 +115,15 @@ test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {
   assert.ok(
     graph.relationships.some((r) => r.name === 'Require: ./routes/users'),
     'Expected to extract require("./routes/users") as RELATIONSHIP'
+  );
+});
+
+test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
+  const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app', 'app.js');
+  const graph = analyzeTarget(fixtureFile);
+
+  assert.ok(
+    graph.boundaries.some((b) => b.name === 'CJS Export: default'),
+    'Expected to extract module.exports as BOUNDARY'
   );
 });
