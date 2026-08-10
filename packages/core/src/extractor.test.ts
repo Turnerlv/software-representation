@@ -141,3 +141,39 @@ test('analyzeTarget extracts EventEmitter patterns', () => {
     'Expected to extract EventEmitter.emit as RELATIONSHIP'
   );
 });
+
+test('analyzeTarget extracts Object.create as RELATIONSHIP', () => {
+  const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app', 'inheritance.js');
+  const graph = analyzeTarget(fixtureFile);
+
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Inherits: http.IncomingMessage.prototype'),
+    'Expected to extract Object.create as RELATIONSHIP'
+  );
+});
+
+test('analyzeTarget extracts method calls as INFERRED RELATIONSHIP with confidence levels', () => {
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'method-calls');
+  const graph = analyzeTarget(fixtureDir);
+
+  // HIGH confidence
+  const createUserRel = graph.relationships.find((r) => r.name === 'Call: userService.createUser()');
+  assert.ok(createUserRel, 'Expected to extract userService.createUser()');
+  assert.strictEqual(createUserRel.status, 'INFERRED');
+  assert.strictEqual(createUserRel.confidence, 'HIGH');
+  assert.ok(Array.isArray(createUserRel.evidence) && createUserRel.evidence.length === 3);
+
+  // MEDIUM confidence
+  const someMethodRel = graph.relationships.find((r) => r.name === 'Call: otherService.someMethod()');
+  assert.ok(someMethodRel, 'Expected to extract otherService.someMethod()');
+  assert.strictEqual(someMethodRel.status, 'INFERRED');
+  assert.strictEqual(someMethodRel.confidence, 'MEDIUM');
+  assert.ok(Array.isArray(someMethodRel.evidence) && someMethodRel.evidence.length === 2);
+
+  // LOW confidence
+  const unknownMethodRel = graph.relationships.find((r) => r.name === 'Call: globalService.unknownMethod()');
+  assert.ok(unknownMethodRel, 'Expected to extract globalService.unknownMethod()');
+  assert.strictEqual(unknownMethodRel.status, 'INFERRED');
+  assert.strictEqual(unknownMethodRel.confidence, 'LOW');
+  assert.ok(Array.isArray(unknownMethodRel.evidence) && unknownMethodRel.evidence.length === 1);
+});

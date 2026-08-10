@@ -25,7 +25,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 |---|---|
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
 | `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, etc. with a string path literal) |
-| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router mounts (`app.use('/path', router)`) |
+| `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router mounts (`app.use('/path', router)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`) |
 | `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`) |
 
 If you see one of these patterns in the source and it IS in the `chomp analyze` output, it is working correctly — skip it.
@@ -86,6 +86,7 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] `app.use('/prefix', router)` — Express router mounting (hierarchical dependency) ✅ **Already handled by `expressAdapter.ts`**
 - [ ] `@Module({ imports: [OtherModule] })` — NestJS module dependency
 - [ ] `extends BaseClass` — class inheritance (currently not captured)
+- [ ] `Object.create(...)` / `Object.setPrototypeOf(...)` — prototypal inheritance ✅ **Already handled by `relationshipVisitor.ts`**
 - [ ] `implements Interface` — explicit contract implementation (currently not captured)
 - [ ] `require('module')` — CommonJS require ✅ **Already handled by `relationshipVisitor.ts`**
 - [ ] Dynamic `import('module')` — lazy-loaded imports (currently not captured)

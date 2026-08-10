@@ -128,6 +128,18 @@
       ]
     }
   },
+  "system_audits": [
+    {
+      "id": "2026-08-10-graph-edges-inferred-relationships",
+      "date": "2026-08-10T21:00:00+08:00",
+      "summary_path": "fixtures/research/system-audits/2026-08-10-graph-edges-inferred-relationships.md",
+      "changes": [
+        "Added sourceId and targetId to StructuralEntity (Graph Edges)",
+        "Added INFERRED and DETERMINISTIC status and confidence levels",
+        "Updated relationshipVisitor to detect method calls and verify cross-file exports for confidence levels"
+      ]
+    }
+  ],
   "_schema": {
     "session": {
       "session_id": "<YYYY-MM-DD-HHMMSS>-<repo-name>",
@@ -152,6 +164,12 @@
       "gaps_logged": 0,
       "gaps_resolved": 0,
       "status": "IN_PROGRESS | COMPLETE"
+    },
+    "system_audit": {
+      "id": "<YYYY-MM-DD>-<kebab-case-name>",
+      "date": "<ISO date>",
+      "summary_path": "fixtures/research/system-audits/<id>.md",
+      "changes": ["<description of change>"]
     }
   }
 }

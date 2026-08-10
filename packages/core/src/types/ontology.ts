@@ -27,6 +27,8 @@ export interface EvidenceRecord {
   lineNumber?: number;
   /** Up to 80-character snippet of the source text at the extraction point. */
   snippet?: string;
+  /** Categorical role for multiple evidence records (e.g. inferred method calls) */
+  evidenceRole?: 'syntax-call' | 'import-match' | 'target-signature';
 }
 
 /**
@@ -43,7 +45,19 @@ export interface StructuralEntity {
   /** The ontology primitive this entity belongs to. */
   type: EntityType;
   /** Line-level source evidence for this entity's existence. */
-  evidence: EvidenceRecord;
+  evidence: EvidenceRecord | EvidenceRecord[];
+  
+  // Graph edge fields (populated primarily for RELATIONSHIP)
+  /** ID of the source entity (e.g. the enclosing boundary). */
+  sourceId?: string;
+  /** ID of the target entity (e.g. the canonical canonical module path). */
+  targetId?: string;
+  
+  // Inference classification
+  /** Whether the relationship is deterministically known or probabilistically inferred. */
+  status?: 'DETERMINISTIC' | 'INFERRED';
+  /** Confidence level for inferred relationships. */
+  confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
 }
 
 /**

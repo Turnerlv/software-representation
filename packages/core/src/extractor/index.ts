@@ -73,7 +73,7 @@ export function collectFiles(targetPath: string): string[] {
  * Collision risk is negligible at 12 hex chars (48 bits of hash space) for the expected
  * entity counts of any single repository analysis run.
  */
-function stableEntityId(filePath: string, type: string, name: string): string {
+export function stableEntityId(filePath: string, type: string, name: string): string {
   return createHash('sha256')
     .update(`${type}:${filePath}:${name}`)
     .digest('hex')
@@ -100,6 +100,10 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
   const contracts: StructuralEntity[] = [];
   const relationships: StructuralEntity[] = [];
   const openConnectors: StructuralEntity[] = [];
+  
+  const repoRoot = path.resolve(targetPath);
+  const isTargetFile = fs.statSync(repoRoot).isFile();
+  const actualRepoRoot = isTargetFile ? path.dirname(repoRoot) : repoRoot;
 
   for (const filePath of files) {
     const sourceText = fs.readFileSync(filePath, 'utf8');
@@ -138,7 +142,10 @@ export function analyzeTarget(targetPath: string): RepresentationGraph {
         contracts.push(contractEntity);
       }
 
-      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '');
+      // We use the file itself as the boundary for relationships if not inside a class
+      const sourceId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
+
+      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, sourceId);
       if (relationshipEntity) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
         relationships.push(relationshipEntity);

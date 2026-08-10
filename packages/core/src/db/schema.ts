@@ -43,6 +43,10 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       repository_id TEXT NOT NULL,
       name TEXT NOT NULL,
       type TEXT NOT NULL,
+      source_id TEXT,
+      target_id TEXT,
+      status TEXT,
+      confidence TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE
     );
@@ -53,6 +57,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       file_path TEXT NOT NULL,
       line_number INTEGER,
       snippet TEXT,
+      evidence_role TEXT,
       FOREIGN KEY (entity_id) REFERENCES structural_entities(id) ON DELETE CASCADE
     );
 
@@ -73,6 +78,12 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  try { db.exec("ALTER TABLE structural_entities ADD COLUMN source_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE structural_entities ADD COLUMN target_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
 
   return db;
 }

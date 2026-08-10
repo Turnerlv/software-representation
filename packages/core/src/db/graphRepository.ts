@@ -49,13 +49,13 @@ export function saveRepresentationGraph(
     );
 
     const insertEntity = db.prepare(`
-      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type)
-      VALUES (?, ?, ?, ?)
+      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, source_id, target_id, status, confidence)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
-      INSERT OR IGNORE INTO evidence_records (id, entity_id, file_path, line_number, snippet)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO evidence_records (id, entity_id, file_path, line_number, snippet, evidence_role)
+      VALUES (?, ?, ?, ?, ?, ?)
     `);
 
     const allEntities: StructuralEntity[] = [
@@ -68,16 +68,21 @@ export function saveRepresentationGraph(
     let counter = 1;
     for (const entity of allEntities) {
       const globalEntityId = `${repo.id}:${entity.id}`;
-      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type);
-      if (entity.evidence) {
-        const evidenceId = `ev_${repo.id}_${entity.id}_${counter++}`;
-        insertEvidence.run(
-          evidenceId,
-          globalEntityId,
-          entity.evidence.filePath,
-          entity.evidence.lineNumber ?? null,
-          entity.evidence.snippet ?? null
-        );
+      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null);
+      
+      const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
+      for (const ev of evidences) {
+        if (ev) {
+          const evidenceId = `ev_${repo.id}_${entity.id}_${counter++}`;
+          insertEvidence.run(
+            evidenceId,
+            globalEntityId,
+            ev.filePath,
+            ev.lineNumber ?? null,
+            ev.snippet ?? null,
+            ev.evidenceRole ?? null
+          );
+        }
       }
     }
   });
@@ -110,14 +115,14 @@ export function getRepresentationGraph(
 
   const entityRows = db
     .prepare(
-      'SELECT id, name, type FROM structural_entities WHERE repository_id = ?'
+      'SELECT id, name, type, source_id, target_id, status, confidence FROM structural_entities WHERE repository_id = ?'
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null }>;
 
   const evidenceRows = db
     .prepare(
       `
-      SELECT er.entity_id, er.file_path, er.line_number, er.snippet
+      SELECT er.entity_id, er.file_path, er.line_number, er.snippet, er.evidence_role
       FROM evidence_records er
       JOIN structural_entities se ON er.entity_id = se.id
       WHERE se.repository_id = ?
@@ -128,10 +133,11 @@ export function getRepresentationGraph(
     file_path: string;
     line_number: number | null;
     snippet: string | null;
+    evidence_role: 'syntax-call' | 'import-match' | 'target-signature' | null;
   }>;
 
   const prefix = `${repoId}:`;
-  const evidenceMap = new Map<string, EvidenceRecord>();
+  const evidenceMap = new Map<string, EvidenceRecord[]>();
   for (const row of evidenceRows) {
     const record: EvidenceRecord = {
       filePath: row.file_path,
@@ -142,10 +148,17 @@ export function getRepresentationGraph(
     if (row.snippet !== null && row.snippet !== undefined) {
       record.snippet = row.snippet;
     }
+    if (row.evidence_role !== null && row.evidence_role !== undefined) {
+      record.evidenceRole = row.evidence_role;
+    }
     const cleanEntityId = row.entity_id.startsWith(prefix)
       ? row.entity_id.slice(prefix.length)
       : row.entity_id;
-    evidenceMap.set(cleanEntityId, record);
+      
+    if (!evidenceMap.has(cleanEntityId)) {
+      evidenceMap.set(cleanEntityId, []);
+    }
+    evidenceMap.get(cleanEntityId)!.push(record);
   }
 
   const boundaries: StructuralEntity[] = [];
@@ -157,13 +170,19 @@ export function getRepresentationGraph(
     const cleanId = row.id.startsWith(prefix)
       ? row.id.slice(prefix.length)
       : row.id;
-    const evidence = evidenceMap.get(cleanId) ?? { filePath: '' };
+    const evidenceArray = evidenceMap.get(cleanId) ?? [];
+    const evidence = evidenceArray.length === 1 ? evidenceArray[0] : (evidenceArray.length > 1 ? evidenceArray : { filePath: '' });
     const entity: StructuralEntity = {
       id: cleanId,
       name: row.name,
       type: row.type,
       evidence,
     };
+    
+    if (row.source_id) entity.sourceId = row.source_id;
+    if (row.target_id) entity.targetId = row.target_id;
+    if (row.status) entity.status = row.status;
+    if (row.confidence) entity.confidence = row.confidence;
 
     switch (row.type) {
       case 'BOUNDARY':
