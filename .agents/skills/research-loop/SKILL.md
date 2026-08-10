@@ -224,21 +224,21 @@ After all gaps are processed:
    <Agent fills in edge cases, surprises, deferred decisions, or patterns worth investigating next session>
    ```
 
-4b. **Reconcile Session Report File Paths:** Check the `## Gaps Discovered` and `## Build Plan` sections in `fixtures/research/sessions/<session_id>.md`. If the actual file created/modified during Stage 2 differs from the initial proposed path (e.g., `expressAdapter.ts` instead of `adapters/express/index.ts`), update those lines to reflect the exact target file path.
+5. **Reconcile Session Report File Paths:** Check the `## Gaps Discovered` and `## Build Plan` sections in `fixtures/research/sessions/<session_id>.md`. If the actual file created/modified during Stage 2 differs from the initial proposed path (e.g., `expressAdapter.ts` instead of `adapters/express/index.ts`), update those lines to reflect the exact target file path.
 
-4c. **Proactively Sync Parser Harness Documentation:** Update `.agents/skills/parser-eval-harness/SKILL.md`:
+6. **Proactively Sync Parser Harness Documentation:** Update `.agents/skills/parser-eval-harness/SKILL.md`:
    - In Section 1 (**What the Extractor Already Handles**), add any newly extracted AST patterns to the corresponding primitive row in the table.
    - In Section 3 (**Pattern Checklist**), update the item for each resolved pattern to mark it with `✅ **Already handled by `<visitor/adapter filename>`**`.
 
-5. Update `registry.json`:
+7. Update `registry.json`:
    - Set `entity_counts.after`
    - Set `gaps_resolved` count
    - Set `status: "COMPLETE"`
 
-6. Commit everything — session report + `registry.json` — with message:
+8. Commit everything — session report + `registry.json` — with message:
    `research(<repo-name>): session <session_id> complete — see fixtures/research/sessions/<session_id>.md`
 
-7. **🛑 PRINT TO CHAT — output the full Outcome section and Resolution Summary verbatim before asking anything.** The human must see the delta table and every resolved/deferred gap in the conversation without opening the session file.
+9. **🛑 PRINT TO CHAT — output the full Outcome section and Resolution Summary verbatim before asking anything.** The human must see the delta table and every resolved/deferred gap in the conversation without opening the session file.
 
    Then ask:
    > "Session complete. How would you like to close this branch?"
@@ -246,7 +246,7 @@ After all gaps are processed:
    > - `pr` — push branch to remote and stop; open a GitHub PR manually
    > - `skip` — do nothing; branch stays local
 
-8. If `merge`:
+10. If `merge`:
    ```bash
    git push origin research/<repo-name>-<date>
    git checkout main
@@ -267,7 +267,7 @@ After all gaps are processed:
 
    If no gaps were resolved (`gaps_resolved = 0` and `after == before` for all primitives), **skip the version bump** and print:
    > ℹ️ No extractor changes landed this session — version left at `<current-version>`.
-9. If `pr`:
+11. If `pr`:
    ```bash
    git push origin research/<repo-name>-<date>
    ```
