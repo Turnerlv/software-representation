@@ -27,8 +27,16 @@ app.post('/login', (req, res) => {
   });
 });
 
+app.route('/settings')
+  .get((req, res) => res.send('Get settings'))
+  .post((req, res) => res.send('Update settings'));
+
 // Router mounts
 app.use('/api', apiRouter);
 app.use('/users', usersRouter);
+
+app.get('/download', (req, res) => {
+  res.download('/tmp/file.pdf');
+});
 
 module.exports = app;

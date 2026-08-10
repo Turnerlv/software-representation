@@ -8,7 +8,7 @@ import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
  * Set of supported Express HTTP routing method names.
  * Matched against method invocation identifiers (e.g. `app.get`, `router.post`).
  */
-const EXPRESS_ROUTE_METHODS = new Set(['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all']);
+const EXPRESS_ROUTE_METHODS = new Set(['get', 'post', 'put', 'delete', 'patch', 'options', 'head', 'all', 'route']);
 
 /**
  * Extracts an Express route handler definition as a CONTRACT primitive entity.
@@ -198,6 +198,39 @@ export function extractExpressContentNegotiation(
           evidence: getEvidence(node),
         };
       }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Extracts an Express file response (`res.sendFile(...)` or `res.download(...)`)
+ * as an OPEN_CONNECTOR primitive entity representing a filesystem I/O boundary.
+ *
+ * Matches expressions like:
+ * - `res.sendFile('/path/to/file')`
+ * - `res.download('/path/to/file')`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns An OPEN_CONNECTOR StructuralEntity for the file response, or null if node does not match.
+ */
+export function extractExpressFileResponse(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    if ((methodName === 'sendFile' || methodName === 'download') && node.arguments.length >= 1) {
+      return {
+        id: nextId(),
+        name: `Express File Response: ${methodName}`,
+        type: 'OPEN_CONNECTOR',
+        evidence: getEvidence(node),
+      };
     }
   }
 
