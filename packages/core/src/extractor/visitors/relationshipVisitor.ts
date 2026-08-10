@@ -3,6 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
+import { extractExpressRouterMount } from '../adapters/expressAdapter.js';
 
 /**
  * Inspects a single AST node and returns a RELATIONSHIP entity if it matches a known dependency pattern.
@@ -29,14 +30,30 @@ export function visitRelationship(
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
 ): StructuralEntity | null {
-  if (ts.isImportDeclaration(node)) {
-    const moduleSpecifier = node.moduleSpecifier.getText(sourceFile).replace(/['"]/g, '');
+  if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
     return {
       id: nextId(),
-      name: `Import: ${moduleSpecifier}`,
+      name: `Import: ${node.moduleSpecifier.text}`,
       type: 'RELATIONSHIP',
       evidence: getEvidence(node),
     };
   }
+
+  // CommonJS Require
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'require' && node.arguments.length > 0) {
+    const firstArg = node.arguments[0];
+    if (ts.isStringLiteral(firstArg)) {
+      return {
+        id: nextId(),
+        name: `Require: ${firstArg.text}`,
+        type: 'RELATIONSHIP',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  const expressMount = extractExpressRouterMount(node, sourceFile, getEvidence, nextId);
+  if (expressMount) return expressMount;
+
   return null;
 }

@@ -3,6 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
+import { extractExpressRoute } from '../adapters/expressAdapter.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -50,5 +51,9 @@ export function visitContract(
       evidence: getEvidence(node),
     };
   }
+  
+  const expressRoute = extractExpressRoute(node, getEvidence, nextId);
+  if (expressRoute) return expressRoute;
+
   return null;
 }
