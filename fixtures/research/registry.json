@@ -266,8 +266,14 @@
             }
           },
           "gaps_logged": 2,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS"
+          "gaps_resolved": 2,
+          "status": "COMPLETE",
+          "entities_after": {
+            "BOUNDARY": 54,
+            "CONTRACT": 508,
+            "RELATIONSHIP": 1416,
+            "OPEN_CONNECTOR": 186
+          }
         }
       ]
     }
