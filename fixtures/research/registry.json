@@ -337,15 +337,15 @@
               "OPEN_CONNECTOR": 222
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 92,
+              "CONTRACT": 538,
+              "RELATIONSHIP": 1419,
+              "OPEN_CONNECTOR": 222
             }
           },
           "gaps_logged": 1,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS"
+          "gaps_resolved": 1,
+          "status": "COMPLETE"
         }
       ]
     }
