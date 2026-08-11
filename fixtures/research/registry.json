@@ -274,6 +274,30 @@
             "RELATIONSHIP": 1416,
             "OPEN_CONNECTOR": 186
           }
+        },
+        {
+          "session_id": "2026-08-11-215227-express",
+          "branch": "research/express-2026-08-11-215227",
+          "date": "2026-08-11T13:52:27.101Z",
+          "extractor_version": "0.1.8",
+          "report_path": "fixtures/research/sessions/2026-08-11-215227-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 54,
+              "CONTRACT": 508,
+              "RELATIONSHIP": 1416,
+              "OPEN_CONNECTOR": 114
+            },
+            "after": {
+              "BOUNDARY": 92,
+              "CONTRACT": 538,
+              "RELATIONSHIP": 1416,
+              "OPEN_CONNECTOR": 114
+            }
+          },
+          "gaps_logged": 2,
+          "gaps_resolved": 2,
+          "status": "COMPLETE"
         }
       ]
     }
