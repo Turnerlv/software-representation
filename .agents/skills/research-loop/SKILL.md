@@ -158,25 +158,9 @@ After all gaps are processed:
 
 7. If `merge`:
    ```bash
-   git push origin research/<repo-name>-<date>
-   git checkout main
-   git merge --no-ff research/<repo-name>-<date> -m "research(<repo-name>): merge session <session_id>"
+   TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <repo-name>
    ```
-
-   **After the merge, bump the extractor version** — but only if the session produced a real delta (i.e., `gaps_resolved > 0` and at least one primitive count increased). This keeps the version number meaningful for the Stage 0 guard.
-
-   ```bash
-   npm version patch --no-git-tag-version --prefix packages/core
-   ```
-
-   Then commit the bump to `main`:
-   ```bash
-   git add packages/core/package.json
-   git commit -m "chore: bump @chomp/core to <new-version> — <session_id> (<N> gaps resolved)"
-   ```
-
-   If no gaps were resolved (`gaps_resolved = 0` and `after == before` for all primitives), **skip the version bump** and print:
-   > ℹ️ No extractor changes landed this session — version left at `<current-version>`.
+   
 8. If `pr`:
    ```bash
    git push origin research/<repo-name>-<date>

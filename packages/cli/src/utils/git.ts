@@ -19,3 +19,16 @@ export function commitChanges(files: string[], message: string, cwd: string) {
   const safeMessage = message.replace(/'/g, "'\\''");
   execGit(`commit -m '${safeMessage}'`, cwd);
 }
+
+export function checkoutBranch(branchName: string, cwd: string) {
+  execGit(`checkout ${branchName}`, cwd);
+}
+
+export function pushBranch(branchName: string, cwd: string) {
+  execGit(`push origin ${branchName}`, cwd);
+}
+
+export function mergeBranch(branchName: string, message: string, cwd: string) {
+  const safeMessage = message.replace(/'/g, "'\\''");
+  execGit(`merge --no-ff ${branchName} -m '${safeMessage}'`, cwd);
+}

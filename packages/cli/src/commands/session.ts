@@ -1,8 +1,9 @@
 import { Command } from "commander";
 import { existsSync, readFileSync, statSync, writeFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
+import { execSync } from "node:child_process";
 import { readRegistry, writeRegistry, Session, EntityCounts } from "../utils/registry.js";
-import { createBranch, commitChanges } from "../utils/git.js";
+import { createBranch, commitChanges, checkoutBranch, mergeBranch, pushBranch } from "../utils/git.js";
 import { findWorkspaceRoot } from "../utils/db.js";
 import { analyzeTarget, initDatabase, saveRepresentationGraph, getRepresentationGraph } from "@chomp/core";
 
@@ -247,4 +248,46 @@ export function registerSessionCommand(program: Command) {
       commitChanges(["fixtures/research/registry.json", session.report_path], `research(${options.repo}): session ${session.session_id} complete — see ${session.report_path}`, workspaceRoot);
       console.log(`Session ${session.session_id} closed.`);
     });
+
+  sessionCmd
+    .command("merge")
+    .description("Merge a completed research session back to main and bump version")
+    .requiredOption("--repo <name>", "Repository name")
+    .action((options) => {
+      const baseDir = process.env.INIT_CWD ?? process.cwd();
+      const workspaceRoot = findWorkspaceRoot(baseDir);
+      const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
+      const registry = readRegistry(registryPath);
+      
+      const session = [...(registry.repos[options.repo].sessions || [])].reverse().find((s: any) => s.status === "COMPLETE");
+      if (!session) {
+        console.error(`No COMPLETE session found for repo ${options.repo}`);
+        process.exit(1);
+      }
+
+      console.log(`Pushing branch ${session.branch} to remote...`);
+      try {
+        pushBranch(session.branch, workspaceRoot);
+      } catch (e: any) {
+        console.warn(`⚠️ Could not push branch ${session.branch} to remote. Continuing with local merge...`);
+      }
+
+      console.log(`Checking out main...`);
+      checkoutBranch("main", workspaceRoot);
+
+      console.log(`Merging ${session.branch} into main...`);
+      mergeBranch(session.branch, `research(${options.repo}): merge session ${session.session_id}`, workspaceRoot);
+
+      if (session.gaps_resolved > 0) {
+        console.log(`Gaps resolved: ${session.gaps_resolved}. Bumping @chomp/core version...`);
+        execSync("npm version patch --no-git-tag-version --prefix packages/core", { cwd: workspaceRoot, stdio: 'inherit' });
+        
+        const newVersion = getExtractorVersion(workspaceRoot);
+        commitChanges(["packages/core/package.json"], `chore: bump @chomp/core to ${newVersion} — ${session.session_id} (${session.gaps_resolved} gaps resolved)`, workspaceRoot);
+        console.log(`✅ Bumped version to ${newVersion} and committed.`);
+      } else {
+        console.log(`ℹ️ No extractor changes landed this session (${session.gaps_resolved} gaps resolved). Version left at ${getExtractorVersion(workspaceRoot)}.`);
+      }
+    });
 }
+
