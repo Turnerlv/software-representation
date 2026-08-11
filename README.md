@@ -69,6 +69,8 @@ chomp ledger [--db <path>]                          # Inspect the extractor cove
 chomp session start --repo <name> [--force]         # Setup session, branch, DB, and report stub
 chomp session log-gaps --repo <name> --count <n>    # Record logged gaps and commit report
 chomp session close --repo <name> --resolved <n>    # Re-analyze graph, record final state & complete
+chomp audit start --topic <name>                    # Setup system audit, branch, and report stub
+chomp audit close --topic <name> --change <items..> # Close audit and log changes to registry
 ```
 
 ---

@@ -22,10 +22,17 @@ export interface Session {
   status: "IN_PROGRESS" | "COMPLETE";
 }
 
+export interface SystemAudit {
+  id: string;
+  date: string;
+  summary_path: string;
+  changes: string[];
+}
+
 export interface Registry {
   repos: Record<string, any>;
   sessions: Session[];
-  system_audits?: any[];
+  system_audits?: SystemAudit[];
   _schema?: any;
 }
 

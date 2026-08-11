@@ -6,6 +6,7 @@ import { Command } from "commander";
 import { registerAnalyzeCommand } from "./commands/analyze.js";
 import { registerLedgerCommand } from "./commands/ledger.js";
 import { registerSessionCommand } from "./commands/session.js";
+import { registerAuditCommand } from "./commands/audit.js";
 
 const program = new Command();
 
@@ -16,5 +17,6 @@ program
 registerAnalyzeCommand(program);
 registerLedgerCommand(program);
 registerSessionCommand(program);
+registerAuditCommand(program);
 
 program.parse(process.argv);
