@@ -343,7 +343,7 @@
               "OPEN_CONNECTOR": 0
             }
           },
-          "gaps_logged": 0,
+          "gaps_logged": 1,
           "gaps_resolved": 0,
           "status": "IN_PROGRESS"
         }
