@@ -269,3 +269,94 @@ export function extractExpressResponseConnector(
 
   return null;
 }
+
+/**
+ * Extracts an Express app listener (`app.listen(...)`)
+ * as an OPEN_CONNECTOR primitive entity representing a network boundary.
+ *
+ * Matches expressions like:
+ * - `app.listen(3000)`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns An OPEN_CONNECTOR StructuralEntity for the listener, or null if node does not match.
+ */
+export function extractExpressAppListen(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    if (methodName === 'listen') {
+      let isExpressApp = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        // Typically 'app' or 'server'
+        if (['app', 'server'].includes(rootName)) {
+          isExpressApp = true;
+        }
+      }
+
+      if (isExpressApp) {
+        return {
+          id: nextId(),
+          name: `Express App Listen`,
+          type: 'OPEN_CONNECTOR',
+          evidence: getEvidence(node),
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Extracts an Express response cookie operation (`res.cookie(...)` or `res.clearCookie(...)`)
+ * as an OPEN_CONNECTOR primitive entity representing client-side state interaction.
+ *
+ * Matches expressions like:
+ * - `res.cookie('remember', 1)`
+ * - `res.clearCookie('remember')`
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns An OPEN_CONNECTOR StructuralEntity for the cookie operation, or null if node does not match.
+ */
+export function extractExpressResponseCookie(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    if (methodName === 'cookie' || methodName === 'clearCookie') {
+      let isExpressRes = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        if (['res'].includes(rootName)) {
+          isExpressRes = true;
+        }
+      }
+
+      if (isExpressRes) {
+        let cookieName = 'Unknown';
+        if (node.arguments.length >= 1 && ts.isStringLiteral(node.arguments[0])) {
+          cookieName = node.arguments[0].text;
+        }
+
+        return {
+          id: nextId(),
+          name: `Express Response Cookie: ${cookieName}`,
+          type: 'OPEN_CONNECTOR',
+          evidence: getEvidence(node),
+        };
+      }
+    }
+  }
+
+  return null;
+}

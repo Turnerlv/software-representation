@@ -246,3 +246,25 @@ test('analyzeTarget extracts method calls as INFERRED RELATIONSHIP with confiden
   assert.strictEqual(unknownMethodRel.confidence, 'LOW');
   assert.ok(Array.isArray(unknownMethodRel.evidence) && unknownMethodRel.evidence.length === 1);
 });
+
+test('analyzeTarget extracts dynamic require and import as RELATIONSHIP', () => {
+  const fixtureFile = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'dynamic-require', 'index.js');
+  const graph = analyzeTarget(fixtureFile);
+
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Dynamic Require: mod'),
+    'Expected to extract require(mod) as RELATIONSHIP'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Dynamic Require: engine'),
+    'Expected to extract require(engine) as RELATIONSHIP'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name === 'Import: path'),
+    'Expected to extract import("path") as RELATIONSHIP'
+  );
+  assert.ok(
+    graph.relationships.some((r) => r.name.includes('Dynamic Import:')),
+    'Expected to extract dynamic import() as RELATIONSHIP'
+  );
+});

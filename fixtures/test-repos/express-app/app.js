@@ -66,3 +66,12 @@ Object.defineProperty(req, 'protocol', {
   enumerable: true,
   get: function protocol() { return 'http'; }
 });
+
+app.get('/cookie', (req, res) => {
+  res.cookie('remember', 1);
+  res.clearCookie('remember');
+});
+
+if (require.main === module) {
+  app.listen(3000);
+}

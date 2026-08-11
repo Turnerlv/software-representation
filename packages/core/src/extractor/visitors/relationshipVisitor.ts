@@ -91,6 +91,58 @@ export function visitRelationship(
           { ...getEvidence(node), evidenceRole: 'syntax-call' }
         ],
       };
+    } else {
+      // Dynamic Require
+      return {
+        id: nextId(),
+        name: `Dynamic Require: ${firstArg.getText(sourceFile)}`,
+        type: 'RELATIONSHIP',
+        sourceId,
+        status: 'DETERMINISTIC',
+        confidence: 'MEDIUM',
+        evidence: [
+          { ...getEvidence(node), evidenceRole: 'syntax-call' }
+        ],
+      };
+    }
+  }
+
+  // Dynamic Import (e.g. import(mod) or import('mod'))
+  if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword && node.arguments.length > 0) {
+    const firstArg = node.arguments[0];
+    if (ts.isStringLiteral(firstArg)) {
+      const importLiteral = firstArg.text;
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      let targetId: string | undefined = undefined;
+      
+      if (resolvedPath) {
+        targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+      }
+
+      return {
+        id: nextId(),
+        name: `Import: ${importLiteral}`,
+        type: 'RELATIONSHIP',
+        sourceId,
+        targetId,
+        status: 'DETERMINISTIC',
+        confidence: 'HIGH',
+        evidence: [
+          { ...getEvidence(node), evidenceRole: 'syntax-call' }
+        ],
+      };
+    } else {
+      return {
+        id: nextId(),
+        name: `Dynamic Import: ${firstArg.getText(sourceFile)}`,
+        type: 'RELATIONSHIP',
+        sourceId,
+        status: 'DETERMINISTIC',
+        confidence: 'MEDIUM',
+        evidence: [
+          { ...getEvidence(node), evidenceRole: 'syntax-call' }
+        ],
+      };
     }
   }
 

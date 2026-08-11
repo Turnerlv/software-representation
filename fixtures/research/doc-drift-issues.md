@@ -176,3 +176,15 @@
 **Discovered:** 2026-08-11T22:05:00+08:00
 **Session:** 2026-08-11-215227-express
 ---
+
+---
+**File:** `.agents/skills/system-audit/SKILL.md`
+**Line(s):** 27, 34, 39
+**Issue type:** wrong-command
+**Description:** Commands `pnpm chomp audit start`, `close`, and `merge` are missing the required `TSX_DISABLE_IPC=1` prefix.
+**Suggested fix:** Prefix the commands with `TSX_DISABLE_IPC=1`.
+**Status:** RESOLVED
+**Fixed:** 2026-08-11T23:35:40+08:00
+**Discovered:** 2026-08-11T23:33:40+08:00
+**Session:** 2026-08-11-232327-express
+---
