@@ -6,6 +6,7 @@ import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation } from '../adapters/expressAdapter.js';
 import { extractEventEmitterContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
+import { extractDefinePropertyContract } from './definePropertyVisitor.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -18,6 +19,7 @@ import { extractCommonjsExport } from './commonjsExportVisitor.js';
  * - Express Route Parameters   (delegated to `extractExpressRouteParameter`)
  * - Express Content Format     (delegated to `extractExpressContentNegotiation`)
  * - EventEmitter Listeners     (delegated to `extractEventEmitterContract`)
+ * - Object.defineProperty      (delegated to `extractDefinePropertyContract`)
  *
  * @param node         The AST node to inspect.
  * @param getEvidence  Returns a populated EvidenceRecord for the given node.
@@ -72,6 +74,9 @@ export function visitContract(
 
   const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
   if (cjsExport && cjsExport.type === 'CONTRACT') return cjsExport;
+
+  const definePropertyContract = extractDefinePropertyContract(node, getEvidence, nextId);
+  if (definePropertyContract) return definePropertyContract;
 
   return null;
 }

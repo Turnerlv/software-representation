@@ -97,7 +97,8 @@ export function registerSessionCommand(program: Command) {
       }
 
       const currentVersion = getExtractorVersion(workspaceRoot);
-      const repoSessions = registry.sessions.filter(s => s.session_id.endsWith(`-${repoName}`));
+      const repoSessions = registry.repos[repoName].sessions || [];
+      registry.repos[repoName].sessions = repoSessions;
       
       // Stage 0 Guard
       if (!options.force) {
@@ -153,7 +154,7 @@ export function registerSessionCommand(program: Command) {
         status: "IN_PROGRESS"
       };
 
-      registry.sessions.push(newSession);
+      registry.repos[repoName].sessions.push(newSession);
 
       // Create branch
       console.log(`Creating branch: ${branchName}`);
@@ -205,7 +206,7 @@ export function registerSessionCommand(program: Command) {
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
       const registry = readRegistry(registryPath);
       
-      const session = [...registry.sessions].reverse().find(s => s.session_id.endsWith(`-${options.repo}`) && s.status === "IN_PROGRESS");
+      const session = [...(registry.repos[options.repo].sessions || [])].reverse().find((s: any) => s.status === "IN_PROGRESS");
       if (!session) {
         console.error(`No IN_PROGRESS session found for repo ${options.repo}`);
         process.exit(1);
@@ -229,7 +230,7 @@ export function registerSessionCommand(program: Command) {
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
       const registry = readRegistry(registryPath);
       
-      const session = [...registry.sessions].reverse().find(s => s.session_id.endsWith(`-${options.repo}`) && s.status === "IN_PROGRESS");
+      const session = [...(registry.repos[options.repo].sessions || [])].reverse().find((s: any) => s.status === "IN_PROGRESS");
       if (!session) {
         console.error(`No IN_PROGRESS session found for repo ${options.repo}`);
         process.exit(1);

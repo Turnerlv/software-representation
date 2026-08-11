@@ -51,3 +51,18 @@ module.exports = app;
 
 app.init = function() {};
 app['delete'] = function() {};
+
+// New patterns: Exported object method assignments on req and res
+const req = Object.create(null);
+req.header = function() {};
+module.exports.request = req;
+
+const res = Object.create(null);
+res.status = function() {};
+module.exports.response = res;
+
+Object.defineProperty(req, 'protocol', {
+  configurable: true,
+  enumerable: true,
+  get: function protocol() { return 'http'; }
+});

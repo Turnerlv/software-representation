@@ -56,40 +56,18 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 ## Stage 1 — Gap Analysis 🛑 HUMAN GATE
 
-1. Invoke the `parser-eval-harness` skill against the cloned repo. The eval harness logs gaps into the ledger.
-2. Run: `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db`
-   > **DB table reference:** Entity counts live in `structural_entities`. If you ever need a raw count query, use:
-   > `sqlite3 fixtures/cloned-repos/<repo-name>.db "SELECT type, count(*) FROM structural_entities GROUP BY type;"`
-3. **Produce a Research Brief** and append it to the session report. The brief must include:
+1. Invoke the `parser-eval-harness` skill against the cloned repo. 
+   - The eval harness is responsible for logging gaps into the SQLite ledger using `chomp ledger log` and appending the "Research Brief" (including the Gaps Discovered and Build Plan) to the `fixtures/research/sessions/<session_id>.md` report.
+   - *Note: If you need to view raw SQLite stats, use `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db`.*
 
-   ```markdown
-   ## Gaps Discovered
+2. Once `parser-eval-harness` completes its execution, review the session report to confirm the Research Brief and Build Plan were properly appended.
 
-   ### [<IMPACT>] <patternName>
-   - **Evidence:** `<evidenceFile>:<evidenceLine>` — `<evidenceSnippet>`
-   - **Missing primitive:** <BOUNDARY | CONTRACT | RELATIONSHIP | OPEN_CONNECTOR>
-   - **Proposed fix:** `<fixLocation>`
-   - **Rationale:** <one sentence explaining why this pattern is structurally significant>
-
-   <!-- Repeat for each gap -->
-
-   ## Build Plan
-   | Gap | Impact | Decision | Target File |
-   |---|---|---|---|
-   | <patternName> | HIGH | ✅ Build | <adapter/visitor file> |
-   | <patternName> | MEDIUM | ✅ Build | <adapter/visitor file> |
-   | <patternName> | LOW | ⏭ Defer | — |
-
-   ---
-   🛑 **HUMAN GATE — Stage 1:** Review the build plan above before any parser changes are made.
-   ```
-
-4. Run the log-gaps command to automatically record the gap count in `registry.json` and commit the updated session report:
+3. Run the log-gaps command to automatically record the gap count in `registry.json` and commit the updated session report:
    ```bash
    TSX_DISABLE_IPC=1 pnpm chomp session log-gaps --repo <repo-name> --count <n>
    ```
 
-5. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
+4. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
 
    Then ask:
    > "Gap analysis complete. Review the build plan above. Proceed to build fixes? (yes / skip / abort)"

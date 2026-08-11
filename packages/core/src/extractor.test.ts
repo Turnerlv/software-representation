@@ -167,6 +167,18 @@ test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
     graph.contracts.some((c) => c.name === 'Dynamic Export: app[method]'),
     'Expected to extract dynamic method assignment as CONTRACT'
   );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'CJS Export: header' && c.evidence.snippet?.includes('req.header')),
+    'Expected to extract req.header assignment as CONTRACT'
+  );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'CJS Export: status' && c.evidence.snippet?.includes('res.status')),
+    'Expected to extract res.status assignment as CONTRACT'
+  );
+  assert.ok(
+    graph.contracts.some((c) => c.name === 'Property Getter: protocol'),
+    'Expected to extract Object.defineProperty protocol getter as CONTRACT'
+  );
 });
 
 test('analyzeTarget extracts EventEmitter patterns', () => {

@@ -24,7 +24,7 @@ Before inspecting any file, internalize what the current extractor covers so you
 | Primitive | Currently Extracted Patterns |
 |---|---|
 | `BOUNDARY` | `class` declarations, `namespace`/`module` declarations, CommonJS module exports (`module.exports` / `exports.foo = ...`) |
-| `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, `app.route`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`), aliased CommonJS module exports (`app.init = function()`), dynamic method assignments (`app[method] = function()`) |
+| `CONTRACT` | `interface` declarations, `type` alias declarations, exported `function` declarations, Express route definitions (`app.get`, `app.post`, `router.get`, `app.route`, etc. with a string path literal), Express route parameters (`app.param`), Express content negotiation (`res.format`), aliased CommonJS module exports (`app.init = function()`, `req.header = ...`, `res.status = ...`), dynamic method assignments (`app[method] = function()`, `req[method] = ...`, `res[method] = ...`), object property getters (`Object.defineProperty(obj, name, { get: ... })`) |
 | `RELATIONSHIP` | `import` declarations (static, named, default, namespace), CommonJS `require('module')` calls, Express router and middleware mounts (`app.use('/path', router)`, `app.use(middleware)`), Prototypal inheritance (`Object.create`, `Object.setPrototypeOf`), prototype mixins (e.g., `mixin(dest, src.prototype)`), inferred method calls |
 | `OPEN_CONNECTOR` | Calls where the root identifier is in the HTTP allowlist (`fetch`, `axios`, `got`, `superagent`, `needle`, `request`, `ky`, `XMLHttpRequest`) or DB/broker allowlist (`prisma`, `knex`, `mongoose`, `sequelize`, `typeorm`, `drizzle`, `supabase`, `pg`, `mysql`, `mysql2`, `sqlite3`, `redis`, `dynamodb`, `bull`, `bullmq`, `amqplib`, `kafka`, `nats`), Express responses (`res.sendFile`, `res.download`, `res.render`, `res.redirect`) |
 
@@ -83,8 +83,9 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] Zod/Yup/Joi schema declarations — typed validation schemas ARE contracts
 - [ ] `@ApiProperty()` / `@ApiResponse()` decorators (NestJS Swagger) — documented contracts
 - [ ] `EventEmitter.on('eventName', handler)` — event contracts ✅ **Already handled by `eventEmitterVisitor.ts`**
-- [ ] Aliased CommonJS module exports (e.g. `app.init = function()`) ✅ **Already handled by `commonjsExportVisitor.ts`**
-- [ ] Dynamic method assignments (e.g. `app[method] = function()`) ✅ **Already handled by `commonjsExportVisitor.ts`**
+- [ ] `Object.defineProperty(obj, name, { get: ... })` — object property getters ✅ **Already handled by `definePropertyVisitor.ts`**
+- [ ] Aliased CommonJS module exports (e.g. `app.init = function()`, `req.header = ...`, `res.status = ...`) ✅ **Already handled by `commonjsExportVisitor.ts`**
+- [ ] Dynamic method assignments (e.g. `app[method] = function()`, `res[method] = ...`) ✅ **Already handled by `commonjsExportVisitor.ts`**
 
 ### RELATIONSHIP gaps (things that describe structural dependencies beyond `import`)
 - [ ] `app.use('/prefix', router)` / `app.use(middleware)` — Express router and middleware mounting (hierarchical dependency) ✅ **Already handled by `expressAdapter.ts`**
@@ -111,15 +112,15 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 
 ## 4. Ledger Entry Template
 
-When you find a gap, log it directly into the SQLite database. The `TSX_DISABLE_IPC=1 pnpm chomp ledger` command only displays the ledger; it does not have a command to add gaps. Therefore, insert gaps using a SQL statement:
+When you find a gap, log it directly into the SQLite database. Do NOT use raw SQL statements to do this, because they produce non-deterministic gap IDs. Instead, use the deterministic CLI command which securely hashes the file, line, and pattern:
 
 ```bash
-sqlite3 fixtures/cloned-repos/<repo-name>.db "INSERT INTO extractor_coverage_ledger (id, pattern_name, framework, status, impact_level, evidence_repo, evidence_file, evidence_line, evidence_snippet) VALUES ('gap_' || lower(hex(randomblob(6))), '<Pattern Name>', '<Framework>', 'DISCOVERED', '<IMPACT>', 'fixtures/cloned-repos/<repo-folder-name>', '<evidenceFile>', <evidenceLine>, '<evidenceSnippet>');"
+TSX_DISABLE_IPC=1 pnpm chomp ledger log --repo <repo-folder-name> --file <evidenceFile> --line <evidenceLine> --pattern "<Pattern Name>" --framework "<Framework>" --impact <IMPACT> --snippet "<evidenceSnippet>" --db fixtures/cloned-repos/<repo-name>.db
 ```
 
 For example:
 ```bash
-sqlite3 fixtures/cloned-repos/express.db "INSERT INTO extractor_coverage_ledger (id, pattern_name, framework, status, impact_level, evidence_repo, evidence_file, evidence_line, evidence_snippet) VALUES ('gap_' || lower(hex(randomblob(6))), 'Express Route Definition', 'Express', 'DISCOVERED', 'HIGH', 'fixtures/cloned-repos/express', 'examples/hello-world/index.js', 7, 'app.get(''/path'', function(req, res){');"
+TSX_DISABLE_IPC=1 pnpm chomp ledger log --repo fixtures/cloned-repos/express --file examples/hello-world/index.js --line 7 --pattern "Express Route Definition" --framework Express --impact HIGH --snippet "app.get('/path', function(req, res){" --db fixtures/cloned-repos/express.db
 ```
 
 **Naming conventions for `pattern_name`:**
@@ -151,10 +152,12 @@ sqlite3 fixtures/cloned-repos/express.db "INSERT INTO extractor_coverage_ledger 
 
 ---
 
-## 6. Session Output Checklist
+## 6. Session Output Checklist & Human Gate
 
 Before ending an eval session on a repo, confirm:
-- [ ] Every HIGH-impact gap has been logged with a line number and snippet.
+- [ ] Every HIGH-impact gap has been logged with a line number and snippet via `chomp ledger log`.
 - [ ] Every MEDIUM-impact gap has been logged, even if the line number is approximate.
 - [ ] No duplicate ledger entries were created for patterns already in the ledger.
-- [ ] Run `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db` and confirm new entries appear with correct framework and status.
+- [ ] **Document the Session**: If this skill is run as part of the `research-loop`, ensure the gaps are appended to the `fixtures/research/sessions/<session_id>.md` report as a "Research Brief". If you are running in isolation, produce a Research Brief locally or in the chat.
+- [ ] **Human Validation**: **🛑 STOP and explicitly ask the human to validate the discovered gaps and build plan BEFORE handing off to the `parser-builder` skill or concluding the session.** Do not proceed without explicit human consent.
+- [ ] **Doc Drift Reminder**: Note that as you resolve these gaps later, the checklists in Section 3 of this document will become outdated. Do NOT modify this prompt yourself. The `doc-drift-audit` skill will automatically sync these checklists after the session is fully resolved.

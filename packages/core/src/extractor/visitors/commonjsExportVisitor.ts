@@ -37,7 +37,7 @@ export function extractCommonjsExport(
       } else if (ts.isIdentifier(left.expression) && left.expression.text === 'exports') {
         isCjsExport = true;
         exportName = left.name.text;
-      } else if (ts.isIdentifier(left.expression) && left.expression.text === 'app') {
+      } else if (ts.isIdentifier(left.expression) && ['app', 'req', 'res'].includes(left.expression.text)) {
         // Express alias
         isCjsExport = true;
         exportName = left.name.text;
@@ -47,12 +47,12 @@ export function extractCommonjsExport(
     } else if (ts.isElementAccessExpression(left)) {
       // Dynamic export (e.g. app[method] = function() {})
       const leftExpr = left.expression;
-      if (ts.isIdentifier(leftExpr) && leftExpr.text === 'app') {
+      if (ts.isIdentifier(leftExpr) && ['app', 'req', 'res'].includes(leftExpr.text)) {
         const isFunction = ts.isFunctionExpression(node.right) || ts.isArrowFunction(node.right);
         if (isFunction) {
           return {
             id: nextId(),
-            name: `Dynamic Export: app[method]`,
+            name: `Dynamic Export: ${leftExpr.text}[method]`,
             type: 'CONTRACT',
             evidence: getEvidence(node),
           };

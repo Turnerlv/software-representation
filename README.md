@@ -64,8 +64,9 @@ collectFiles()
 The local CLI for running extraction and research session orchestration:
 
 ```
-chomp analyze <path> [--db <path>]                  # Extract + persist a repo's structural graph
-chomp ledger [--db <path>]                          # Inspect the extractor coverage ledger
+chomp analyze --repo <name> [--format json]      # Extracts AST and outputs ontology metrics
+chomp ledger [--db <path>]                        # Displays gap analysis ledger
+chomp ledger log --repo <name> --file <path> ...  # Deterministically logs an extraction gap
 chomp session start --repo <name> [--force]         # Setup session, branch, DB, and report stub
 chomp session log-gaps --repo <name> --count <n>    # Record logged gaps and commit report
 chomp session close --repo <name> --resolved <n>    # Re-analyze graph, record final state & complete
