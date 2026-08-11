@@ -11,6 +11,14 @@ This skill orchestrates a complete research session against a target repository.
 
 ---
 
+## Operational Warnings
+
+- **Do NOT pipe `chomp analyze` output** (e.g., `| tail`). Doing so can cause `EPIPE` errors and prevent the DB from saving successfully.
+- **Always use `pnpm chomp`**. The `chomp` command is mapped in `package.json`. Do NOT try to run `tsx` directly or use `pnpm cli analyze`.
+- **Always use the `--db` flag** when running `chomp analyze` or `chomp ledger`. Omitting `--db` will cause the DB to be saved to the default path `apps/backend/data/chomp.db` instead of the target repo folder.
+
+---
+
 ## Prerequisites
 
 Before invoking this skill, ensure:
@@ -38,7 +46,7 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 3. Read the newly generated session report at `fixtures/research/sessions/<session_id>.md` (which the CLI created) to get the baseline counts.
 
-9. **Print to chat** — immediately after setup, output the following so the human can confirm the baseline before gap analysis begins:
+4. **Print to chat** — immediately after setup, output the following so the human can confirm the baseline before gap analysis begins:
 
    > **Session `<session_id>` — Setup Complete**
    > Branch: `research/<repo-name>-<YYYY-MM-DD-HHMMSS>`
@@ -148,7 +156,7 @@ After all gaps are processed:
    > - `pr` — push branch to remote and stop; open a GitHub PR manually
    > - `skip` — do nothing; branch stays local
 
-10. If `merge`:
+7. If `merge`:
    ```bash
    git push origin research/<repo-name>-<date>
    git checkout main
@@ -169,7 +177,7 @@ After all gaps are processed:
 
    If no gaps were resolved (`gaps_resolved = 0` and `after == before` for all primitives), **skip the version bump** and print:
    > ℹ️ No extractor changes landed this session — version left at `<current-version>`.
-11. If `pr`:
+8. If `pr`:
    ```bash
    git push origin research/<repo-name>-<date>
    ```
