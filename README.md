@@ -61,11 +61,14 @@ collectFiles()
 ```
 
 ### `@chomp/cli`
-The local CLI for running extraction. Two commands:
+The local CLI for running extraction and research session orchestration:
 
 ```
-chomp analyze <path> [--db <path>]   # Extract + persist a repo's structural graph
-chomp ledger [--db <path>]           # Inspect the extractor coverage ledger
+chomp analyze <path> [--db <path>]                  # Extract + persist a repo's structural graph
+chomp ledger [--db <path>]                          # Inspect the extractor coverage ledger
+chomp session start --repo <name> [--force]         # Setup session, branch, DB, and report stub
+chomp session log-gaps --repo <name> --count <n>    # Record logged gaps and commit report
+chomp session close --repo <name> --resolved <n>    # Re-analyze graph, record final state & complete
 ```
 
 ---
@@ -102,6 +105,19 @@ pnpm chomp ledger
 pnpm chomp ledger --db fixtures/cloned-repos/my-repo.db
 ```
 
+### Manage research sessions
+
+```bash
+# Start session (runs setup, branch creation, DB analyze, registry tracking)
+pnpm chomp session start --repo express
+
+# Log discovered gaps
+pnpm chomp session log-gaps --repo express --count 3
+
+# Close session (re-analyzes graph, updates registry counts, marks COMPLETE)
+pnpm chomp session close --repo express --resolved 2
+```
+
 ### Run tests
 
 ```bash
@@ -112,13 +128,13 @@ pnpm test --filter @chomp/core
 
 ## Research Workflow
 
-The standard loop for expanding extractor coverage against real-world repos uses the `research-loop` agent skill, tracking state in `fixtures/research/registry.json`.
+The standard loop for expanding extractor coverage against real-world repos uses the `research-loop` agent skill, backed by deterministic `pnpm chomp session` CLI guardrails and state tracking in `fixtures/research/registry.json`.
 
 ```
 [Clone Repo] -> [Stage 0: Setup] -> [Stage 1: Eval gaps] -> [Stage 2: Build fixes] -> [Stage 3: Confirm & Record]
 ```
 
-Invoke the `research-loop` skill to run a guided session. The session runs on its own branch (e.g., `research/<repo-name>-<date>`).
+Invoke the `research-loop` skill to run a guided session. The session uses `chomp session` CLI commands to manage setup, branch creation, JSON updates, and commits atomically on its dedicated research branch (e.g., `research/<repo-name>-<date>`).
 
 See [AGENTS.md](./AGENTS.md) Section 9 for the full rules and workflow details.
 

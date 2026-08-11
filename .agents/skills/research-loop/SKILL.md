@@ -26,89 +26,17 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 ## Stage 0 — Session Setup (Automated)
 
-1. Read `<repo-name>`, `pinned_commit`, and `extractor_version` (from `packages/core/package.json`) from `registry.json`.
+1. **Create Checklist Artifact:** Create a `task.md` Artifact (or a local `scratch/checklist.md`) with a checklist of the stages in this session. You must check off `[x]` items sequentially as you complete each stage to ground your execution state.
 
-2. **Guard: prior COMPLETE session with same extractor version.**
-   Read the current `extractor_version` from `packages/core/package.json`. Then find the most recent session in `registry.json` for this repo whose `status` is `COMPLETE` **and** whose `extractor_version` matches the current version.
+2. Run the session start command. This handles version checking, DB generation/re-use, branch creation, registry updating, session report stub creation, and git committing automatically.
 
-   If such a session exists, print:
-   > ⚠️ A completed session (`<session_id>`) already ran against this repo with extractor v`<version>`. Running again is likely to produce identical results unless the source files have changed.
-   > Continue anyway? (yes / abort)
-   - `abort` → exit without any changes.
-   - `yes` → continue.
-
-   > **Note:** `pinned_commit` is a repo-level field shared by all sessions, so it is not used as a differentiator here. The meaningful signal of redundant work is an identical `extractor_version` on a prior COMPLETE session.
-
-3. **Freshness check: does analyze need to re-run?**
-
-   Determine the current extractor version from `packages/core/package.json`. Then find the most recent session for this repo (any status).
-
-   The DB is considered **fresh** if **all three** of the following are true:
-   - `fixtures/cloned-repos/<repo-name>.db` exists.
-   - The DB file's modification time is **newer** than the most recent session's `date`.
-   - The most recent session's `extractor_version` matches the current version from `packages/core/package.json`.
-
-   **If the DB is fresh** — skip re-analysis. Print:
-   > ✅ DB is up-to-date (extractor v<version>, last run after <last_session_date>). Reusing existing extraction results.
-
-   **If the DB is stale or missing** — delete and re-run:
    ```bash
-   rm -f fixtures/cloned-repos/<repo-name>.db
-   TSX_DISABLE_IPC=1 pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
+   TSX_DISABLE_IPC=1 pnpm chomp session start --repo <repo-name>
    ```
-   > **Note:** `TSX_DISABLE_IPC=1` is required to prevent an EPERM error from tsx's IPC pipe on macOS. Always include it.
-   > 
-   > **Operational Warnings:**
-   > - **Do NOT pipe** the output of `chomp analyze` (e.g., `| tail`). Doing so can cause an `EPIPE` error which silently aborts the SQLite transaction, leaving the DB un-updated.
-   > - `pnpm chomp` is explicitly mapped in `package.json`. Do not try to run `npx tsx`, `pnpm cli`, or other variants if `pnpm chomp` appears to fail initially.
-   > - The `--db` flag is mandatory. If omitted, the DB will save to a fallback path (`apps/backend/data/chomp.db`) instead of the targeted fixtures directory.
+   
+   > **Note:** If this errors because a complete session already exists for this extractor version, you may append `--force` if the human explicitly wants to override.
 
-4. Create a new session entry in `registry.json`:
-   ```json
-   {
-     "session_id": "<YYYY-MM-DD-HHMMSS>-<repo-name>",
-     "branch": "research/<repo-name>-<YYYY-MM-DD-HHMMSS>",
-     "date": "<today ISO date>",
-     "extractor_version": "<packages/core version>",
-     "report_path": "fixtures/research/sessions/<YYYY-MM-DD-HHMMSS>-<repo-name>.md",
-     "entity_counts": {
-       "before": { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 },
-       "after":  { "BOUNDARY": 0, "CONTRACT": 0, "RELATIONSHIP": 0, "OPEN_CONNECTOR": 0 }
-     },
-     "gaps_logged": 0,
-     "gaps_resolved": 0,
-     "status": "IN_PROGRESS"
-   }
-   ```
-
-5. Create and checkout a git branch: `research/<repo-name>-<YYYY-MM-DD-HHMMSS>`
-
-6. Record the **before** entity counts from the analyze output (or the reused DB) into the session entry in `registry.json`.
-7. Create the session report file at `fixtures/research/sessions/<session_id>.md`. Use this template for the header:
-
-   ```markdown
-   # Research Session: <repo-name> — <YYYY-MM-DD-HHMMSS>
-
-   ## Target
-   - Repo: <url>
-   - Pinned commit: <short SHA>
-   - Extractor version: <version>
-   - Branch: research/<repo-name>-<YYYY-MM-DD-HHMMSS>
-
-   ## Extraction Baseline
-   | Primitive      | Count |
-   |---|---|
-   | BOUNDARY       | <n>   |
-   | CONTRACT       | <n>   |
-   | RELATIONSHIP   | <n>   |
-   | OPEN_CONNECTOR | <n>   |
-
-   ---
-   <!-- Stage 1 content will be appended below -->
-   ```
-
-8. Commit both `registry.json` and the session report stub to the branch:
-   `research(<repo-name>): session <session_id> — setup`
+3. Read the newly generated session report at `fixtures/research/sessions/<session_id>.md` (which the CLI created) to get the baseline counts.
 
 9. **Print to chat** — immediately after setup, output the following so the human can confirm the baseline before gap analysis begins:
 
@@ -156,12 +84,12 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
    🛑 **HUMAN GATE — Stage 1:** Review the build plan above before any parser changes are made.
    ```
 
-4. Commit the updated session report to the branch:
-   `research(<repo-name>): session <session_id> — gap analysis complete`
+4. Run the log-gaps command to automatically record the gap count in `registry.json` and commit the updated session report:
+   ```bash
+   TSX_DISABLE_IPC=1 pnpm chomp session log-gaps --repo <repo-name> --count <n>
+   ```
 
-5. Update `gaps_logged` in `registry.json` with the total count of DISCOVERED gaps.
-
-6. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
+5. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
 
    Then ask:
    > "Gap analysis complete. Review the build plan above. Proceed to build fixes? (yes / skip / abort)"
@@ -200,14 +128,8 @@ After all gaps are processed:
 
 ## Stage 3 — Confirm & Record 🛑 HUMAN GATE
 
-1. Delete the DB and re-run extraction fresh:
-   ```bash
-   rm -f fixtures/cloned-repos/<repo-name>.db
-   TSX_DISABLE_IPC=1 pnpm chomp analyze fixtures/cloned-repos/<repo-name> --db fixtures/cloned-repos/<repo-name>.db
-   ```
-2. Run: `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db`
-3. Record the **after** entity counts into the session entry in `registry.json`.
-4. Append the outcome section to the session report:
+1. Re-run `chomp analyze` to inspect the delta. You can use the CLI or SQLite to check the numbers.
+2. Append the outcome section to the session report file (`fixtures/research/sessions/<session_id>.md`):
 
    ```markdown
    ## Outcome
@@ -229,21 +151,18 @@ After all gaps are processed:
    <Agent fills in edge cases, surprises, deferred decisions, or patterns worth investigating next session>
    ```
 
-5. **Reconcile Session Report File Paths:** Check the `## Gaps Discovered` and `## Build Plan` sections in `fixtures/research/sessions/<session_id>.md`. If the actual file created/modified during Stage 2 differs from the initial proposed path (e.g., `expressAdapter.ts` instead of `adapters/express/index.ts`), update those lines to reflect the exact target file path.
+3. **Reconcile Session Report File Paths:** Check the `## Gaps Discovered` and `## Build Plan` sections in `fixtures/research/sessions/<session_id>.md`. If the actual file created/modified during Stage 2 differs from the initial proposed path (e.g., `expressAdapter.ts` instead of `adapters/express/index.ts`), update those lines to reflect the exact target file path.
 
-6. **Proactively Sync Parser Harness Documentation:** Update `.agents/skills/parser-eval-harness/SKILL.md`:
+4. **Proactively Sync Parser Harness Documentation:** Update `.agents/skills/parser-eval-harness/SKILL.md`:
    - In Section 1 (**What the Extractor Already Handles**), add any newly extracted AST patterns to the corresponding primitive row in the table.
    - In Section 3 (**Pattern Checklist**), update the item for each resolved pattern to mark it with `✅ **Already handled by `<visitor/adapter filename>`**`.
 
-7. Update `registry.json`:
-   - Set `entity_counts.after`
-   - Set `gaps_resolved` count
-   - Set `status: "COMPLETE"`
+5. Run the session close command to automatically re-analyze the graph, record the final entity counts, mark the session as `COMPLETE`, and commit the changes:
+   ```bash
+   TSX_DISABLE_IPC=1 pnpm chomp session close --repo <repo-name> --resolved <n>
+   ```
 
-8. Commit everything — session report + `registry.json` — with message:
-   `research(<repo-name>): session <session_id> complete — see fixtures/research/sessions/<session_id>.md`
-
-9. **🛑 PRINT TO CHAT — output the full Outcome section and Resolution Summary verbatim before asking anything.** The human must see the delta table and every resolved/deferred gap in the conversation without opening the session file.
+6. **🛑 PRINT TO CHAT — output the full Outcome section and Resolution Summary verbatim before asking anything.** The human must see the delta table and every resolved/deferred gap in the conversation without opening the session file.
 
    Then ask:
    > "Session complete. How would you like to close this branch?"
