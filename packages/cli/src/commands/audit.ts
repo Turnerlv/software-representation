@@ -1,8 +1,9 @@
 import { Command } from "commander";
-import { existsSync, writeFileSync, mkdirSync } from "node:fs";
+import { existsSync, writeFileSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
+import { execSync } from "node:child_process";
 import { readRegistry, writeRegistry, SystemAudit } from "../utils/registry.js";
-import { createBranch, commitChanges } from "../utils/git.js";
+import { createBranch, commitChanges, checkoutBranch, mergeBranch, pushBranch } from "../utils/git.js";
 import { findWorkspaceRoot } from "../utils/db.js";
 
 function formatDate(date: Date): string {
@@ -97,5 +98,47 @@ export function registerAuditCommand(program: Command) {
 
       commitChanges(["fixtures/research/registry.json", reportPath], `audit(${options.topic}): complete system audit`, workspaceRoot);
       console.log(`Audit ${auditId} closed and logged to registry.`);
+    });
+
+  auditCmd
+    .command("merge")
+    .description("Merge a completed system audit back to main and bump version")
+    .requiredOption("--topic <name>", "Kebab-case topic name for the audit")
+    .action((options) => {
+      const baseDir = process.env.INIT_CWD ?? process.cwd();
+      const workspaceRoot = findWorkspaceRoot(baseDir);
+      const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
+      const registry = readRegistry(registryPath);
+      
+      const audit = [...(registry.system_audits || [])].reverse().find((a: any) => a.id.endsWith(`-${options.topic}`));
+      if (!audit) {
+        console.error(`No completed audit found for topic ${options.topic}`);
+        process.exit(1);
+      }
+
+      const branchName = `audit/${audit.id}`;
+
+      console.log(`Pushing branch ${branchName} to remote...`);
+      try {
+        pushBranch(branchName, workspaceRoot);
+      } catch (e: any) {
+        console.warn(`⚠️ Could not push branch ${branchName} to remote. Continuing with local merge...`);
+      }
+
+      console.log(`Checking out main...`);
+      checkoutBranch("main", workspaceRoot);
+
+      console.log(`Merging ${branchName} into main...`);
+      mergeBranch(branchName, `audit(${options.topic}): merge audit ${audit.id}`, workspaceRoot);
+
+      console.log(`Bumping @chomp/core version...`);
+      execSync("npm version patch --no-git-tag-version --prefix packages/core", { cwd: workspaceRoot, stdio: 'inherit' });
+      
+      const pkgPath = resolve(workspaceRoot, "packages/core/package.json");
+      const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+      const newVersion = pkg.version;
+      
+      commitChanges(["packages/core/package.json"], `chore: bump @chomp/core to ${newVersion} — audit ${audit.id}`, workspaceRoot);
+      console.log(`✅ Bumped version to ${newVersion} and committed.`);
     });
 }
