@@ -97,7 +97,7 @@ test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
   );
 });
 
-test('analyzeTarget extracts Express Response Connectors (download, render, redirect)', () => {
+test('analyzeTarget extracts Express Response Connectors', () => {
   const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'express-app');
   const graph = analyzeTarget(fixtureDir);
 
@@ -112,6 +112,18 @@ test('analyzeTarget extracts Express Response Connectors (download, render, redi
   assert.ok(
     graph.openConnectors.some((c) => c.name === 'Express Redirect'),
     'Expected to extract Express Redirect as OPEN_CONNECTOR'
+  );
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: send'),
+    'Expected to extract Express HTTP Response: send as OPEN_CONNECTOR'
+  );
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: json'),
+    'Expected to extract Express HTTP Response: json as OPEN_CONNECTOR'
+  );
+  assert.ok(
+    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: sendStatus'),
+    'Expected to extract Express HTTP Response: sendStatus as OPEN_CONNECTOR'
   );
 });
 

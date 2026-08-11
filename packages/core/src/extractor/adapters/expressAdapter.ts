@@ -247,6 +247,23 @@ export function extractExpressResponseConnector(
         type: 'OPEN_CONNECTOR',
         evidence: getEvidence(node),
       };
+    } else if (methodName === 'send' || methodName === 'json' || methodName === 'jsonp' || methodName === 'sendStatus') {
+      let isExpressRes = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        if (['res'].includes(rootName)) {
+          isExpressRes = true;
+        }
+      }
+      
+      if (isExpressRes) {
+        return {
+          id: nextId(),
+          name: `Express HTTP Response: ${methodName}`,
+          type: 'OPEN_CONNECTOR',
+          evidence: getEvidence(node),
+        };
+      }
     }
   }
 
