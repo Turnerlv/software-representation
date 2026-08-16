@@ -370,6 +370,30 @@
           "gaps_logged": 2,
           "gaps_resolved": 2,
           "status": "COMPLETE"
+        },
+        {
+          "session_id": "2026-08-16-222732-express",
+          "branch": "research/express-2026-08-16-222732",
+          "date": "2026-08-16T14:27:32.237Z",
+          "extractor_version": "0.2.3",
+          "report_path": "fixtures/research/sessions/2026-08-16-222732-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 92,
+              "CONTRACT": 538,
+              "RELATIONSHIP": 1419,
+              "OPEN_CONNECTOR": 224
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS"
         }
       ]
     }
