@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { Command } from "commander";
 import { initDatabase, getLedgerSummary, getAllLedgerEntries, logExtractionGap } from "@chomp/core";
@@ -78,7 +79,6 @@ export function registerLedgerCommand(program: Command) {
     .requiredOption("--repo <name>", "Repository name (to associate evidence)")
     .option("--db <path>", "Path to SQLite database file")
     .action((options) => {
-      const { readFileSync } = require("node:fs");
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const dbPath = resolveDbPath(baseDir, options.db);
       
