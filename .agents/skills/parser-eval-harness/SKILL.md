@@ -83,9 +83,10 @@ For each file you inspect, explicitly evaluate whether these patterns are presen
 - [ ] Zod/Yup/Joi schema declarations — typed validation schemas ARE contracts
 - [ ] `@ApiProperty()` / `@ApiResponse()` decorators (NestJS Swagger) — documented contracts
 - [ ] `EventEmitter.on('eventName', handler)` — event contracts ✅ **Already handled by `eventEmitterVisitor.ts`**
-- [ ] `Object.defineProperty(obj, name, { get: ... })` — object property getters ✅ **Already handled by `definePropertyVisitor.ts`**
+- [ ] `Object.defineProperty(obj, name, { get: ... })` / `defineGetter(obj, name, fn)` — object property getters ✅ **Already handled by `definePropertyVisitor.ts`**
 - [ ] Aliased CommonJS module exports (e.g. `app.init = function()`, `req.header = ...`, `res.status = ...`) ✅ **Already handled by `commonjsExportVisitor.ts`**
 - [ ] Dynamic method assignments (e.g. `app[method] = function()`, `res[method] = ...`) ✅ **Already handled by `commonjsExportVisitor.ts`**
+- [ ] Prototype method assignments (`Class.prototype.method = function`) ✅ **Already handled by `commonjsExportVisitor.ts`**
 
 ### RELATIONSHIP gaps (things that describe structural dependencies beyond `import`)
 - [ ] `app.use('/prefix', router)` / `app.use(middleware)` — Express router and middleware mounting (hierarchical dependency) ✅ **Already handled by `expressAdapter.ts`**
