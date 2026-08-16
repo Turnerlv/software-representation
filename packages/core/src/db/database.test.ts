@@ -38,13 +38,15 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
   };
 
   const graph: RepresentationGraph = {
-    version: '1.0.0',
+    extractorVersion: '1.0.0',
     analyzedAt: '2026-08-09T10:00:00Z',
     boundaries: [
       {
         id: 'b1',
         name: 'AuthService',
         type: 'BOUNDARY',
+        entityType: 'CLASS',
+        scope: 'USER',
         evidence: {
           filePath: 'src/auth/service.ts',
           lineNumber: 12,
@@ -57,6 +59,8 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
         id: 'c1',
         name: 'POST /api/login',
         type: 'CONTRACT',
+        entityType: 'HTTP_ENDPOINT',
+        scope: 'USER',
         evidence: {
           filePath: 'src/auth/router.ts',
           lineNumber: 45,
@@ -69,6 +73,8 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
         id: 'r1',
         name: 'AuthService -> Database',
         type: 'RELATIONSHIP',
+        entityType: 'IMPORT',
+        scope: 'USER',
         evidence: {
           filePath: 'src/auth/service.ts',
           lineNumber: 8,
@@ -81,6 +87,8 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
         id: 'oc1',
         name: 'StripePaymentGateway',
         type: 'OPEN_CONNECTOR',
+        entityType: 'HTTP_FETCH',
+        scope: 'USER',
         evidence: {
           filePath: 'src/payment/stripe.ts',
           lineNumber: 3,

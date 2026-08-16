@@ -36,6 +36,7 @@ export function visitContract(
       id: nextId(),
       name: `Interface: ${node.name.text}`,
       type: 'CONTRACT',
+      entityType: 'EXPORTED_TYPE',
       evidence: getEvidence(node),
     };
   }
@@ -44,6 +45,7 @@ export function visitContract(
       id: nextId(),
       name: `Type: ${node.name.text}`,
       type: 'CONTRACT',
+      entityType: 'EXPORTED_TYPE',
       evidence: getEvidence(node),
     };
   }
@@ -56,6 +58,7 @@ export function visitContract(
       id: nextId(),
       name: `Exported Function: ${node.name.text}`,
       type: 'CONTRACT',
+      entityType: 'EXPORTED_FUNCTION',
       evidence: getEvidence(node),
     };
   }

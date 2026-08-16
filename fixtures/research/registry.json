@@ -27,7 +27,8 @@
           },
           "gaps_logged": 3,
           "gaps_resolved": 3,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-171034-express",
@@ -51,7 +52,8 @@
           },
           "gaps_logged": 3,
           "gaps_resolved": 3,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-175537-express",
@@ -75,7 +77,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-184852-express",
@@ -99,7 +102,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-194511-express",
@@ -123,7 +127,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-214045-express",
@@ -147,7 +152,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-220819-express",
@@ -171,7 +177,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 1,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-230507-express",
@@ -195,7 +202,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-231907-express",
@@ -219,7 +227,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-10-233800-express",
@@ -243,7 +252,8 @@
           },
           "gaps_logged": 3,
           "gaps_resolved": 3,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-11-002100-express",
@@ -273,7 +283,8 @@
             "CONTRACT": 508,
             "RELATIONSHIP": 1416,
             "OPEN_CONNECTOR": 186
-          }
+          },
+          "deprecated": true
         },
         {
           "session_id": "2026-08-11-215227-express",
@@ -297,7 +308,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-11-232327-express",
@@ -321,7 +333,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-11-233739-express",
@@ -345,7 +358,8 @@
           },
           "gaps_logged": 1,
           "gaps_resolved": 1,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-11-235604-express",
@@ -369,7 +383,8 @@
           },
           "gaps_logged": 2,
           "gaps_resolved": 2,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         },
         {
           "session_id": "2026-08-16-222732-express",
@@ -393,7 +408,8 @@
           },
           "gaps_logged": 5,
           "gaps_resolved": 5,
-          "status": "COMPLETE"
+          "status": "COMPLETE",
+          "deprecated": true
         }
       ]
     }

@@ -119,6 +119,25 @@ export function analyzeTarget(
     );
 
     const relativePath = path.relative(process.cwd(), filePath) || filePath;
+    let scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' = 'USER';
+    const lowerPath = relativePath.toLowerCase();
+    if (lowerPath.includes('/test/') || lowerPath.includes('/tests/') || lowerPath.includes('__tests__') || lowerPath.includes('.test.') || lowerPath.includes('.spec.')) {
+      scope = 'TEST';
+    } else if (lowerPath.includes('mock') || lowerPath.includes('__mocks__')) {
+      scope = 'MOCK';
+    } else if (lowerPath.includes('config')) {
+      scope = 'CONFIG';
+    }
+
+    const fileId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
+    boundaries.push({
+      id: fileId,
+      name: `File: ${relativePath}`,
+      type: 'BOUNDARY',
+      entityType: 'FILE',
+      scope,
+      evidence: { filePath: relativePath },
+    });
 
     /**
      * Constructs a 1-indexed source evidence record for the given AST node.
@@ -145,27 +164,31 @@ export function analyzeTarget(
       const boundaryEntity = visitBoundary(node, getEvidence, () => '');
       if (boundaryEntity) {
         boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
+        boundaryEntity.sourceId = fileId;
+        boundaryEntity.scope = scope;
         boundaries.push(boundaryEntity);
       }
 
       const contractEntity = visitContract(node, getEvidence, () => '');
       if (contractEntity) {
         contractEntity.id = stableEntityId(relativePath, contractEntity.type, contractEntity.name);
+        contractEntity.sourceId = fileId;
+        contractEntity.scope = scope;
         contracts.push(contractEntity);
       }
 
-      // We use the file itself as the boundary for relationships if not inside a class
-      const sourceId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
-
-      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, sourceId);
+      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
       if (relationshipEntity) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
+        relationshipEntity.scope = scope;
         relationships.push(relationshipEntity);
       }
 
       const openConnectorEntity = visitOpenConnector(node, sourceFile, getEvidence, () => '');
       if (openConnectorEntity) {
         openConnectorEntity.id = stableEntityId(relativePath, openConnectorEntity.type, openConnectorEntity.name);
+        openConnectorEntity.sourceId = fileId;
+        openConnectorEntity.scope = scope;
         openConnectors.push(openConnectorEntity);
       }
 
@@ -176,7 +199,7 @@ export function analyzeTarget(
   }
 
   return {
-    version: extractorVersion,
+    extractorVersion,
     analyzedAt: new Date().toISOString(),
     commitSha,
     boundaries,

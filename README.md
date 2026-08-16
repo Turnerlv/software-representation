@@ -63,13 +63,16 @@ collectFiles()
 ### `@chomp/cli`
 The local CLI for running extraction and research session orchestration:
 
-```
+```bash
 chomp analyze --repo <name> [--format json]      # Extracts AST and outputs ontology metrics
 chomp ledger [--db <path>]                        # Displays gap analysis ledger
 chomp ledger log --repo <name> --file <path> ...  # Deterministically logs an extraction gap
 chomp session start --repo <name> [--force]         # Setup session, branch, DB, and report stub
+chomp audit prepare --repo <name>                   # Export current_extraction.json & system_prompt.md for AI Studio
+chomp ledger import --file <path> --repo <name>   # Import studio_output.json into SQLite ledger
 chomp session log-gaps --repo <name> --count <n>    # Record logged gaps and commit report
 chomp session close --repo <name> --resolved <n>    # Re-analyze graph, record final state & complete
+chomp session merge --repo <name>                   # Push, checkout main, merge --no-ff & patch bump @chomp/core
 chomp audit start --topic <name>                    # Setup system audit, branch, and report stub
 chomp audit close --topic <name> --change <items..> # Close audit and log changes to registry
 ```
@@ -108,19 +111,6 @@ pnpm chomp ledger
 pnpm chomp ledger --db fixtures/cloned-repos/my-repo.db
 ```
 
-### Manage research sessions
-
-```bash
-# Start session (runs setup, branch creation, DB analyze, registry tracking)
-pnpm chomp session start --repo express
-
-# Log discovered gaps
-pnpm chomp session log-gaps --repo express --count 3
-
-# Close session (re-analyzes graph, updates registry counts, marks COMPLETE)
-pnpm chomp session close --repo express --resolved 2
-```
-
 ### Run tests
 
 ```bash
@@ -129,29 +119,73 @@ pnpm test --filter @chomp/core
 
 ---
 
-## Research Workflow
+## Manual Research Workflow
 
-The standard loop for expanding extractor coverage against real-world repos uses the `research-loop` agent skill, backed by deterministic `pnpm chomp session` CLI guardrails and state tracking in `fixtures/research/registry.json`.
+This step-by-step workflow expands Chomp's AST extractor coverage against real-world repositories without relying on automated bridge API calls.
+
+> **Note on `<repo-name>`:** `<repo-name>` refers to the repository **identifier** registered under `repos` in [`fixtures/research/registry.json`](file:///Users/turnervickery/code/chomp/fixtures/research/registry.json) (e.g. `express`), **not** a file path. The CLI automatically maps `<repo-name>` to `fixtures/cloned-repos/<repo-name>` and `fixtures/cloned-repos/<repo-name>.db`.
 
 ```
-[Clone Repo] -> [Stage 0: Setup] -> [Stage 1: Eval gaps] -> [Stage 2: Build fixes] -> [Stage 3: Confirm & Record]
+[0. Clone Repo] ──> [1. Health Metrics Gate] ──> [2. Deep Analysis (AI)] ──> [3. Audit & Record]
 ```
 
-Invoke the `research-loop` skill to run a guided session. The session uses `chomp session` CLI commands to manage setup, branch creation, JSON updates, and commits atomically on its dedicated research branch (e.g., `research/<repo-name>-<date>`).
+---
 
-See [AGENTS.md](./AGENTS.md) Section 9 for the full rules and workflow details.
+### Step 0: Clone Target Repository
+
+- **What it is:** Clone the repository to analyze into the fixtures directory.
+- **What it does:** Downloads the target repository source code so Chomp can extract AST primitives.
+- **Command to run:**
+  ```bash
+  git clone <repo-url> fixtures/cloned-repos/<repo-name>
+  ```
+- **Files modified:** Register the repository entry under `repos` in `fixtures/research/registry.json`.
+
+---
+
+### Step 1: Structural Health Metrics Gate
+
+- **What it is:** Run the structural health metrics against the cloned repository.
+- **What it does:** Ensures that the extracted structural representation is complete enough to be reasoned about by AI. If this fails, AI analysis must NOT proceed.
+- **Command to run:**
+  ```bash
+  pnpm chomp health --repo fixtures/cloned-repos/<repo-name>
+  ```
+- **Actions to take:**
+  - If **FAIL**: Stop. You must implement AST extraction logic for the missing structural patterns. Proceed to `fixture-builder` to author deterministic `expected.json` ground truths, build the parser fix, verify against the test suite, and run `health` again.
+  - If **PASS**: Proceed to Deep Analysis.
+
+---
+
+### Step 2: Deep Analysis (AI Oracle)
+
+- **What it is:** Perform manual or automated structural analysis on a healthy graph.
+- **What it does:** Queries the Oracle (e.g., Gemini 1.5 Pro) with Chomp's structurally sound extraction graph to infer semantic architectures, deferred `CALL` resolutions, or missing contexts.
+- **Actions to take:**
+  - Invoke the `deep-analysis` skill to bridge to Google AI Studio.
+
+---
+
+### Step 3: Audit & Record
+
+- **What it is:** Record the session and audit system state.
+- **What it does:** Produces deep-analysis output reports and tracks doc-drift.
+- **Actions to take:**
+  - Log findings in `fixtures/research/analysis/`.
+  - Invoke `system-audit` or `doc-drift-audit`.
 
 ---
 
 ## Agent Skills
 
-Three skills are available for AI-assisted research and development:
+Four skills are available for AI-assisted research and development:
 
 | Skill | Trigger when... |
 |---|---|
-| `parser-eval-harness` | Evaluating a cloned repo's extraction output and identifying AST gaps |
-| `parser-builder` | Implementing new visitor or adapter logic to resolve a logged gap |
-| `architect-mode` | Discussing ontology design, schema changes, or engineering strategy |
+| `research-loop` | Orchestrating a full research session on a target repository |
+| `fixture-builder` | Building new test fixtures and deterministic `expected.json` ground truths for extraction |
+| `parser-builder` | Implementing new visitor or adapter logic in `@chomp/core` to resolve a fixture gap |
+| `deep-analysis` | Performing strategic AI analysis on a repository that passes health metrics |
 
 ---
 

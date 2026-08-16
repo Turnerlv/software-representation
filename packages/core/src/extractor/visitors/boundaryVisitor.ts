@@ -27,6 +27,7 @@ export function visitBoundary(
       id: nextId(),
       name: `Class: ${node.name.text}`,
       type: 'BOUNDARY',
+      entityType: 'CLASS',
       evidence: getEvidence(node),
     };
   }
@@ -35,6 +36,7 @@ export function visitBoundary(
       id: nextId(),
       name: `Module: ${node.name.text}`,
       type: 'BOUNDARY',
+      entityType: 'MODULE',
       evidence: getEvidence(node),
     };
   }

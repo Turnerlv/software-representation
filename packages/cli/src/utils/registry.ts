@@ -29,10 +29,25 @@ export interface SystemAudit {
   changes: string[];
 }
 
+export interface AnalysisRecord {
+  date: string;
+  repo: string;
+  report_path: string;
+  extractor_version?: string;
+  entity_counts?: {
+    BOUNDARY: number;
+    CONTRACT: number;
+    RELATIONSHIP: number;
+    OPEN_CONNECTOR: number;
+  };
+  key_findings?: string[];
+}
+
 export interface Registry {
   repos: Record<string, any>;
   sessions: Session[];
   system_audits?: SystemAudit[];
+  analyses?: AnalysisRecord[];
   _schema?: any;
 }
 
