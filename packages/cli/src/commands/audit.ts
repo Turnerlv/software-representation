@@ -15,6 +15,76 @@ export function registerAuditCommand(program: Command) {
   const auditCmd = program.command("audit").description("Manage system architecture audits");
 
   auditCmd
+    .command("prepare")
+    .description("Prepare an extraction snapshot for the AI Oracle")
+    .requiredOption("--repo <name>", "Repository ID/Name to export")
+    .option("--db <path>", "Path to SQLite database file")
+    .action((options) => {
+      const baseDir = process.env.INIT_CWD ?? process.cwd();
+      const workspaceRoot = findWorkspaceRoot(baseDir);
+      
+      const { initDatabase, getRepresentationGraph } = require("@chomp/core");
+      const { resolveDbPath } = require("../utils/db.js");
+      
+      const dbPath = resolveDbPath(baseDir, options.db);
+      if (!existsSync(dbPath)) {
+        console.error(`Database not found: ${dbPath}`);
+        process.exit(1);
+      }
+      
+      const db = initDatabase(dbPath);
+      const graph = getRepresentationGraph(db, options.repo);
+      db.close();
+      
+      if (!graph) {
+        console.error(`Repository '${options.repo}' not found in database.`);
+        process.exit(1);
+      }
+      
+      const dateStr = formatDate(new Date());
+      const sessionId = `${options.repo}-${dateStr}`;
+      const handoffDir = resolve(workspaceRoot, `fixtures/research/handoffs/${sessionId}`);
+      
+      if (!existsSync(handoffDir)) mkdirSync(handoffDir, { recursive: true });
+      
+      const extractionPath = resolve(handoffDir, "current_extraction.json");
+      writeFileSync(extractionPath, JSON.stringify(graph, null, 2), "utf8");
+      
+      const systemPromptPath = resolve(handoffDir, "system_prompt.md");
+      const systemPrompt = `# Chomp Oracle System Instructions
+
+You are the Chomp Oracle. Your objective is to find 'Missing Evidence' and 'Architectural Evolutions' in a dataset. 
+You will be provided with a JSON list of extracted code primitives (current_extraction.json) and the raw source code they were extracted from. Compare them based on the provided Ideal Schema.
+
+1. **GAPS**: Report any structural fact found in the code that is entirely missing from the JSON.
+2. **EVOLUTIONS**: If the current primitives are insufficient to represent the architecture, suggest Data Additions (e.g., new metadata fields, new relationship types).
+
+Your output MUST be a strict JSON array conforming to this schema, with no markdown code block wrapping:
+[
+  {
+    "discovery_type": "GAP | EVOLUTION",
+    "file": "string",
+    "line": "number",
+    "pattern": "string",
+    "snippet": "string",
+    "impact": "HIGH | MEDIUM",
+    "suggested_evolution": {
+      "field_name": "string (e.g., 'parent_scope', 'http_method', etc.)",
+      "suggested_value": "any",
+      "reasoning": "Why this specific data is required to complete the structural picture"
+    },
+    "rationale": "Oracle's architectural justification for this discovery"
+  }
+]`;
+      writeFileSync(systemPromptPath, systemPrompt, "utf8");
+      
+      console.log(`\n**Audit Prepare Complete**`);
+      console.log(`Handoff session prepared at: fixtures/research/handoffs/${sessionId}`);
+      console.log(`- current_extraction.json created`);
+      console.log(`- system_prompt.md created`);
+    });
+
+  auditCmd
     .command("start")
     .description("Start a new system audit session")
     .requiredOption("--topic <name>", "Kebab-case topic name for the audit")

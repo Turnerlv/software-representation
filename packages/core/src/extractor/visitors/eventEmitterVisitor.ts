@@ -41,14 +41,14 @@ export function extractEventEmitterContract(
 
 /**
  * Extracts an EventEmitter publisher call (`.emit('event', ...payload)`)
- * as a RELATIONSHIP primitive entity.
+ * as an OPEN_CONNECTOR primitive entity (since we don't know who is listening).
  *
  * @param node        The AST node to inspect.
  * @param getEvidence Callback returning an EvidenceRecord for the node.
  * @param nextId      Closure providing a placeholder entity ID.
- * @returns A RELATIONSHIP StructuralEntity for the event dispatch, or null if node does not match.
+ * @returns An OPEN_CONNECTOR StructuralEntity for the event dispatch, or null if node does not match.
  */
-export function extractEventEmitterRelationship(
+export function extractEventEmitterEmit(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
@@ -63,7 +63,7 @@ export function extractEventEmitterRelationship(
           return {
             id: nextId(),
             name: `Event Emit: ${firstArg.text}`,
-            type: 'RELATIONSHIP',
+            type: 'OPEN_CONNECTOR',
             evidence: getEvidence(node),
           };
         }

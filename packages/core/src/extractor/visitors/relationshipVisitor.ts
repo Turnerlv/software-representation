@@ -6,7 +6,7 @@ import path from 'path';
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRouterMount } from '../adapters/expressAdapter.js';
-import { extractEventEmitterRelationship } from './eventEmitterVisitor.js';
+
 import { resolveModulePath } from '../pathResolver.js';
 import { stableEntityId } from '../index.js';
 import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorVisitor.js';
@@ -18,7 +18,7 @@ import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorV
  * - ImportDeclaration         (ES Module `import ... from '...'`)
  * - CallExpression (require)   (CommonJS `require('...')`)
  * - Express Router Mounts      (delegated to `extractExpressRouterMount`)
- * - EventEmitter Emits         (delegated to `extractEventEmitterRelationship`)
+
  * - Prototypal Inheritance     (`Object.create(...)`, `Object.setPrototypeOf(...)`)
  * - Inferred Method Calls      (e.g. `userService.createUser()`) with 3-tier confidence classification:
  *   - HIGH:   Root identifier matches a local ES import AND target exported method signature is verified.
@@ -154,13 +154,6 @@ export function visitRelationship(
     return expressMount;
   }
 
-  const eventEmitterRelationship = extractEventEmitterRelationship(node, getEvidence, nextId);
-  if (eventEmitterRelationship) {
-    eventEmitterRelationship.sourceId = sourceId;
-    eventEmitterRelationship.status = 'DETERMINISTIC';
-    eventEmitterRelationship.confidence = 'HIGH';
-    return eventEmitterRelationship;
-  }
 
   // Object.create (Prototypal Inheritance)
   if (
@@ -206,7 +199,18 @@ export function visitRelationship(
     };
   }
 
-  // Prototype Mixin (e.g. mixin(app, EventEmitter.prototype) or Object.assign(app, EventEmitter.prototype))
+  /**
+   * Prototype Mixin
+   * Handles patterns where properties from a prototype are mixed into an object.
+   *
+   * @example
+   * // Object.assign mixin
+   * Object.assign(app, EventEmitter.prototype)
+   *
+   * @example
+   * // merge-descriptors third-party mixin (3 arguments)
+   * mixin(app, EventEmitter.prototype, false);
+   */
   if (
     ts.isCallExpression(node) &&
     node.arguments.length >= 2 &&

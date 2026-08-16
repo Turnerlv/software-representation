@@ -57,8 +57,8 @@ export function saveRepresentationGraph(
     );
 
     const insertEntity = db.prepare(`
-      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, source_id, target_id, status, confidence)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, source_id, target_id, status, confidence, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
@@ -75,7 +75,8 @@ export function saveRepresentationGraph(
 
     for (const entity of allEntities) {
       const globalEntityId = `${repo.id}:${entity.id}`;
-      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null);
+      const metadataStr = entity.metadata ? JSON.stringify(entity.metadata) : null;
+      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
       
       const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
       for (const ev of evidences) {
@@ -124,9 +125,9 @@ export function getRepresentationGraph(
 
   const entityRows = db
     .prepare(
-      'SELECT id, name, type, source_id, target_id, status, confidence FROM structural_entities WHERE repository_id = ?'
+      'SELECT id, name, type, source_id, target_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ?'
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
 
   const evidenceRows = db
     .prepare(
@@ -192,6 +193,13 @@ export function getRepresentationGraph(
     if (row.target_id) entity.targetId = row.target_id;
     if (row.status) entity.status = row.status;
     if (row.confidence) entity.confidence = row.confidence;
+    if (row.metadata) {
+      try {
+        entity.metadata = JSON.parse(row.metadata);
+      } catch (e) {
+        // Fallback for corrupted JSON, though shouldn't happen
+      }
+    }
 
     switch (row.type) {
       case 'BOUNDARY':

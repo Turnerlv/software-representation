@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressResponseConnector, extractExpressAppListen, extractExpressResponseCookie } from '../adapters/expressAdapter.js';
-
+import { extractEventEmitterEmit } from './eventEmitterVisitor.js';
 /**
  * Known HTTP / network client root identifiers.
  * Matched against the root object of a call expression (e.g. `axios` in `axios.get(...)`).
@@ -100,6 +100,11 @@ export function visitOpenConnector(
   const expressCookie = extractExpressResponseCookie(node, getEvidence, nextId);
   if (expressCookie) {
     return expressCookie;
+  }
+
+  const eventEmitterEmit = extractEventEmitterEmit(node, getEvidence, nextId);
+  if (eventEmitterEmit) {
+    return eventEmitterEmit;
   }
 
   const rootId = getRootIdentifier(node.expression);

@@ -1,7 +1,6 @@
 import Database from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
-
 /**
  * Initializes the Chomp SQLite database and ensures all tables exist.
  *
@@ -19,18 +18,16 @@ import path from 'path';
  * @param dbPath File path for the SQLite database. Defaults to ':memory:' for tests.
  *               Parent directory is created automatically if it does not exist.
  */
-export function initDatabase(dbPath: string = ':memory:'): Database.Database {
-  if (dbPath !== ':memory:') {
-    const dir = path.dirname(dbPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+export function initDatabase(dbPath = ':memory:') {
+    if (dbPath !== ':memory:') {
+        const dir = path.dirname(dbPath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
     }
-  }
-
-  const db = new Database(dbPath);
-  db.pragma('foreign_keys = ON');
-
-  db.exec(`
+    const db = new Database(dbPath);
+    db.pragma('foreign_keys = ON');
+    db.exec(`
     CREATE TABLE IF NOT EXISTS repositories (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -49,7 +46,6 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       target_id TEXT,
       status TEXT,
       confidence TEXT,
-      metadata TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE
     );
@@ -75,9 +71,6 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       evidence_file TEXT NOT NULL,
       evidence_line INTEGER,
       evidence_snippet TEXT,
-      discovery_type TEXT,
-      suggested_evolution TEXT,
-      rationale TEXT,
       fix_location TEXT,
       fix_pattern_summary TEXT,
       test_fixture_path TEXT,
@@ -85,19 +78,37 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
-
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN source_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN target_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN metadata TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN discovery_type TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN suggested_evolution TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN rationale TEXT;"); } catch (e) {}
-  try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) {}
-
-  return db;
+    try {
+        db.exec("ALTER TABLE structural_entities ADD COLUMN source_id TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE structural_entities ADD COLUMN target_id TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;");
+    }
+    catch (e) { }
+    try {
+        db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);");
+    }
+    catch (e) { }
+    return db;
 }

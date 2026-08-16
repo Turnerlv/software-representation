@@ -26,6 +26,9 @@ function mapRowToCoverageEntry(row: any): ExtractorCoverageEntry {
     evidenceFile: row.evidence_file,
     evidenceLine: row.evidence_line ?? null,
     evidenceSnippet: row.evidence_snippet ?? null,
+    discoveryType: row.discovery_type ?? null,
+    suggestedEvolution: row.suggested_evolution ?? null,
+    rationale: row.rationale ?? null,
     fixLocation: row.fix_location ?? null,
     fixPatternSummary: row.fix_pattern_summary ?? null,
     testFixturePath: row.test_fixture_path ?? null,
@@ -78,15 +81,20 @@ export function logExtractionGap(
     gapData.fixPatternSummary ?? gapData.fix_pattern_summary ?? null;
   const testFixturePath =
     gapData.testFixturePath ?? gapData.test_fixture_path ?? null;
+  const discoveryType = gapData.discoveryType ?? gapData.discovery_type ?? null;
+  const suggestedEvolution = typeof gapData.suggestedEvolution === 'object' ? JSON.stringify(gapData.suggestedEvolution) : (gapData.suggestedEvolution ?? gapData.suggested_evolution ?? null);
+  const rationale = gapData.rationale ?? null;
 
   const stmt = db.prepare(`
     INSERT INTO extractor_coverage_ledger (
       id, pattern_name, framework, status, impact_level,
       evidence_repo, evidence_file, evidence_line, evidence_snippet,
+      discovery_type, suggested_evolution, rationale,
       fix_location, fix_pattern_summary, test_fixture_path
     ) VALUES (
       ?, ?, ?, ?, ?,
       ?, ?, ?, ?,
+      ?, ?, ?,
       ?, ?, ?
     )
   `);
@@ -101,6 +109,9 @@ export function logExtractionGap(
     evidenceFile,
     evidenceLine,
     evidenceSnippet,
+    discoveryType,
+    suggestedEvolution,
+    rationale,
     fixLocation,
     fixPatternSummary,
     testFixturePath

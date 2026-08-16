@@ -72,6 +72,64 @@ export function registerLedgerCommand(program: Command) {
     });
 
   ledgerCmd
+    .command("import")
+    .description("Import Oracle Discovery Notes (JSON) into the ledger")
+    .requiredOption("--file <path>", "Path to studio_output.json")
+    .requiredOption("--repo <name>", "Repository name (to associate evidence)")
+    .option("--db <path>", "Path to SQLite database file")
+    .action((options) => {
+      const { readFileSync } = require("node:fs");
+      const baseDir = process.env.INIT_CWD ?? process.cwd();
+      const dbPath = resolveDbPath(baseDir, options.db);
+      
+      let data: any[];
+      try {
+        const fileContent = readFileSync(resolve(baseDir, options.file), "utf8");
+        data = JSON.parse(fileContent);
+      } catch (err: any) {
+        console.error(`Failed to read or parse input JSON: ${err.message}`);
+        process.exit(1);
+      }
+      
+      const db = initDatabase(dbPath);
+      let importedCount = 0;
+      
+      for (const item of data) {
+        const hash = createHash("sha256")
+          .update(`${item.file}:${item.line}:${item.pattern}`)
+          .digest("hex")
+          .substring(0, 8);
+        const gapId = `gap_${hash}`;
+        
+        try {
+          logExtractionGap(db, {
+            id: gapId,
+            patternName: item.pattern || "Unknown Pattern",
+            framework: "Unknown", 
+            impactLevel: item.impact as any || "MEDIUM",
+            evidenceRepo: options.repo,
+            evidenceFile: item.file || "unknown",
+            evidenceLine: item.line ? parseInt(item.line, 10) : null,
+            evidenceSnippet: item.snippet || null,
+            discoveryType: item.discovery_type as any,
+            suggestedEvolution: item.suggested_evolution,
+            rationale: item.rationale
+          });
+          importedCount++;
+          console.log(`Imported Discovery Note: ${gapId} (${item.discovery_type})`);
+        } catch (err: any) {
+          if (err.message && err.message.includes("UNIQUE constraint failed")) {
+             console.log(`Note ${gapId} already exists in ledger. Skipping.`);
+          } else {
+             console.error(`Error logging note ${gapId}: ${err.message}`);
+          }
+        }
+      }
+      db.close();
+      console.log(`\n✅ Successfully imported ${importedCount} Discovery Notes into ledger.`);
+    });
+
+  ledgerCmd
     .command("log")
     .description("Log an extraction gap deterministically")
     .requiredOption("--repo <name>", "Evidence repository name")

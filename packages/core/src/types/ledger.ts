@@ -50,6 +50,15 @@ export interface ExtractorCoverageEntry {
   fixLocation: string | null;
   /** Brief summary of how the parser visitor handles the AST pattern. */
   fixPatternSummary: string | null;
+  
+  // Oracle Discovery Fields
+  /** Whether this is a GAP (missing entity) or EVOLUTION (metadata addition). */
+  discoveryType?: 'GAP' | 'EVOLUTION';
+  /** Suggested metadata or schema addition by the Oracle. */
+  suggestedEvolution?: string | null;
+  /** Oracle's architectural justification for this discovery. */
+  rationale?: string | null;
+  
   /** Relative path to the committed test fixture exercising the fix. */
   testFixturePath: string | null;
   /** ISO-8601 creation timestamp. */
@@ -82,6 +91,13 @@ export interface LogExtractionGapInput {
   fix_location?: string | null;
   fixPatternSummary?: string | null;
   fix_pattern_summary?: string | null;
+  
+  discoveryType?: 'GAP' | 'EVOLUTION';
+  discovery_type?: 'GAP' | 'EVOLUTION';
+  suggestedEvolution?: string | null;
+  suggested_evolution?: string | null;
+  rationale?: string | null;
+
   testFixturePath?: string | null;
   test_fixture_path?: string | null;
 }

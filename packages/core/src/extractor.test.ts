@@ -38,8 +38,9 @@ test('analyzeTarget extracts boundaries, contracts, relationships, and open conn
   // Open connectors use 'HTTP Call:' prefix for allowlisted HTTP clients
   assert.ok(graph.openConnectors.some((oc) => oc.name.startsWith('HTTP Call:') && oc.name.includes('fetch')));
 
-  assert.ok(graph.boundaries[0].evidence.filePath);
-  assert.ok(graph.boundaries[0].evidence.lineNumber);
+  const evidence = Array.isArray(graph.boundaries[0].evidence) ? graph.boundaries[0].evidence[0] : graph.boundaries[0].evidence;
+  assert.ok(evidence.filePath);
+  assert.ok(evidence.lineNumber);
 });
 
 test('analyzeTarget does NOT emit false-positive OPEN_CONNECTORs for non-allowlisted calls', () => {
@@ -180,11 +181,17 @@ test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
     'Expected to extract dynamic method assignment as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'CJS Export: header' && c.evidence.snippet?.includes('req.header')),
+    graph.contracts.some((c) => {
+      const ev = Array.isArray(c.evidence) ? c.evidence[0] : c.evidence;
+      return c.name === 'CJS Export: header' && ev.snippet?.includes('req.header');
+    }),
     'Expected to extract req.header assignment as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'CJS Export: status' && c.evidence.snippet?.includes('res.status')),
+    graph.contracts.some((c) => {
+      const ev = Array.isArray(c.evidence) ? c.evidence[0] : c.evidence;
+      return c.name === 'CJS Export: status' && ev.snippet?.includes('res.status');
+    }),
     'Expected to extract res.status assignment as CONTRACT'
   );
   assert.ok(
@@ -202,8 +209,8 @@ test('analyzeTarget extracts EventEmitter patterns', () => {
     'Expected to extract EventEmitter.on as CONTRACT'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Event Emit: event'),
-    'Expected to extract EventEmitter.emit as RELATIONSHIP'
+    graph.openConnectors.some((r) => r.name === 'Event Emit: event'),
+    'Expected to extract EventEmitter.emit as OPEN_CONNECTOR'
   );
 });
 

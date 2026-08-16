@@ -64,21 +64,36 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 ## Stage 1 — Gap Analysis 🛑 HUMAN GATE
 
-1. Invoke the `parser-eval-harness` skill against the cloned repo. 
-   - The eval harness is responsible for logging gaps into the SQLite ledger using `chomp ledger log` and appending the "Research Brief" (including the Gaps Discovered and Build Plan) to the `fixtures/research/sessions/<session_id>.md` report.
-   - *Note: If you need to view raw SQLite stats, use `TSX_DISABLE_IPC=1 pnpm chomp ledger --db fixtures/cloned-repos/<repo-name>.db`.*
+1. Prepare the Oracle handoff payload using the CLI:
+   ```bash
+   TSX_DISABLE_IPC=1 pnpm chomp audit prepare --repo <repo-name>
+   ```
+   *Note: This creates the handoff directory at `fixtures/research/handoffs/<repo-name>-<date>` with `current_extraction.json`.*
 
-2. Once `parser-eval-harness` completes its execution, review the session report to confirm the Research Brief and Build Plan were properly appended.
+2. Run the Studio Bridge to query the Oracle (Gemini 1.5 Pro) about missing structural facts or required metadata evolutions:
+   ```bash
+   TSX_DISABLE_IPC=1 tsx packages/cli/src/bridge.ts <repo-name>-<date>
+   ```
 
-3. Run the log-gaps command to automatically record the gap count in `registry.json` and commit the updated session report:
+3. Import the Oracle's discovery notes back into the local SQLite ledger:
+   ```bash
+   TSX_DISABLE_IPC=1 pnpm chomp ledger import --file fixtures/research/handoffs/<repo-name>-<date>/studio_output.json --repo <repo-name>
+   ```
+
+4. Display the updated ledger to the human:
+   ```bash
+   TSX_DISABLE_IPC=1 pnpm chomp ledger
+   ```
+
+5. Run the log-gaps command to automatically record the gap count in `registry.json` and commit the updated session report:
    ```bash
    TSX_DISABLE_IPC=1 pnpm chomp session log-gaps --repo <repo-name> --count <n>
    ```
 
-4. **🛑 PRINT TO CHAT — do this before asking anything.** Output the entire Research Brief verbatim in the chat. This means every gap entry and the full Build Plan table must appear in the conversation. Do not summarize. Do not say "see the session file". The human must be able to review and decide without opening any file.
+6. **🛑 PRINT TO CHAT — do this before asking anything.** Output the newly discovered gaps and evolutions from the ledger. The human must be able to review and decide without opening any file.
 
    Then ask:
-   > "Gap analysis complete. Review the build plan above. Proceed to build fixes? (yes / skip / abort)"
+   > "Gap analysis complete. Review the discoveries above. Proceed to build fixes/evolutions? (yes / skip / abort)"
    - `yes` → continue to Stage 2
    - `skip` → mark session `COMPLETE`, commit `registry.json`, push branch, exit
    - `abort` → exit without committing further

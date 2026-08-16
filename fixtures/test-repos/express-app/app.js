@@ -73,5 +73,6 @@ app.get('/cookie', (req, res) => {
 });
 
 if (require.main === module) {
+  app.emit('mount', this);
   app.listen(3000);
 }

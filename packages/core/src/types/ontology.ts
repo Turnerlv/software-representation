@@ -58,6 +58,10 @@ export interface StructuralEntity {
   status?: 'DETERMINISTIC' | 'INFERRED';
   /** Confidence level for inferred relationships. */
   confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
+  
+  // Data Evolution
+  /** Extensible key-value store for high-fidelity details (e.g., HTTP paths, parameter types). */
+  metadata?: Record<string, any>;
 }
 
 /**

@@ -1,0 +1,44 @@
+// packages/core/src/extractor/visitors/definePropertyVisitor.ts
+// Visitor for extracting Object.defineProperty getter contracts.
+import ts from 'typescript';
+/**
+ * Extracts Object.defineProperty calls that define properties (usually getters/setters)
+ * on objects, treating them as CONTRACT entities.
+ *
+ * Matches expressions like:
+ * - `Object.defineProperty(obj, 'name', { get: ... })` (CONTRACT)
+ *
+ * @param node         The AST node to inspect.
+ * @param getEvidence  Returns a populated EvidenceRecord for the given node.
+ * @param nextId       Closure providing a placeholder ID.
+ * @returns A StructuralEntity or null if the node does not match.
+ */
+export function extractDefinePropertyContract(node, getEvidence, nextId) {
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+        const expr = node.expression;
+        if (ts.isIdentifier(expr.expression) && expr.expression.text === 'Object' && expr.name.text === 'defineProperty') {
+            if (node.arguments.length >= 2) {
+                const propNameArg = node.arguments[1];
+                if (ts.isStringLiteral(propNameArg)) {
+                    const propName = propNameArg.text;
+                    return {
+                        id: nextId(),
+                        name: `Property Getter: ${propName}`,
+                        type: 'CONTRACT',
+                        evidence: getEvidence(node),
+                    };
+                }
+                else if (ts.isIdentifier(propNameArg)) {
+                    const propName = propNameArg.text;
+                    return {
+                        id: nextId(),
+                        name: `Property Getter: ${propName}`,
+                        type: 'CONTRACT',
+                        evidence: getEvidence(node),
+                    };
+                }
+            }
+        }
+    }
+    return null;
+}
