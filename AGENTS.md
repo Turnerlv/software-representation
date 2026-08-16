@@ -132,7 +132,7 @@ chomp/
 This is the standard cycle for expanding extractor coverage using real-world repositories. The process is orchestrated by the `research-loop` skill, which tracks sessions in `fixtures/research/registry.json`.
 
 ```
-[Clone Repo] → [Stage 0: Setup] → [Stage 1: Eval gaps] → [Stage 2: Build fixes] → [Stage 3: Confirm & Record]
+[Clone Repo] → [Stage 1: Health Metrics] → [Stage 2: Deep Analysis (AI)] → [Stage 3: Audit & Record]
 ```
 
 To run a research session:
@@ -140,15 +140,15 @@ To run a research session:
 2. Invoke the **`research-loop`** skill.
 
 The `research-loop` skill will automatically:
-- Create an isolated DB for the session
-- Branch off and manage commits for the research session
-- Invoke `parser-eval-harness` to find gaps
-- Prompt you to use `parser-builder` to build fixes for discovered gaps
-- Record final entity counts and gap metrics back to `registry.json`
+- Run `chomp health` to gate AI reasoning. If metrics fail, the agent is routed to build new controlled fixtures via `fixture-builder`.
+- If health metrics pass, invoke the Oracle (`deep-analysis`) to reason about the structurally sound graph.
+- Record findings and invoke audits.
 
 ### Rules for research sessions
+- **Health Before AI:** Never invoke AI analysis (the Oracle) on a repository that fails `chomp health`. AI models hallucinate when given structurally broken graphs.
+- **Controlled Fixtures:** AST parsing logic (`packages/core`) must be developed against deterministic `expected.json` ground truths built by `fixture-builder`, not against cloned open-source repos directly.
 - The `research-loop` skill is the **only** entry point for starting a new research session. Do not run ad-hoc analyze commands against cloned repos.
-- One repo at a time. Finish the eval-build-verify loop before moving to the next.
-- All gaps, even LOW-impact ones, must be logged before closing a session.
 - Do NOT commit cloned repos or `.db` files from research runs.
 - Run `pnpm test --filter @chomp/core` before and after every visitor change.
+
+> **Note:** The initial 17 `express` research sessions conducted under the legacy count-based methodology have been marked `"deprecated": true` in `registry.json` and must not be used as baseline comparisons.

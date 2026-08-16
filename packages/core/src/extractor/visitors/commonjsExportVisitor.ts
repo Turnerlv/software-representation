@@ -41,6 +41,17 @@ export function extractCommonjsExport(
         // Express alias
         isCjsExport = true;
         exportName = left.name.text;
+      } else if (ts.isPropertyAccessExpression(left.expression) && left.expression.name.text === 'prototype') {
+        const className = ts.isIdentifier(left.expression.expression) ? left.expression.expression.text : 'Object';
+        const methodName = left.name.text;
+        const isFunction = ts.isFunctionExpression(node.right) || ts.isArrowFunction(node.right);
+        return {
+          id: nextId(),
+          name: `Prototype Method: ${className}.prototype.${methodName}`,
+          type: isFunction ? 'CONTRACT' : 'BOUNDARY',
+          entityType: isFunction ? 'PROTOTYPE_METHOD' : 'CJS_EXPORT',
+          evidence: getEvidence(node),
+        };
       }
     } else if (ts.isIdentifier(left) && left.text === 'exports') {
       isCjsExport = true;
@@ -54,6 +65,7 @@ export function extractCommonjsExport(
             id: nextId(),
             name: `Dynamic Export: ${leftExpr.text}[method]`,
             type: 'CONTRACT',
+            entityType: 'CJS_METHOD',
             evidence: getEvidence(node),
           };
         }
@@ -67,6 +79,7 @@ export function extractCommonjsExport(
         id: nextId(),
         name: `CJS Export: ${exportName}`,
         type: isFunction ? 'CONTRACT' : 'BOUNDARY',
+        entityType: isFunction ? 'EXPORTED_FUNCTION' : 'CJS_EXPORT',
         evidence: getEvidence(node),
       };
     }

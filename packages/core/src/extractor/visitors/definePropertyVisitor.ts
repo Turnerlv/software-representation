@@ -21,25 +21,34 @@ export function extractDefinePropertyContract(
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
 ): StructuralEntity | null {
-  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
-    const expr = node.expression;
-    if (ts.isIdentifier(expr.expression) && expr.expression.text === 'Object' && expr.name.text === 'defineProperty') {
+  if (ts.isCallExpression(node)) {
+    if (ts.isPropertyAccessExpression(node.expression)) {
+      const expr = node.expression;
+      if (ts.isIdentifier(expr.expression) && expr.expression.text === 'Object' && expr.name.text === 'defineProperty') {
+        if (node.arguments.length >= 2) {
+          const propNameArg = node.arguments[1];
+          if (ts.isStringLiteral(propNameArg) || ts.isIdentifier(propNameArg)) {
+            const propName = propNameArg.text;
+            return {
+              id: nextId(),
+              name: `Property Getter: ${propName}`,
+              type: 'CONTRACT',
+              entityType: 'PROPERTY_GETTER',
+              evidence: getEvidence(node),
+            };
+          }
+        }
+      }
+    } else if (ts.isIdentifier(node.expression) && node.expression.text === 'defineGetter') {
       if (node.arguments.length >= 2) {
         const propNameArg = node.arguments[1];
-        if (ts.isStringLiteral(propNameArg)) {
+        if (ts.isStringLiteral(propNameArg) || ts.isIdentifier(propNameArg)) {
           const propName = propNameArg.text;
           return {
             id: nextId(),
             name: `Property Getter: ${propName}`,
             type: 'CONTRACT',
-            evidence: getEvidence(node),
-          };
-        } else if (ts.isIdentifier(propNameArg)) {
-          const propName = propNameArg.text;
-          return {
-            id: nextId(),
-            name: `Property Getter: ${propName}`,
-            type: 'CONTRACT',
+            entityType: 'PROPERTY_GETTER',
             evidence: getEvidence(node),
           };
         }

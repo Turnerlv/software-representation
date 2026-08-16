@@ -57,8 +57,8 @@ export function saveRepresentationGraph(
     );
 
     const insertEntity = db.prepare(`
-      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, source_id, target_id, status, confidence, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
@@ -76,7 +76,7 @@ export function saveRepresentationGraph(
     for (const entity of allEntities) {
       const globalEntityId = `${repo.id}:${entity.id}`;
       const metadataStr = entity.metadata ? JSON.stringify(entity.metadata) : null;
-      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
+      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.entityType, entity.scope ?? 'USER', entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
       
       const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
       for (const ev of evidences) {
@@ -111,7 +111,8 @@ export function saveRepresentationGraph(
  */
 export function getRepresentationGraph(
   db: Database.Database,
-  repoId: string
+  repoId: string,
+  options: { scopes?: Array<'USER' | 'TEST' | 'MOCK' | 'CONFIG'> } = { scopes: ['USER'] }
 ): RepresentationGraph | null {
   const repoRow = db
     .prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories WHERE id = ?')
@@ -123,11 +124,12 @@ export function getRepresentationGraph(
     return null;
   }
 
+  const scopesStr = options.scopes?.length ? options.scopes.map(s => `'${s}'`).join(',') : "'USER'";
   const entityRows = db
     .prepare(
-      'SELECT id, name, type, source_id, target_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ?'
+      `SELECT id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ? AND scope IN (${scopesStr})`
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
 
   const evidenceRows = db
     .prepare(
@@ -186,6 +188,8 @@ export function getRepresentationGraph(
       id: cleanId,
       name: row.name,
       type: row.type,
+      entityType: row.entity_type,
+      scope: row.scope,
       evidence,
     };
     
@@ -218,7 +222,7 @@ export function getRepresentationGraph(
   }
 
   const result: RepresentationGraph = {
-    version: repoRow.extractor_version ?? '1.0.0',
+    extractorVersion: repoRow.extractor_version ?? '1.0.0',
     analyzedAt: repoRow.analyzed_at,
     boundaries,
     contracts,

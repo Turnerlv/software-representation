@@ -1,0 +1,52 @@
+[
+  {
+    "discovery_type": "GAP",
+    "file": "/lib/response.js",
+    "line": 67,
+    "pattern": "res.status = function status(code) {",
+    "snippet": "res.status = function status(code) {\n  // Check if the status code is not an integer",
+    "impact": "HIGH",
+    "rationale": "The `res` object is exported as the default module export, and methods like `status`, `send`, `json`, `sendFile`, etc., are assigned to it. These act as the public API (Contracts) for the response object, but they are entirely missing from the extracted JSON."
+  },
+  {
+    "discovery_type": "GAP",
+    "file": "/lib/request.js",
+    "line": 137,
+    "pattern": "req.accepts = function(){",
+    "snippet": "req.accepts = function(){\n  var accept = accepts(this);",
+    "impact": "HIGH",
+    "rationale": "The `req` object is exported as the default module export, and methods like `accepts`, `get`, `is`, `range`, etc., are assigned to it. These act as the public API (Contracts) for the request object, but they are entirely missing from the extracted JSON."
+  },
+  {
+    "discovery_type": "GAP",
+    "file": "/lib/view.js",
+    "line": 93,
+    "pattern": "View.prototype.lookup = function lookup(name) {",
+    "snippet": "View.prototype.lookup = function lookup(name) {\n  var path;",
+    "impact": "HIGH",
+    "rationale": "The `View` class is exported, but its prototype methods (`lookup`, `render`, `resolve`) are not extracted as Contracts. These methods define the public interface of the `View` boundary."
+  },
+  {
+    "discovery_type": "EVOLUTION",
+    "file": "/lib/request.js",
+    "line": 215,
+    "pattern": "this.get('Range')",
+    "snippet": "var range = this.get('Range');",
+    "impact": "HIGH",
+    "suggested_evolution": {
+      "field_name": "route_definition_heuristics",
+      "suggested_value": "require_path_argument",
+      "reasoning": "The extractor currently flags any `.get('string')` call as an Express route definition. It should require a path string (e.g., starting with '/') and a handler function/array to distinguish route definitions from header/setting retrievals."
+    },
+    "rationale": "Structural extraction must differentiate between retrieving a header/setting and defining an HTTP route contract. The current extraction creates phantom routes like 'GET Range' and 'GET env'."
+  },
+  {
+    "discovery_type": "GAP",
+    "file": "/lib/request.js",
+    "line": 299,
+    "pattern": "defineGetter(req, 'protocol', function protocol(){",
+    "snippet": "defineGetter(req, 'protocol', function protocol(){\n  var proto = this.socket.encrypted",
+    "impact": "MEDIUM",
+    "rationale": "The `defineGetter` helper is used to define public properties (like `protocol`, `secure`, `ip`) on the exported `req` object. These properties form part of the request contract but are not extracted."
+  }
+]

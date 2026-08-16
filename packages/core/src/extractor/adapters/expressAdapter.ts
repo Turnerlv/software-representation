@@ -31,15 +31,25 @@ export function extractExpressRoute(
     const methodName = node.expression.name.text;
     
     // Express Route Definition: e.g. app.get('/path', handler)
+    // Avoid false positives like app.get('env') or req.get('Range') which have only 1 arg and are getters
     if (EXPRESS_ROUTE_METHODS.has(methodName) && node.arguments.length >= 1) {
       const firstArg = node.arguments[0];
       if (ts.isStringLiteral(firstArg)) {
-        return {
-          id: nextId(),
-          name: `Express Route: ${methodName.toUpperCase()} ${firstArg.text}`,
-          type: 'CONTRACT',
-          evidence: getEvidence(node),
-        };
+        const pathText = firstArg.text;
+        // Getter calls like req.get('Range') or app.get('env') have 1 arg and non-path strings
+        if (methodName === 'get' && node.arguments.length === 1 && !pathText.startsWith('/')) {
+          return null;
+        }
+        // Only consider it a route if there are at least 2 arguments or it starts with '/'
+        if (node.arguments.length >= 2 || pathText.startsWith('/')) {
+          return {
+            id: nextId(),
+            name: `Express Route: ${methodName.toUpperCase()} ${pathText}`,
+            type: 'CONTRACT',
+            entityType: 'HTTP_ENDPOINT',
+            evidence: getEvidence(node),
+          };
+        }
       }
     }
   }
@@ -104,6 +114,7 @@ export function extractExpressRouterMount(
         id: nextId(),
         name: `Express Mount: ${pathPrefix} -> ${target}`,
         type: 'RELATIONSHIP',
+        entityType: 'MOUNTS',
         evidence: getEvidence(node),
       };
     }
@@ -148,6 +159,7 @@ export function extractExpressRouteParameter(
         id: nextId(),
         name: `Express Param: ${paramName}`,
         type: 'CONTRACT',
+        entityType: 'HTTP_ENDPOINT',
         evidence: getEvidence(node),
       };
     }
@@ -195,6 +207,7 @@ export function extractExpressContentNegotiation(
           id: nextId(),
           name: `Express Content Negotiation: ${types.join(', ')}`,
           type: 'CONTRACT',
+          entityType: 'HTTP_ENDPOINT',
           evidence: getEvidence(node),
         };
       }
@@ -231,6 +244,7 @@ export function extractExpressResponseConnector(
         id: nextId(),
         name: `Express File Response: ${methodName}`,
         type: 'OPEN_CONNECTOR',
+        entityType: 'FILE_RESPONSE',
         evidence: getEvidence(node),
       };
     } else if (methodName === 'render' && node.arguments.length >= 1) {
@@ -238,6 +252,7 @@ export function extractExpressResponseConnector(
         id: nextId(),
         name: `Express View Render`,
         type: 'OPEN_CONNECTOR',
+        entityType: 'VIEW_RENDER',
         evidence: getEvidence(node),
       };
     } else if (methodName === 'redirect' && node.arguments.length >= 1) {
@@ -245,6 +260,7 @@ export function extractExpressResponseConnector(
         id: nextId(),
         name: `Express Redirect`,
         type: 'OPEN_CONNECTOR',
+        entityType: 'REDIRECT',
         evidence: getEvidence(node),
       };
     } else if (methodName === 'send' || methodName === 'json' || methodName === 'jsonp' || methodName === 'sendStatus') {
@@ -261,6 +277,7 @@ export function extractExpressResponseConnector(
           id: nextId(),
           name: `Express HTTP Response: ${methodName}`,
           type: 'OPEN_CONNECTOR',
+          entityType: 'HTTP_RESPONSE',
           evidence: getEvidence(node),
         };
       }
@@ -304,6 +321,7 @@ export function extractExpressAppListen(
           id: nextId(),
           name: `Express App Listen`,
           type: 'OPEN_CONNECTOR',
+          entityType: 'NETWORK_LISTEN',
           evidence: getEvidence(node),
         };
       }
@@ -352,6 +370,7 @@ export function extractExpressResponseCookie(
           id: nextId(),
           name: `Express Response Cookie: ${cookieName}`,
           type: 'OPEN_CONNECTOR',
+          entityType: 'HTTP_RESPONSE',
           evidence: getEvidence(node),
         };
       }

@@ -70,9 +70,19 @@ Object.defineProperty(req, 'protocol', {
 app.get('/cookie', (req, res) => {
   res.cookie('remember', 1);
   res.clearCookie('remember');
+  const range = req.get('Range'); // Getter call, should NOT be extracted as Express Route: GET Range
 });
+
+function defineGetter(obj, name, fn) {
+  Object.defineProperty(obj, name, { get: fn });
+}
+defineGetter(req, 'ip', function ip() { return '127.0.0.1'; });
+
+function View(name) {}
+View.prototype.lookup = function lookup(name) {};
 
 if (require.main === module) {
   app.emit('mount', this);
   app.listen(3000);
 }
+

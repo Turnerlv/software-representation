@@ -4,9 +4,10 @@
 
 import { Command } from "commander";
 import { registerAnalyzeCommand } from "./commands/analyze.js";
-import { registerLedgerCommand } from "./commands/ledger.js";
 import { registerSessionCommand } from "./commands/session.js";
 import { registerAuditCommand } from "./commands/audit.js";
+import { registerLedgerCommand } from "./commands/ledger.js";
+import { registerHealthCommand } from "./commands/health.js";
 
 const program = new Command();
 
@@ -15,8 +16,9 @@ program
   .description("Chomp CLI - Software Representation Engine");
 
 registerAnalyzeCommand(program);
-registerLedgerCommand(program);
 registerSessionCommand(program);
 registerAuditCommand(program);
+registerLedgerCommand(program);
+registerHealthCommand(program);
 
 program.parse(process.argv);

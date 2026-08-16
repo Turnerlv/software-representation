@@ -44,6 +44,10 @@ export interface StructuralEntity {
   name: string;
   /** The ontology primitive this entity belongs to. */
   type: EntityType;
+  /** The specific sub-type of the entity (e.g. 'FILE', 'CLASS', 'HTTP_ENDPOINT'). */
+  entityType: string;
+  /** The code scope (e.g. 'USER', 'TEST'). */
+  scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG';
   /** Line-level source evidence for this entity's existence. */
   evidence: EvidenceRecord | EvidenceRecord[];
   
@@ -70,7 +74,7 @@ export interface StructuralEntity {
  */
 export interface RepresentationGraph {
   /** The version of the extractor (@chomp/core) that generated this graph. */
-  version: string;
+  extractorVersion: string;
   /** ISO-8601 timestamp of when this graph was generated. */
   analyzedAt: string;
   /** The Git commit SHA of the analyzed repository, if known. */

@@ -118,6 +118,7 @@ export function visitOpenConnector(
       id: nextId(),
       name: `HTTP Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
+      entityType: 'HTTP_FETCH',
       evidence: getEvidence(node),
     };
   }
@@ -128,6 +129,7 @@ export function visitOpenConnector(
       id: nextId(),
       name: `DB Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
+      entityType: 'DB_QUERY',
       evidence: getEvidence(node),
     };
   }

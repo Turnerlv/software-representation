@@ -29,6 +29,7 @@ export function extractEventEmitterContract(
             id: nextId(),
             name: `Event Listener: ${firstArg.text}`,
             type: 'CONTRACT',
+            entityType: 'EVENT_LISTENER',
             evidence: getEvidence(node),
           };
         }
@@ -64,6 +65,7 @@ export function extractEventEmitterEmit(
             id: nextId(),
             name: `Event Emit: ${firstArg.text}`,
             type: 'OPEN_CONNECTOR',
+            entityType: 'EVENT_EMIT',
             evidence: getEvidence(node),
           };
         }
