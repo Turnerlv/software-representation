@@ -72,8 +72,17 @@ If a session with `status: "IN_PROGRESS"` already exists for today in `registry.
 
 2. Run the Studio Bridge to query the Oracle (Gemini 1.5 Pro) about missing structural facts or required metadata evolutions:
    ```bash
-   TSX_DISABLE_IPC=1 tsx packages/cli/src/bridge.ts <repo-name>-<date>
+   TSX_DISABLE_IPC=1 ./packages/cli/node_modules/.bin/tsx packages/cli/src/bridge.ts <repo-name>-<date>
    ```
+
+   **🛑 CONDITIONAL HUMAN GATE (API Failure Check):**
+   If the Studio Bridge call fails or exits with an error (e.g., missing `GEMINI_API_KEY`, API error, network failure):
+   - **Do NOT proceed** to manual gap analysis or import incomplete notes.
+   - **Inform the user immediately** of the exact error and failure details.
+   - **Ask the user:**
+     > "The call to Google AI Studio was unsuccessful (`<error message>`). How would you like to proceed?"
+     > - `drop` / `terminate` — checkout `main`, delete the research branch, and abort the session cleanly
+     > - `retry` — re-run the Studio Bridge call after fixing `.env` or credentials
 
 3. Import the Oracle's discovery notes back into the local SQLite ledger:
    ```bash

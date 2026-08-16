@@ -1,9 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import dotenv from "dotenv";
 import { findWorkspaceRoot } from "./utils/db.js";
 
 async function main() {
+  const baseDir = process.env.INIT_CWD ?? process.cwd();
+  const workspaceRoot = findWorkspaceRoot(baseDir);
+  dotenv.config({ path: resolve(workspaceRoot, ".env") });
+
   const sessionId = process.argv[2];
   if (!sessionId) {
     console.error("Usage: tsx packages/cli/src/bridge.ts <sessionId>");
@@ -15,9 +20,6 @@ async function main() {
     console.error("Error: GEMINI_API_KEY environment variable is not set.");
     process.exit(1);
   }
-
-  const baseDir = process.env.INIT_CWD ?? process.cwd();
-  const workspaceRoot = findWorkspaceRoot(baseDir);
   const handoffDir = resolve(workspaceRoot, `fixtures/research/handoffs/${sessionId}`);
   
   const extractionPath = resolve(handoffDir, "current_extraction.json");

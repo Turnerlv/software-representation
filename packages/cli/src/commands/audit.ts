@@ -11,6 +11,9 @@ function formatDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+import { initDatabase, getRepresentationGraph } from "@chomp/core";
+import { resolveDbPath } from "../utils/db.js";
+
 export function registerAuditCommand(program: Command) {
   const auditCmd = program.command("audit").description("Manage system architecture audits");
 
@@ -22,9 +25,6 @@ export function registerAuditCommand(program: Command) {
     .action((options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const workspaceRoot = findWorkspaceRoot(baseDir);
-      
-      const { initDatabase, getRepresentationGraph } = require("@chomp/core");
-      const { resolveDbPath } = require("../utils/db.js");
       
       const dbPath = resolveDbPath(baseDir, options.db);
       if (!existsSync(dbPath)) {
