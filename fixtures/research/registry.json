@@ -534,6 +534,32 @@
           "gaps_resolved": 0,
           "status": "COMPLETE",
           "type": "inventory"
+        },
+        {
+          "session_id": "2026-08-17-222534-realworld",
+          "branch": "fix/another-test-pattern-2026-08-17-222534",
+          "date": "2026-08-17T14:25:34.595Z",
+          "extractor_version": "0.2.5",
+          "report_path": "fixtures/research/sessions/v0.2.5-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "fix",
+          "target": "another-test-pattern"
         }
       ]
     }
