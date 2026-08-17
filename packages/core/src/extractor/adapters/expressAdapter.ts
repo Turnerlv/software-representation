@@ -58,6 +58,82 @@ export function extractExpressRoute(
   return null;
 }
 
+/**
+ * Extracts inline middleware arguments from Express route handlers as RELATIONSHIP primitive entities.
+ *
+ * Matches expressions like:
+ * - `router.get('/path', auth.optional, handler)`
+ *
+ * @param node        The AST node to inspect.
+ * @param sourceFile  TypeScript SourceFile object used for text extraction.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns An array of RELATIONSHIP StructuralEntities for each middleware, or null if node does not match.
+ */
+export function extractExpressRouteMiddleware(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity[] | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    const methodName = node.expression.name.text;
+    
+    if (EXPRESS_ROUTE_METHODS.has(methodName) && node.arguments.length >= 3) {
+      const firstArg = node.arguments[0];
+      if (ts.isStringLiteral(firstArg)) {
+        const pathText = firstArg.text;
+        if (methodName === 'get' && !pathText.startsWith('/')) {
+           return null;
+        }
+
+        const entities: StructuralEntity[] = [];
+        
+        // Loop from second arg to second-to-last arg (last arg is the handler)
+        for (let i = 1; i < node.arguments.length - 1; i++) {
+          const middlewareArg = node.arguments[i];
+          let target = 'Unknown Middleware';
+          
+          if (ts.isIdentifier(middlewareArg)) {
+            target = middlewareArg.text;
+          } else if (ts.isPropertyAccessExpression(middlewareArg)) {
+            if (ts.isIdentifier(middlewareArg.expression)) {
+              target = `${middlewareArg.expression.text}.${middlewareArg.name.text}`;
+            } else {
+              target = middlewareArg.name.text;
+            }
+          } else if (ts.isCallExpression(middlewareArg)) {
+            if (ts.isIdentifier(middlewareArg.expression)) {
+              target = `${middlewareArg.expression.text}()`;
+            } else if (ts.isPropertyAccessExpression(middlewareArg.expression)) {
+              target = `${middlewareArg.expression.name.text}()`;
+            }
+          } else if (ts.isFunctionExpression(middlewareArg) || ts.isArrowFunction(middlewareArg)) {
+            target = 'Inline Middleware';
+          } else {
+            target = middlewareArg.getText(sourceFile);
+          }
+          
+          entities.push({
+            id: nextId(),
+            name: `Express Mount: ${pathText} -> ${target}`,
+            type: 'RELATIONSHIP',
+            entityType: 'INTERCEPTS',
+            targetId: stableEntityId(`middleware:${target}`, 'BOUNDARY', `Middleware: ${target}`),
+            evidence: getEvidence(node),
+          });
+        }
+        
+        if (entities.length > 0) {
+          return entities;
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
 function parseExpressUseTarget(node: ts.CallExpression, sourceFile: ts.SourceFile) {
   const firstArg = node.arguments[0];
   let pathPrefix = 'Root';
