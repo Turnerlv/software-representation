@@ -411,6 +411,20 @@
           "status": "COMPLETE",
           "deprecated": true
         }
+      ],
+      "analyses": [
+        {
+          "date": "2026-08-17",
+          "branch": "analysis/express-2026-08-17-141151",
+          "report_path": "fixtures/research/analysis/express-2026-08-17.md",
+          "health_snapshot": {
+            "connectivity_rate": 100,
+            "scope_purity": 100
+          },
+          "key_findings": [
+            "Analysis completed automatically"
+          ]
+        }
       ]
     }
   },
@@ -475,7 +489,7 @@
       "report_path": "fixtures/research/analysis/<repo>-<date>.md",
       "health_snapshot": {
         "connectivity_rate": 98.6,
-        "scope_purity": 100.0
+        "scope_purity": 100
       },
       "key_findings": [
         "string"
