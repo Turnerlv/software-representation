@@ -483,6 +483,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "src/app/routes/routes.ts"
+        },
+        {
+          "session_id": "2026-08-17-213421-realworld",
+          "branch": "fix/express.route.inline-middleware-2026-08-17-213421",
+          "date": "2026-08-17T13:34:21.967Z",
+          "extractor_version": "0.2.4",
+          "report_path": "fixtures/research/sessions/2026-08-17-213421-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 128,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "express.route.inline-middleware"
         }
       ]
     }

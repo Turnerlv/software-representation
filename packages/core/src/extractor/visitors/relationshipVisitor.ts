@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
-import { extractExpressRouterMount } from '../adapters/expressAdapter.js';
+import { extractExpressRouterMount, extractExpressRouteMiddleware } from '../adapters/expressAdapter.js';
 
 import { resolveModulePath } from '../pathResolver.js';
 import { stableEntityId } from '../index.js';
@@ -163,6 +163,16 @@ export function visitRelationship(
     expressMount.status = 'DETERMINISTIC';
     expressMount.confidence = 'HIGH';
     return expressMount;
+  }
+
+  const expressRouteMiddlewares = extractExpressRouteMiddleware(node, sourceFile, getEvidence, nextId);
+  if (expressRouteMiddlewares && expressRouteMiddlewares.length > 0) {
+    for (const rw of expressRouteMiddlewares) {
+      rw.sourceId = sourceId;
+      rw.status = 'DETERMINISTIC';
+      rw.confidence = 'HIGH';
+    }
+    return expressRouteMiddlewares;
   }
 
 
