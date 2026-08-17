@@ -509,6 +509,31 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "express.route.inline-middleware"
+        },
+        {
+          "session_id": "2026-08-17-221839-realworld",
+          "branch": "research/inventory/realworld-2026-08-17-221839",
+          "date": "2026-08-17T14:18:39.834Z",
+          "extractor_version": "0.2.5",
+          "report_path": "fixtures/research/sessions/v0.2.5-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
         }
       ]
     }
