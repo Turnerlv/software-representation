@@ -2,7 +2,6 @@
   "schema_version": "v4",
   "repos": {
     "express": {
-
       "url": "https://github.com/expressjs/express.git",
       "pinned_commit": "a3714473feb3d2908add734d340e7755fd85e0a3",
       "clone_cmd": "git clone https://github.com/expressjs/express.git fixtures/cloned-repos/express && git -C fixtures/cloned-repos/express checkout a3714473feb3d2908add734d340e7755fd85e0a3",
@@ -428,6 +427,38 @@
           ]
         }
       ]
+    },
+    "realworld": {
+      "url": "https://github.com/gothinkster/node-express-realworld-example-app",
+      "framework": "express",
+      "status": "active",
+      "sessions": [
+        {
+          "session_id": "2026-08-17-212952-realworld",
+          "branch": "research/inventory/realworld-2026-08-17-212952",
+          "date": "2026-08-17T13:29:52.516Z",
+          "extractor_version": "0.2.4",
+          "report_path": "fixtures/research/sessions/2026-08-17-212952-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 128,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 128,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
+        }
+      ]
     }
   },
   "system_audits": [
@@ -496,13 +527,6 @@
       "key_findings": [
         "string"
       ]
-    }
-  },
-  "repositories": {
-    "realworld": {
-      "url": "https://github.com/gothinkster/node-express-realworld-example-app",
-      "framework": "express",
-      "status": "active"
     }
   }
 }
