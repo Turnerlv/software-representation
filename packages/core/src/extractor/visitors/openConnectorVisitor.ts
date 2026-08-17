@@ -82,7 +82,7 @@ export function visitOpenConnector(
   sourceFile: ts.SourceFile,
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
-): StructuralEntity | null {
+): StructuralEntity | StructuralEntity[] | null {
   if (!ts.isCallExpression(node)) {
     return null;
   }

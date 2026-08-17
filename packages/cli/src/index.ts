@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // packages/cli/src/index.ts
-// Chomp CLI entry point. Defines the 'analyze', 'ledger', and 'session' commands using commander.
+// Chomp CLI entry point.
 
 import { Command } from "commander";
 import { registerAnalyzeCommand } from "./commands/analyze.js";
@@ -8,7 +8,7 @@ import { registerSessionCommand } from "./commands/session.js";
 import { registerAuditCommand } from "./commands/audit.js";
 import { registerLedgerCommand } from "./commands/ledger.js";
 import { registerHealthCommand } from "./commands/health.js";
-import { registerResearchCommand } from "./commands/research.js";
+import { registerInventoryCommand } from "./commands/inventory.js";
 
 const program = new Command();
 
@@ -21,6 +21,6 @@ registerSessionCommand(program);
 registerAuditCommand(program);
 registerLedgerCommand(program);
 registerHealthCommand(program);
-registerResearchCommand(program);
+registerInventoryCommand(program);
 
 program.parse(process.argv);

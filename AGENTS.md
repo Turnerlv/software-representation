@@ -1,4 +1,4 @@
-# Software Representation Engine (`chomp`) — Agent Guidelines & System Context
+<!-- # Software Representation Engine (`chomp`) — Agent Guidelines & System Context
 
 This document outlines the core principles, data ontology, architecture, and scope for **chomp** (Software Representation Engine), derived from the foundational thesis ([`SR_ledger_2.1.md`](file://.context/SR_ledger_2.1.md)) and capstone specification ([`20260728_software_representation.pdf`](file://.context/20260728_software_representation.pdf)).
 
@@ -151,4 +151,4 @@ The `research-loop` skill will automatically:
 - Do NOT commit cloned repos or `.db` files from research runs.
 - Run `pnpm test --filter @chomp/core` before and after every visitor change.
 
-> **Note:** The initial 17 `express` research sessions conducted under the legacy count-based methodology have been marked `"deprecated": true` in `registry.json` and must not be used as baseline comparisons.
+> **Note:** The initial 17 `express` research sessions conducted under the legacy count-based methodology have been marked `"deprecated": true` in `registry.json` and must not be used as baseline comparisons. -->

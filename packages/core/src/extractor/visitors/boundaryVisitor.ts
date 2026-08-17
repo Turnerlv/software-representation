@@ -4,6 +4,9 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
+import { resolveModulePath } from '../pathResolver.js';
+import { extractExpressMiddlewareBoundary } from '../adapters/expressAdapter.js';
+
 /**
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
  *
@@ -11,17 +14,24 @@ import { extractCommonjsExport } from './commonjsExportVisitor.js';
  * - ClassDeclaration   (named classes only)
  * - ModuleDeclaration  (namespace/module blocks)
  * - BinaryExpression   (CommonJS module exports: `module.exports = ...`, `exports.name = ...`)
+ * - ImportDeclaration  (External packages)
+ * - Require Calls      (External packages)
+ * - Express Middleware (Express routes/middleware)
  *
  * @param node         The AST node to inspect.
+ * @param sourceFile   TypeScript SourceFile object used for text extraction.
  * @param getEvidence  Returns a populated EvidenceRecord for the given node.
  * @param nextId       Closure providing a placeholder ID — replaced by stableEntityId() in the orchestrator.
- * @returns A StructuralEntity or null if the node does not match any BOUNDARY pattern.
+ * @param repoRoot     The repository root for path resolution.
+ * @returns A StructuralEntity, array of entities, or null if the node does not match any BOUNDARY pattern.
  */
 export function visitBoundary(
   node: ts.Node,
+  sourceFile: ts.SourceFile,
   getEvidence: (node: ts.Node) => EvidenceRecord,
-  nextId: () => string
-): StructuralEntity | null {
+  nextId: () => string,
+  repoRoot: string = ''
+): StructuralEntity | StructuralEntity[] | null {
   if (ts.isClassDeclaration(node) && node.name) {
     return {
       id: nextId(),
@@ -42,6 +52,42 @@ export function visitBoundary(
   }
   const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
   if (cjsExport && cjsExport.type === 'BOUNDARY') return cjsExport;
+
+  // External package boundaries from imports
+  if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+    const importLiteral = node.moduleSpecifier.text;
+    const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+    if (!resolvedPath && !importLiteral.startsWith('.')) {
+      return {
+        id: nextId(),
+        name: `Package: ${importLiteral}`,
+        type: 'BOUNDARY',
+        entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  // External package boundaries from requires
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'require' && node.arguments.length > 0) {
+    const firstArg = node.arguments[0];
+    if (ts.isStringLiteral(firstArg)) {
+      const importLiteral = firstArg.text;
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      if (!resolvedPath && !importLiteral.startsWith('.')) {
+        return {
+          id: nextId(),
+          name: `Package: ${importLiteral}`,
+          type: 'BOUNDARY',
+          entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE',
+          evidence: getEvidence(node),
+        };
+      }
+    }
+  }
+
+  const expressMiddleware = extractExpressMiddlewareBoundary(node, sourceFile, getEvidence, nextId);
+  if (expressMiddleware) return expressMiddleware;
 
   return null;
 }

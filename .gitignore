@@ -81,3 +81,10 @@ apps/*/package-lock.json
 
 # project context and instructions
 .context/
+
+# Research handoffs (legacy AI Studio export dirs — no longer committed)
+/fixtures/research/handoffs/
+
+# Research SQLite stores
+/fixtures/research/*.db
+/fixtures/research/*.db-journal

@@ -43,7 +43,7 @@ export function visitRelationship(
   nextId: () => string,
   repoRoot: string = '',
   sourceId: string = ''
-): StructuralEntity | null {
+): StructuralEntity | StructuralEntity[] | null {
   if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
     const importLiteral = node.moduleSpecifier.text;
     const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);

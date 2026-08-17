@@ -155,8 +155,8 @@ test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
     'Expected to extract Express /users mount as RELATIONSHIP'
   );
     assert.ok(
-      graph.relationships.some((r) => r.name === 'Express Mount: Root -> express.json()' && r.entityType === 'MOUNTS'),
-      'Expected to extract Express Root -> express.json() mount as RELATIONSHIP'
+      graph.relationships.some((r) => r.name === 'Express Mount: Root -> express.json()' && r.entityType === 'INTERCEPTS'),
+      'Expected to extract Express Root -> express.json() mount as INTERCEPTS'
     );
 });
 

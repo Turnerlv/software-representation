@@ -3,6 +3,21 @@ import { existsSync, readFileSync, statSync, writeFileSync, unlinkSync, mkdirSyn
 import { resolve, join, dirname } from "node:path";
 import { execSync } from "node:child_process";
 import { readRegistry, writeRegistry, Session, EntityCounts } from "../utils/registry.js";
+
+export type SessionType = "inventory" | "comparison" | "fix";
+
+function buildBranchName(type: SessionType, repoName: string, targetSlug: string | undefined, dateId: string): string {
+  switch (type) {
+    case "inventory":
+      return `research/inventory/${repoName}-${dateId}`;
+    case "fix":
+      // targetSlug = pattern/bug id being fixed
+      return `fix/${targetSlug ?? repoName}-${dateId}`;
+    case "comparison":
+    default:
+      return `research/compare/${repoName}-${targetSlug ? `${targetSlug}-` : ""}${dateId}`;
+  }
+}
 import { createBranch, commitChanges, checkoutBranch, mergeBranch, pushBranch } from "../utils/git.js";
 import { findWorkspaceRoot } from "../utils/db.js";
 import { analyzeTarget, initDatabase, saveRepresentationGraph, getRepresentationGraph } from "@chomp/core";
@@ -83,6 +98,8 @@ export function registerSessionCommand(program: Command) {
     .command("start")
     .description("Start a new research session")
     .requiredOption("--repo <name>", "Repository name to analyze")
+    .option("--type <type>", "Session type: inventory | comparison | fix (default: comparison)", "comparison")
+    .option("--target <slug>", "For comparison: file slug being compared. For fix: pattern/bug ID being fixed.")
     .option("--force", "Force start a new session even if a completed session with same extractor version exists")
     .action((options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
@@ -91,6 +108,13 @@ export function registerSessionCommand(program: Command) {
       
       const registry = readRegistry(registryPath);
       const repoName = options.repo;
+      const sessionType: SessionType = options.type ?? "comparison";
+
+      const validTypes: SessionType[] = ["inventory", "comparison", "fix"];
+      if (!validTypes.includes(sessionType)) {
+        console.error(`Invalid session type: ${sessionType}. Valid: ${validTypes.join(" | ")}`);
+        process.exit(1);
+      }
       
       if (!registry.repos || !registry.repos[repoName]) {
         console.error(`Repository ${repoName} not found in registry.json.`);
@@ -137,13 +161,13 @@ export function registerSessionCommand(program: Command) {
       const now = new Date();
       const dateId = formatDateId(now);
       const sessionId = `${dateId}-${repoName}`;
-      const branchName = `research/${repoName}-${dateId}`;
+      const branchName = buildBranchName(sessionType, repoName, options.target, dateId);
       const reportPath = `fixtures/research/sessions/${sessionId}.md`;
 
-      const newSession: Session = {
+      const newSession: Session & { type?: string; target?: string } = {
         session_id: sessionId,
         branch: branchName,
-        date: now.toISOString(), // simplified standard ISO date
+        date: now.toISOString(),
         extractor_version: currentVersion,
         report_path: reportPath,
         entity_counts: {
@@ -152,7 +176,10 @@ export function registerSessionCommand(program: Command) {
         },
         gaps_logged: 0,
         gaps_resolved: 0,
-        status: "IN_PROGRESS"
+        status: "IN_PROGRESS",
+        // v4 fields
+        type: sessionType,
+        ...(options.target ? { target: options.target } : {}),
       };
 
       registry.repos[repoName].sessions.push(newSession);
@@ -166,7 +193,13 @@ export function registerSessionCommand(program: Command) {
       const reportDir = dirname(reportAbsPath);
       if (!existsSync(reportDir)) mkdirSync(reportDir, { recursive: true });
 
-      const reportStub = `# Research Session: ${repoName} — ${dateId}
+      const typeLabel = sessionType.charAt(0).toUpperCase() + sessionType.slice(1);
+      const reportStub = `# ${typeLabel} Session: ${repoName} — ${dateId}${
+        options.target ? ` (${options.target})` : ""
+      }
+
+## Session Type
+${typeLabel}${options.target ? ` — target: \`${options.target}\`` : ""}
 
 ## Target
 - Repo: ${registry.repos[repoName].url || "<url>"}
@@ -183,17 +216,24 @@ export function registerSessionCommand(program: Command) {
 | OPEN_CONNECTOR | ${counts.OPEN_CONNECTOR}   |
 
 ---
-<!-- Stage 1 content will be appended below -->
+<!-- Session findings will be appended below -->
 `;
       writeFileSync(reportAbsPath, reportStub, "utf8");
 
       writeRegistry(registryPath, registry);
       
-      commitChanges(["fixtures/research/registry.json", reportPath], `research(${repoName}): session ${sessionId} — setup`, workspaceRoot);
+      commitChanges(["fixtures/research/registry.json", reportPath], `research(${repoName}): ${sessionType} session ${sessionId} — setup`, workspaceRoot);
 
-      console.log(`\n**Session \`${sessionId}\` — Setup Complete**`);
+      console.log(`\n**Session \`${sessionId}\` [${sessionType}] — Setup Complete**`);
       console.log(`Branch: \`${branchName}\``);
-      console.log(`Proceeding to gap analysis...`);
+      if (sessionType === "inventory") {
+        console.log(`\nNext: run \`pnpm chomp inventory --repo ${repoName}\` to sweep patterns.`);
+      } else if (sessionType === "comparison") {
+        console.log(`\nNext: compare target file against the rubric. Log findings with \`chomp ledger pattern log\` or \`chomp ledger bug log\`.`);
+      } else {
+        console.log(`\nNext: implement the fix in packages/core, then run \`pnpm test --filter @chomp/core\`.`);
+        console.log(`Close with \`chomp session merge --repo ${repoName}\` — health + tests will be verified before merge.`);
+      }
     });
 
   sessionCmd
@@ -265,6 +305,34 @@ export function registerSessionCommand(program: Command) {
         process.exit(1);
       }
 
+      const sessionType: SessionType = session.type ?? "comparison";
+
+      // ── Fix-session merge gate ────────────────────────────────────────────
+      // Fix sessions MUST pass health + tests before merging. This is enforced
+      // programmatically so a human doesn't have to remember.
+      if (sessionType === "fix") {
+        console.log("\n[fix session] Running health gate before merge...");
+        try {
+          execSync(
+            `pnpm chomp health --repo fixtures/cloned-repos/${options.repo}`,
+            { stdio: "inherit", cwd: workspaceRoot }
+          );
+        } catch {
+          console.error("\n❌ Health check failed. Fix extraction issues before merging.");
+          process.exit(1);
+        }
+
+        console.log("\n[fix session] Running @chomp/core tests before merge...");
+        try {
+          execSync("pnpm test --filter @chomp/core", { stdio: "inherit", cwd: workspaceRoot });
+        } catch {
+          console.error("\n❌ Tests failed. Fix test failures before merging.");
+          process.exit(1);
+        }
+
+        console.log("\n✅ Health and tests passed. Proceeding with merge.");
+      }
+
       console.log(`Pushing branch ${session.branch} to remote...`);
       try {
         pushBranch(session.branch, workspaceRoot);
@@ -276,17 +344,17 @@ export function registerSessionCommand(program: Command) {
       checkoutBranch("main", workspaceRoot);
 
       console.log(`Merging ${session.branch} into main...`);
-      mergeBranch(session.branch, `research(${options.repo}): merge session ${session.session_id}`, workspaceRoot);
+      mergeBranch(session.branch, `research(${options.repo}): merge ${sessionType} session ${session.session_id}`, workspaceRoot);
 
-      if (session.gaps_resolved > 0) {
-        console.log(`Gaps resolved: ${session.gaps_resolved}. Bumping @chomp/core version...`);
+      if (session.gaps_resolved > 0 || sessionType === "fix") {
+        console.log(`Bumping @chomp/core patch version...`);
         execSync("npm version patch --no-git-tag-version --prefix packages/core", { cwd: workspaceRoot, stdio: 'inherit' });
         
         const newVersion = getExtractorVersion(workspaceRoot);
-        commitChanges(["packages/core/package.json"], `chore: bump @chomp/core to ${newVersion} — ${session.session_id} (${session.gaps_resolved} gaps resolved)`, workspaceRoot);
+        commitChanges(["packages/core/package.json"], `chore: bump @chomp/core to ${newVersion} — ${session.session_id}`, workspaceRoot);
         console.log(`✅ Bumped version to ${newVersion} and committed.`);
       } else {
-        console.log(`ℹ️ No extractor changes landed this session (${session.gaps_resolved} gaps resolved). Version left at ${getExtractorVersion(workspaceRoot)}.`);
+        console.log(`ℹ️ ${sessionType} session — no extractor code changes. Version left at ${getExtractorVersion(workspaceRoot)}.`);
       }
     });
 }

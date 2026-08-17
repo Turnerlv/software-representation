@@ -58,6 +58,44 @@ export function extractExpressRoute(
   return null;
 }
 
+function parseExpressUseTarget(node: ts.CallExpression, sourceFile: ts.SourceFile) {
+  const firstArg = node.arguments[0];
+  let pathPrefix = 'Root';
+  let targetNode = firstArg;
+  
+  if (ts.isStringLiteral(firstArg) && node.arguments.length >= 2) {
+    pathPrefix = firstArg.text;
+    targetNode = node.arguments[1];
+  }
+
+  let target = 'Unknown Middleware';
+  let isMiddleware = true;
+  
+  if (ts.isCallExpression(targetNode)) {
+    if (ts.isIdentifier(targetNode.expression) && targetNode.expression.text === 'require' && ts.isStringLiteral(targetNode.arguments[0])) {
+      target = targetNode.arguments[0].text;
+      isMiddleware = false; // Requiring a file is usually mounting a router
+    } else if (ts.isIdentifier(targetNode.expression)) {
+      target = `${targetNode.expression.text}()`;
+    } else if (ts.isPropertyAccessExpression(targetNode.expression)) {
+      if (ts.isIdentifier(targetNode.expression.expression)) {
+        target = `${targetNode.expression.expression.text}.${targetNode.expression.name.text}()`;
+      } else {
+        target = `${targetNode.expression.name.text}()`;
+      }
+    }
+  } else if (ts.isIdentifier(targetNode)) {
+    target = targetNode.text;
+    if (target.toLowerCase().includes('router')) {
+      isMiddleware = false;
+    }
+  } else if (ts.isFunctionExpression(targetNode) || ts.isArrowFunction(targetNode)) {
+    target = 'Inline Middleware';
+  }
+  
+  return { pathPrefix, target, isMiddleware };
+}
+
 /**
  * Extracts an Express router mount or middleware registration as a RELATIONSHIP primitive entity.
  *
@@ -82,46 +120,51 @@ export function extractExpressRouterMount(
   if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
     const methodName = node.expression.name.text;
     if (methodName === 'use' && node.arguments.length >= 1) {
-      const firstArg = node.arguments[0];
-      
-      let pathPrefix = 'Root';
-      let targetNode = firstArg;
-      
-      if (ts.isStringLiteral(firstArg) && node.arguments.length >= 2) {
-        pathPrefix = firstArg.text;
-        targetNode = node.arguments[1];
-      }
-
-      let target = 'Unknown Middleware';
-      if (ts.isCallExpression(targetNode)) {
-        if (ts.isIdentifier(targetNode.expression) && targetNode.expression.text === 'require' && ts.isStringLiteral(targetNode.arguments[0])) {
-          target = targetNode.arguments[0].text;
-        } else if (ts.isIdentifier(targetNode.expression)) {
-          target = `${targetNode.expression.text}()`;
-        } else if (ts.isPropertyAccessExpression(targetNode.expression)) {
-          if (ts.isIdentifier(targetNode.expression.expression)) {
-            target = `${targetNode.expression.expression.text}.${targetNode.expression.name.text}()`;
-          } else {
-            target = `${targetNode.expression.name.text}()`;
-          }
-        }
-      } else if (ts.isIdentifier(targetNode)) {
-        target = targetNode.text;
-      } else if (ts.isFunctionExpression(targetNode) || ts.isArrowFunction(targetNode)) {
-        target = 'Inline Middleware';
-      }
+      const { pathPrefix, target, isMiddleware } = parseExpressUseTarget(node, sourceFile);
       
       return {
         id: nextId(),
         name: `Express Mount: ${pathPrefix} -> ${target}`,
         type: 'RELATIONSHIP',
-        entityType: 'MOUNTS',
+        entityType: isMiddleware ? 'INTERCEPTS' : 'MOUNTS',
         targetId: stableEntityId(`middleware:${target}`, 'BOUNDARY', `Middleware: ${target}`),
         evidence: getEvidence(node),
       };
     }
   }
 
+  return null;
+}
+
+/**
+ * Extracts an Express middleware as a BOUNDARY primitive entity.
+ *
+ * @param node        The AST node to inspect.
+ * @param sourceFile  TypeScript SourceFile object used for text extraction.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns A BOUNDARY StructuralEntity for the middleware, or null if node does not match.
+ */
+export function extractExpressMiddlewareBoundary(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
+    if (node.expression.name.text === 'use' && node.arguments.length >= 1) {
+      const { target, isMiddleware } = parseExpressUseTarget(node, sourceFile);
+      if (isMiddleware) {
+        return {
+          id: nextId(),
+          name: `Middleware: ${target}`,
+          type: 'BOUNDARY',
+          entityType: 'MIDDLEWARE',
+          evidence: getEvidence(node),
+        };
+      }
+    }
+  }
   return null;
 }
 
@@ -379,5 +422,41 @@ export function extractExpressResponseCookie(
     }
   }
 
+  return null;
+}
+
+/**
+ * Extracts Express dynamic methods from the iteration loop (methods.forEach).
+ * 
+ * @param node        The AST node to inspect.
+ * @param getEvidence Callback returning an EvidenceRecord for the node.
+ * @param nextId      Closure providing a placeholder entity ID.
+ * @returns An array of CONTRACT StructuralEntity for the endpoints, or null if node does not match.
+ */
+export function extractExpressDynamicMethods(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity[] | null {
+  // Matches: methods.forEach(function (method) { app[method] = function (path) { ... } })
+  if (
+    ts.isCallExpression(node) &&
+    ts.isPropertyAccessExpression(node.expression) &&
+    ts.isIdentifier(node.expression.expression) &&
+    node.expression.expression.text === 'methods' &&
+    node.expression.name.text === 'forEach'
+  ) {
+    const entities: StructuralEntity[] = [];
+    for (const method of EXPRESS_ROUTE_METHODS) {
+      entities.push({
+        id: nextId(),
+        name: `Express Route: ${method.toUpperCase()} (Dynamic)`,
+        type: 'CONTRACT',
+        entityType: 'HTTP_ENDPOINT',
+        evidence: getEvidence(node),
+      });
+    }
+    return entities;
+  }
   return null;
 }

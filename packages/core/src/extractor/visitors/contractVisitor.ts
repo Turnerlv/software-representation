@@ -3,7 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
-import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation } from '../adapters/expressAdapter.js';
+import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation, extractExpressDynamicMethods } from '../adapters/expressAdapter.js';
 import { extractEventEmitterContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
@@ -30,7 +30,7 @@ export function visitContract(
   node: ts.Node,
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
-): StructuralEntity | null {
+): StructuralEntity | StructuralEntity[] | null {
   if (ts.isInterfaceDeclaration(node) && node.name) {
     return {
       id: nextId(),
@@ -71,6 +71,9 @@ export function visitContract(
 
   const expressContentNegotiation = extractExpressContentNegotiation(node, getEvidence, nextId);
   if (expressContentNegotiation) return expressContentNegotiation;
+
+  const expressDynamicMethods = extractExpressDynamicMethods(node, getEvidence, nextId);
+  if (expressDynamicMethods) return expressDynamicMethods;
 
   const eventEmitterContract = extractEventEmitterContract(node, getEvidence, nextId);
   if (eventEmitterContract) return eventEmitterContract;

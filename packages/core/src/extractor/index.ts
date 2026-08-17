@@ -180,35 +180,39 @@ export function analyzeTarget(
      * Replaces placeholder entity IDs with deterministic stableEntityId() before pushing to graph arrays.
      */
     function visit(node: ts.Node) {
-      const boundaryEntity = visitBoundary(node, getEvidence, () => '');
-      if (boundaryEntity) {
+      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot);
+      const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
+      for (const boundaryEntity of boundaryEntities) {
         boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
-        boundaryEntity.sourceId = fileId;
+        if (!boundaryEntity.sourceId) boundaryEntity.sourceId = fileId;
         // parentBoundaryId explicitly models the lexical containment hierarchy (File → Export/Class)
-        boundaryEntity.parentBoundaryId = fileId;
+        if (!boundaryEntity.parentBoundaryId) boundaryEntity.parentBoundaryId = fileId;
         boundaryEntity.scope = scope;
         boundaries.push(boundaryEntity);
       }
 
-      const contractEntity = visitContract(node, getEvidence, () => '');
-      if (contractEntity) {
+      const contractResult = visitContract(node, getEvidence, () => '');
+      const contractEntities = Array.isArray(contractResult) ? contractResult : (contractResult ? [contractResult] : []);
+      for (const contractEntity of contractEntities) {
         contractEntity.id = stableEntityId(relativePath, contractEntity.type, contractEntity.name);
-        contractEntity.sourceId = fileId;
+        if (!contractEntity.sourceId) contractEntity.sourceId = fileId;
         contractEntity.scope = scope;
         contracts.push(contractEntity);
       }
 
-      const relationshipEntity = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
-      if (relationshipEntity) {
+      const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
+      const relationshipEntities = Array.isArray(relationshipResult) ? relationshipResult : (relationshipResult ? [relationshipResult] : []);
+      for (const relationshipEntity of relationshipEntities) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
         relationshipEntity.scope = scope;
         relationships.push(relationshipEntity);
       }
 
-      const openConnectorEntity = visitOpenConnector(node, sourceFile, getEvidence, () => '');
-      if (openConnectorEntity) {
+      const openConnectorResult = visitOpenConnector(node, sourceFile, getEvidence, () => '');
+      const openConnectorEntities = Array.isArray(openConnectorResult) ? openConnectorResult : (openConnectorResult ? [openConnectorResult] : []);
+      for (const openConnectorEntity of openConnectorEntities) {
         openConnectorEntity.id = stableEntityId(relativePath, openConnectorEntity.type, openConnectorEntity.name);
-        openConnectorEntity.sourceId = fileId;
+        if (!openConnectorEntity.sourceId) openConnectorEntity.sourceId = fileId;
         openConnectorEntity.scope = scope;
         openConnectors.push(openConnectorEntity);
       }
