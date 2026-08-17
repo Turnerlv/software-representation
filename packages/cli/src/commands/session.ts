@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { existsSync, readFileSync, statSync, writeFileSync, unlinkSync, mkdirSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync, appendFileSync, unlinkSync, mkdirSync } from "node:fs";
 import { resolve, join, dirname } from "node:path";
 import { execSync } from "node:child_process";
 import { readRegistry, writeRegistry, Session, EntityCounts } from "../utils/registry.js";
@@ -20,7 +20,7 @@ function buildBranchName(type: SessionType, repoName: string, targetSlug: string
 }
 import { createBranch, commitChanges, checkoutBranch, mergeBranch, pushBranch } from "../utils/git.js";
 import { findWorkspaceRoot } from "../utils/db.js";
-import { analyzeTarget, initDatabase, saveRepresentationGraph, getRepresentationGraph } from "@chomp/core";
+import { analyzeTarget, initDatabase, saveRepresentationGraph, getRepresentationGraph, initPatternLedger, getPattern, initBugTracker, getBug } from "@chomp/core";
 
 function getExtractorVersion(workspaceRoot: string): string {
   const pkgPath = resolve(workspaceRoot, "packages/core/package.json");
@@ -121,6 +121,19 @@ export function registerSessionCommand(program: Command) {
         process.exit(1);
       }
 
+      if (sessionType === "comparison") {
+        console.log(`\n[comparison session] Running health gate before starting...`);
+        try {
+          execSync(
+            `pnpm chomp health --repo fixtures/cloned-repos/${options.repo}`,
+            { cwd: workspaceRoot, stdio: "inherit" }
+          );
+        } catch {
+          console.error("\n❌ Health check failed. Fix extraction issues before starting a comparison session.");
+          process.exit(1);
+        }
+      }
+
       const currentVersion = getExtractorVersion(workspaceRoot);
       const repoSessions = registry.repos[repoName].sessions || [];
       registry.repos[repoName].sessions = repoSessions;
@@ -162,7 +175,7 @@ export function registerSessionCommand(program: Command) {
       const dateId = formatDateId(now);
       const sessionId = `${dateId}-${repoName}`;
       const branchName = buildBranchName(sessionType, repoName, options.target, dateId);
-      const reportPath = `fixtures/research/sessions/${sessionId}.md`;
+      const reportPath = `fixtures/research/sessions/v${currentVersion}-${repoName}.md`;
 
       const newSession: Session & { type?: string; target?: string } = {
         session_id: sessionId,
@@ -194,20 +207,43 @@ export function registerSessionCommand(program: Command) {
       if (!existsSync(reportDir)) mkdirSync(reportDir, { recursive: true });
 
       const typeLabel = sessionType.charAt(0).toUpperCase() + sessionType.slice(1);
-      const reportStub = `# ${typeLabel} Session: ${repoName} — ${dateId}${
-        options.target ? ` (${options.target})` : ""
+      
+      if (!existsSync(reportAbsPath)) {
+        const header = `# Research Loop: ${repoName} (v${currentVersion})\n\n`;
+        writeFileSync(reportAbsPath, header, "utf8");
+      }
+      
+      let targetContext = "";
+      if (sessionType === "fix" && options.target) {
+        try {
+          const patternDb = initPatternLedger(resolve(workspaceRoot, "fixtures/research/pattern_ledger.db"));
+          const pattern = getPattern(patternDb, options.target);
+          patternDb.close();
+          if (pattern) {
+            targetContext = `\n### Target Context (Pattern: ${pattern.pattern_id})\n- **Category:** ${pattern.ontology_category}\n- **Status:** ${pattern.status}\n- **Description:** ${pattern.description}\n`;
+          } else {
+            const bugDb = initBugTracker(resolve(workspaceRoot, "fixtures/research/bug_tracker.db"));
+            const bug = getBug(bugDb, options.target);
+            bugDb.close();
+            if (bug) {
+              targetContext = `\n### Target Context (Bug: ${bug.bug_id})\n- **Status:** ${bug.status}\n- **Description:** ${bug.description}\n`;
+            }
+          }
+        } catch (e) {
+          // Ignore
+        }
       }
 
-## Session Type
-${typeLabel}${options.target ? ` — target: \`${options.target}\`` : ""}
-
-## Target
+      const reportStub = `## ${typeLabel} Session — ${dateId}${
+        options.target ? ` (${options.target})` : ""
+      }
+${targetContext}
 - Repo: ${registry.repos[repoName].url || "<url>"}
 - Pinned commit: ${registry.repos[repoName].pinned_commit || "<short SHA>"}
 - Extractor version: ${currentVersion}
 - Branch: ${branchName}
 
-## Extraction Baseline
+### Extraction Baseline
 | Primitive      | Count |
 |---|---|
 | BOUNDARY       | ${counts.BOUNDARY}   |
@@ -216,9 +252,8 @@ ${typeLabel}${options.target ? ` — target: \`${options.target}\`` : ""}
 | OPEN_CONNECTOR | ${counts.OPEN_CONNECTOR}   |
 
 ---
-<!-- Session findings will be appended below -->
 `;
-      writeFileSync(reportAbsPath, reportStub, "utf8");
+      appendFileSync(reportAbsPath, reportStub, "utf8");
 
       writeRegistry(registryPath, registry);
       
@@ -313,11 +348,20 @@ ${typeLabel}${options.target ? ` — target: \`${options.target}\`` : ""}
       if (sessionType === "fix") {
         console.log("\n[fix session] Running health gate before merge...");
         try {
-          execSync(
+          const healthOut = execSync(
             `pnpm chomp health --repo fixtures/cloned-repos/${options.repo}`,
-            { stdio: "inherit", cwd: workspaceRoot }
+            { cwd: workspaceRoot, encoding: "utf8" }
           );
-        } catch {
+          console.log(healthOut);
+          
+          const reportAbsPath = resolve(workspaceRoot, session.report_path);
+          if (existsSync(reportAbsPath)) {
+            appendFileSync(reportAbsPath, `\n### Health Gate (Fix Session Merge)\n\`\`\`\n${healthOut}\n\`\`\`\n---\n`, "utf8");
+            commitChanges([session.report_path], `research(${options.repo}): append health check results`, workspaceRoot);
+          }
+        } catch (e: any) {
+          if (e.stdout) console.log(e.stdout);
+          if (e.stderr) console.error(e.stderr);
           console.error("\n❌ Health check failed. Fix extraction issues before merging.");
           process.exit(1);
         }

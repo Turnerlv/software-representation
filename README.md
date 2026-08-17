@@ -16,16 +16,21 @@ Chomp is **not** a code generator. It is **not** a documentation tool. It is a s
 
 ## Core Ontology
 
-Every extracted structure maps to one of four primitives:
+The ontology is strictly defined as **3 structural primitives + Open Connectors as a distinct non-peer category**.
 
+### The 3 Structural Primitives
 | Primitive | What it captures | Examples |
 |---|---|---|
 | **BOUNDARY** | Structural scopes — where a unit begins and ends | Classes, modules, namespaces, service files |
 | **CONTRACT** | Explicit interfaces for inter-unit communication | Interfaces, type aliases, exported functions, API routes, event schemas |
 | **RELATIONSHIP** | Known structural dependencies between units | Imports, inheritance, composition, router mounts |
+
+### The Non-Peer Extension
+| Category | What it captures | Examples |
+|---|---|---|
 | **OPEN_CONNECTOR** | Known exit points beyond the current evidence boundary | HTTP clients, database clients, message brokers, external service calls |
 
-The ontology has **3 structural primitives** (Boundary, Contract, Relationship) **+ Open Connector as a distinct non-peer category** — not a fourth structural primitive on equal footing. `schema.ts` in `packages/core` is the single source of truth; docs describe it, not the reverse.
+`schema.ts` in `packages/core` is the single source of truth; docs describe it, not the reverse. Open Connectors are structurally distinct from boundaries, contracts, and relationships and are not a fourth structural primitive on equal footing.
 
 Nothing is fabricated — if the evidence doesn't exist in the code, Chomp won't invent the relationship.
 
@@ -142,6 +147,8 @@ The v4 research loop is **fully deterministic in Phase 1** — no LLM calls, no 
 [Clone Repo] → [Inventory Session] → [Comparison Session] → [Fix Session] → [Merge]
                    (ripgrep sweep)     (rubric-driven AI)     (visitor code)
 ```
+
+> **Agent Entry Point:** If you are an AI agent, you must enter this loop via the `research-loop` skill, which will orchestrate the raw CLI commands shown below on your behalf. **Do not** run these raw commands ad-hoc.
 
 ### Session Types
 

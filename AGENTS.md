@@ -154,7 +154,7 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 2. **Log Immediately:** When a comparison session finds a pattern gap or bug, log it immediately via `chomp ledger pattern log` or `chomp ledger bug log`. Do not write a narrative summary and transcribe later — the compression step loses detail.
 3. **Preserve Documentation Integrity:** Maintain explicit references to line numbers and evidence sources.
 4. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
-5. **Schema Compliance:** All extracted structures must adhere to the 4 ontology primitives. `schema.ts` is the authority.
+5. **Schema Compliance:** All extracted structures must adhere to the 3 structural primitives (plus Open Connectors). `schema.ts` is the authority.
 6. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes. Tests must reference committed fixture files in `fixtures/test-repos/<framework>/` — never use inline `fs.writeFileSync` or temp directories.
 7. **Controlled Fixtures:** Visitor logic is proven against `fixtures/test-repos/<framework>/expected.json` ground truths, never directly against live cloned repos.
 8. **Do NOT commit:** Cloned repos, `.db` files, or `fixtures/research/handoffs/` directories.
