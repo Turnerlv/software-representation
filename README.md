@@ -25,7 +25,9 @@ Every extracted structure maps to one of four primitives:
 | **RELATIONSHIP** | Known structural dependencies between units | Imports, inheritance, composition, router mounts |
 | **OPEN_CONNECTOR** | Known exit points beyond the current evidence boundary | HTTP clients, database clients, message brokers, external service calls |
 
-The ontology is intentionally minimal. Every pattern extracted must map to exactly one of these four. Nothing is fabricated — if the evidence doesn't exist in the code, Chomp won't invent the relationship.
+The ontology has **3 structural primitives** (Boundary, Contract, Relationship) **+ Open Connector as a distinct non-peer category** — not a fourth structural primitive on equal footing. `schema.ts` in `packages/core` is the single source of truth; docs describe it, not the reverse.
+
+Nothing is fabricated — if the evidence doesn't exist in the code, Chomp won't invent the relationship.
 
 ---
 
@@ -35,13 +37,18 @@ The ontology is intentionally minimal. Every pattern extracted must map to exact
 chomp/
 ├── packages/
 │   ├── core/           # Extraction engine: AST parsing, ontology types, SQLite persistence
-│   └── cli/            # 'chomp' CLI: analyze and ledger commands
+│   └── cli/            # 'chomp' CLI: analyze, ledger, session, inventory commands
 ├── apps/
-│   ├── backend/        # REST API + JWT auth (Sprint 2)
-│   └── frontend/       # Next.js graph explorer UI (Sprint 2)
+│   ├── backend/        # REST API + JWT auth
+│   └── web/            # Next.js graph explorer UI
 ├── fixtures/
 │   ├── test-repos/     # Committed minimal fixtures for unit tests
-│   └── cloned-repos/   # Git-ignored real-world repos for research runs
+│   ├── cloned-repos/   # Git-ignored real-world repos for research runs
+│   └── research/
+│       ├── registry.json         # Session ledger (schema_version: v4)
+│       ├── pattern_ledger.db     # Coverage gaps — one row per pattern class
+│       ├── bug_tracker.db        # Correctness defects — one row per bug
+│       └── sessions/*.md         # Per-session research reports
 └── .agents/
     └── skills/         # Agent skills for research, building, and architecture
 ```
@@ -64,17 +71,38 @@ collectFiles()
 The local CLI for running extraction and research session orchestration:
 
 ```bash
+# Extraction
 chomp analyze --repo <name> [--format json]      # Extracts AST and outputs ontology metrics
-chomp ledger [--db <path>]                        # Displays gap analysis ledger
-chomp ledger log --repo <name> --file <path> ...  # Deterministically logs an extraction gap
-chomp session start --repo <name> [--force]         # Setup session, branch, DB, and report stub
-chomp audit prepare --repo <name>                   # Export current_extraction.json & system_prompt.md for AI Studio
-chomp ledger import --file <path> --repo <name>   # Import studio_output.json into SQLite ledger
-chomp session log-gaps --repo <name> --count <n>    # Record logged gaps and commit report
-chomp session close --repo <name> --resolved <n>    # Re-analyze graph, record final state & complete
-chomp session merge --repo <name>                   # Push, checkout main, merge --no-ff & patch bump @chomp/core
-chomp audit start --topic <name>                    # Setup system audit, branch, and report stub
-chomp audit close --topic <name> --change <items..> # Close audit and log changes to registry
+chomp health --repo <path>                        # Compute structural health metrics
+
+# Coverage Ledger (legacy — existing gap tracking)
+chomp ledger [--db <path>]                        # Display gap analysis ledger
+chomp ledger log --repo <name> --file <path> ...  # Log an extraction gap
+
+# Pattern Ledger (v4 — coverage gaps by pattern class)
+chomp ledger patterns                             # List all pattern classes
+chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> [--sig <regex>]
+chomp ledger pattern resolve --id <slug> --session <id> [--commit <sha>]
+chomp ledger pattern status --id <slug> --status <unhandled|partial|handled>
+
+# Bug Tracker (v4 — correctness defects)
+chomp ledger bugs                                 # List all bugs
+chomp ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
+chomp ledger bug fix --id <slug> --session <id> [--commit <sha>]
+
+# Inventory Sweep (v4 — Phase 1, deterministic, no LLM)
+chomp inventory --repo <name>                    # Ripgrep sweep of all sweepable patterns
+
+# Session Management (v4 typed sessions)
+chomp session start --repo <name> --type <inventory|comparison|fix> [--target <slug>]
+chomp session log-gaps --repo <name> --count <n>
+chomp session close --repo <name> --resolved <n>
+chomp session merge --repo <name>                # fix-type: health + tests enforced before merge
+
+# System Audits
+chomp audit start --topic <name>
+chomp audit close --topic <name> --change <items..>
+chomp audit merge --topic <name>
 ```
 
 ---
@@ -94,21 +122,8 @@ pnpm install
 ### Analyze a local repo
 
 ```bash
-# Analyze into the default workspace DB
 pnpm chomp analyze ./my-service
-
-# Analyze into an isolated research DB
-pnpm chomp analyze fixtures/cloned-repos/my-repo --db fixtures/cloned-repos/my-repo.db
-```
-
-### Inspect the extractor coverage ledger
-
-```bash
-# Default workspace DB
-pnpm chomp ledger
-
-# Research DB
-pnpm chomp ledger --db fixtures/cloned-repos/my-repo.db
+pnpm chomp health --repo ./my-service
 ```
 
 ### Run tests
@@ -119,158 +134,102 @@ pnpm test --filter @chomp/core
 
 ---
 
-## Manual Research Workflow
+## Research Methodology (v4)
 
-This step-by-step workflow expands Chomp's AST extractor coverage against real-world repositories without relying on automated bridge API calls.
-
-> **Note on `<repo-name>`:** `<repo-name>` refers to the repository **identifier** registered under `repos` in [`fixtures/research/registry.json`](file:///Users/turnervickery/code/chomp/fixtures/research/registry.json) (e.g. `express`), **not** a file path. The CLI automatically maps `<repo-name>` to `fixtures/cloned-repos/<repo-name>` and `fixtures/cloned-repos/<repo-name>.db`.
+The v4 research loop is **fully deterministic in Phase 1** — no LLM calls, no manual copy-paste to AI Studio, no handoff directories. Three formal session types feed each other:
 
 ```
-[0. Clone Repo] ──> [1. Session Start] ──> [2. Prepare Handoff] ──> [3. Manual Studio Audit]
-                                                                              │
-[7. Merge & Bump] <── [6. Session Close] <── [5. Build Fixes] <── [4. Import & Log Gaps]
+[Clone Repo] → [Inventory Session] → [Comparison Session] → [Fix Session] → [Merge]
+                   (ripgrep sweep)     (rubric-driven AI)     (visitor code)
 ```
 
----
+### Session Types
+
+| Type | Branch | What it produces | AI? |
+|---|---|---|---|
+| **Inventory** | `research/inventory/<repo>-<date>` | Occurrence counts per known pattern; unhandled candidates flagged | No |
+| **Comparison** | `research/compare/<repo>-<slug>-<date>` | Pattern Ledger and/or Bug Tracker entries from rubric check | Yes |
+| **Fix** | `fix/<pattern-or-bug-id>-<date>` | Visitor code changes in `packages/core` | Optional |
 
 ### Step 0: Clone Target Repository
 
-- **What it is:** Clone the repository to analyze into the fixtures directory.
-- **What it does:** Downloads the target repository source code so Chomp can extract AST primitives.
-- **Command to run:**
-  ```bash
-  git clone <repo-url> fixtures/cloned-repos/<repo-name>
-  ```
-- **Files modified:** Register the repository entry under `repos` in `fixtures/research/registry.json`.
+```bash
+git clone <repo-url> fixtures/cloned-repos/<repo-name>
+# Then register in fixtures/research/registry.json
+```
 
----
+### Step 1: Inventory Session (Phase 1 — deterministic)
 
-### Step 1: Start Research Session
+```bash
+# Start the session
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type inventory
 
-- **What it is:** Initialize a new research session and isolated git branch.
-- **What it does:** Checks extractor version, parses the repository into `fixtures/cloned-repos/<repo-name>.db`, creates a `research/<repo-name>-<timestamp>` branch, generates a session report stub at `fixtures/research/sessions/<session_id>.md`, sets session status to `IN_PROGRESS` in `registry.json`, and commits baseline metrics.
-- **Command to run:**
-  ```bash
-  TSX_DISABLE_IPC=1 pnpm chomp session start --repo <repo-name>
-  ```
-  *(Add `--force` if a completed session already exists for the current extractor version).*
-- **Files created/modified:**
-  - `fixtures/cloned-repos/<repo-name>.db`
-  - `fixtures/research/sessions/<session_id>.md`
-  - `fixtures/research/registry.json`
+# Run the sweep (health-gated, no LLM, updates pattern_ledger.db occurrence counts)
+TSX_DISABLE_IPC=1 pnpm chomp inventory --repo <name>
 
----
+# Close the session
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+```
 
-### Step 2: Export Assets for AI Studio
+### Step 2: Comparison Session (Phase 2 — AI-assisted, rubric-driven)
 
-- **What it is:** Generate handoff files for manual gap analysis in Google AI Studio.
-- **What it does:** Exports the extracted graph (`current_extraction.json`) and Oracle prompt (`system_prompt.md`) into a handoff directory.
-- **Command to run:**
-  ```bash
-  TSX_DISABLE_IPC=1 pnpm chomp audit prepare --repo <repo-name>
-  ```
-- **Files created:**
-  - `fixtures/research/handoffs/<repo-name>-<date>/current_extraction.json`
-  - `fixtures/research/handoffs/<repo-name>-<date>/system_prompt.md`
+For each unhandled pattern flagged by the inventory sweep:
 
----
+```bash
+# Start comparison session targeting a specific file
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type comparison --target <file-slug>
 
-### Step 3: Run Gap Analysis in Google AI Studio (Manual)
+# AI compares target file against the pattern rubric.
+# Log each confirmed finding directly:
+TSX_DISABLE_IPC=1 pnpm chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>
+TSX_DISABLE_IPC=1 pnpm chomp ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
 
-- **What it is:** Perform manual structural gap analysis using Google AI Studio.
-- **What it does:** Queries Gemini 1.5 Pro with Chomp's baseline extraction graph and raw source files to identify missing primitives (`BOUNDARY`, `CONTRACT`, `RELATIONSHIP`, `OPEN_CONNECTOR`) or schema evolutions.
-- **Actions to take:**
-  1. Open [Google AI Studio](https://aistudio.google.com/).
-  2. Upload `fixtures/research/handoffs/<repo-name>-<date>/current_extraction.json` and target repository source files.
-  3. Copy the contents of `fixtures/research/handoffs/<repo-name>-<date>/system_prompt.md` into System Instructions / Prompt.
-  4. Run the model and copy the generated JSON output array.
-  5. Save the output JSON array locally to `fixtures/research/handoffs/<repo-name>-<date>/studio_output.json`.
-- **Files created:** `fixtures/research/handoffs/<repo-name>-<date>/studio_output.json`
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+```
 
----
+### Step 3: Fix Session (visitor implementation)
 
-### Step 4: Import Discoveries & Log Gaps
+```bash
+# Start fix session targeting a specific pattern
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type fix --target <pattern-id>
 
-- **What it is:** Import AI Studio discoveries into SQLite ledger and record logged gaps.
-- **What it does:** Loads `studio_output.json` into `fixtures/cloned-repos/<repo-name>.db`, displays the gap ledger, updates `registry.json`, and commits the session report.
-- **Commands to run:**
-  ```bash
-  # 1. Import discoveries into SQLite ledger
-  TSX_DISABLE_IPC=1 pnpm chomp ledger import --file fixtures/research/handoffs/<repo-name>-<date>/studio_output.json --repo <repo-name>
+# Implement the visitor fix in packages/core/src/extractor/visitors/
+# Run tests
+pnpm test --filter @chomp/core
 
-  # 2. View imported gaps in ledger
-  TSX_DISABLE_IPC=1 pnpm chomp ledger
+# Close and merge — health + tests are enforced automatically before merge
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 1
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>   # ← refuses if health or tests fail
 
-  # 3. Log gap count and commit session report
-  TSX_DISABLE_IPC=1 pnpm chomp session log-gaps --repo <repo-name> --count <number_of_gaps>
-  ```
-- **Files modified:**
-  - `fixtures/cloned-repos/<repo-name>.db`
-  - `fixtures/research/registry.json`
-  - `fixtures/research/sessions/<session_id>.md`
+# Mark pattern resolved
+TSX_DISABLE_IPC=1 pnpm chomp ledger pattern resolve --id <pattern-id> --session <session-id>
+```
 
----
+### Two Data Stores — Strictly Separated
 
-### Step 5: Implement AST Extractor Fixes (`parser-builder`)
+**Pattern Ledger** (`fixtures/research/pattern_ledger.db`):
+- One row per **pattern class** (a syntactic shape the extractor doesn't know yet)
+- Has `detection_signature` for deterministic sweeping
+- `chomp inventory` updates occurrence counts automatically
 
-- **What it is:** Implement new AST visitor or adapter logic in `@chomp/core` to resolve gaps.
-- **What it does:** Extends TypeScript AST parsing capabilities for discovered patterns, accompanied by committed test fixtures and documentation updates.
-- **Actions & Commands to run:**
-  1. **Write Extractor Logic:**
-     - Framework-agnostic patterns: `packages/core/src/extractor/visitors/<visitorName>.ts`
-     - Framework-specific adapters: `packages/core/src/extractor/adapters/<framework>Adapter.ts`
-     - *(Do not add inline logic directly to `packages/core/src/extractor/index.ts`)*.
-  2. **Add Test Fixture:**
-     - Create minimal fixture files in `fixtures/test-repos/<framework-name>/`.
-  3. **Run Unit Tests:**
-     ```bash
-     pnpm test --filter @chomp/core
-     ```
-  4. **Update Documentation:**
-     - Mark resolved patterns with `✅` in `.agents/skills/parser-eval-harness/SKILL.md` (Sections 1 & 3).
-- **Files modified/created:**
-  - `packages/core/src/extractor/visitors/*` or `adapters/*`
-  - `fixtures/test-repos/<framework-name>/*`
-  - `.agents/skills/parser-eval-harness/SKILL.md`
+**Bug Tracker** (`fixtures/research/bug_tracker.db`):
+- One row per **correctness defect** in an already-handled pattern
+- Example: duplicate evidence records, wrong entity type assigned
 
----
+> A missing pattern goes in the Pattern Ledger. A wrong result for a known pattern goes in the Bug Tracker. Never both.
 
-### Step 6: Close Research Session
-
-- **What it is:** Re-analyze the repository and finalize session metrics.
-- **What it does:** Re-runs AST extraction, records post-fix entity counts and resolved gap metrics, sets session status to `COMPLETE` in `registry.json`, and commits the session report.
-- **Command to run:**
-  ```bash
-  TSX_DISABLE_IPC=1 pnpm chomp session close --repo <repo-name> --resolved <number_resolved>
-  ```
-- **Files modified:**
-  - `fixtures/research/registry.json`
-  - `fixtures/research/sessions/<session_id>.md`
-
----
-
-### Step 7: Merge Branch & Patch Bump Version
-
-- **What it is:** Merge the research branch into `main` and bump `@chomp/core` version.
-- **What it does:** Pushes research branch to remote, checks out `main`, performs a `--no-ff` merge, bumps `@chomp/core` patch version in `packages/core/package.json`, and commits.
-- **Command to run:**
-  ```bash
-  TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <repo-name>
-  ```
-- **Files modified:**
-  - `packages/core/package.json`
-`
 ---
 
 ## Agent Skills
 
-Three skills are available for AI-assisted research and development:
-
-| Skill | Trigger when... |
+| Skill | When to use |
 |---|---|
-| `parser-eval-harness` | Evaluating a cloned repo's extraction output and identifying AST gaps |
-| `parser-builder` | Implementing new visitor or adapter logic to resolve a logged gap |
-| `architect-mode` | Discussing ontology design, schema changes, or engineering strategy |
+| `research-loop` | Starting a new research session |
+| `parser-builder` | Implementing new visitor or adapter logic |
+| `fixture-builder` | Creating new test fixtures and ground-truth manifests |
+| `architect-mode` | Discussing ontology design, schema changes, or strategy |
 
 ---
 
@@ -278,9 +237,10 @@ Three skills are available for AI-assisted research and development:
 
 1. **Reality over assumptions.** Extract only what is structurally evidenced in the code.
 2. **Honest about unknowns.** An unknown is a valid structural state. Chomp never manufactures certainty.
-3. **Deterministic first.** AST extraction is fully deterministic. AI inference is probabilistic and labeled as such.
+3. **Deterministic first.** Phase 1 (inventory sweep) is 100% deterministic. Phase 2 (comparison) is AI-assisted but rubric-driven. AI inference is always labeled as probabilistic.
 4. **Line-level traceability.** Every extracted entity links back to its exact source file and line number.
-5. **Evidence-corroborated confidence.** 1 evidence source = low confidence. 2-3 = medium. 4+ = high.
+5. **Evidence-corroborated confidence.** 1 evidence source = low confidence. 2–3 = medium. 4+ = high.
+6. **Coverage and correctness are separate concerns.** Pattern Ledger tracks unknown shapes. Bug Tracker tracks wrong output for known shapes. Conflating them makes coverage metrics meaningless.
 
 ---
 
@@ -294,8 +254,8 @@ Three skills are available for AI-assisted research and development:
 | Persistence | SQLite via `better-sqlite3` |
 | CLI Framework | `commander` |
 | Test Runner | Node.js built-in `node:test` + `tsx` |
-| Frontend (Sprint 2) | Next.js, React |
-| Backend API (Sprint 2) | Node.js, Express, JWT |
+| Frontend | Next.js, React (`apps/web`) |
+| Backend API | Node.js, Express, JWT (`apps/backend`) |
 
 ---
 

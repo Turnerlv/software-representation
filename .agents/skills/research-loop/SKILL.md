@@ -1,39 +1,120 @@
 ---
 name: research-loop
-description: Orchestrates a research session against a cloned repository using deterministic CLI commands, gating AI analysis behind strict structural health metrics.
+description: Orchestrates a v4 research session against a cloned repository. Uses the three-session-type model (inventory → comparison → fix) with deterministic CLI commands and health-gated merges.
 ---
 
 # `research-loop` Skill
 
-This skill orchestrates a research session against a target repository. It enforces a strict, deterministic, two-step CLI process that prevents AI hallucination by ensuring graphs are structurally sound before analysis.
+This skill orchestrates a research session using the **v4 methodology**: a deterministic Phase 1 inventory sweep, followed by a rubric-driven AI comparison, followed by a fix session. Each phase is a bounded git branch with specific close criteria.
+
+> **Do not** use `chomp research start/close` (deleted) or `chomp audit prepare` (deleted).
+> All findings are logged directly via CLI — no narrative-first, table-later compression step.
 
 ## Prerequisites
 
-1. The target repo must be cloned to `fixtures/cloned-repos/<repo-name>`.
-2. The target repo must be registered in `fixtures/research/registry.json`.
+1. Target repo cloned to `fixtures/cloned-repos/<repo-name>`.
+2. Target repo registered in `fixtures/research/registry.json`.
+3. At least one pattern in `fixtures/research/pattern_ledger.db` with a `detection_signature` (or plan to seed one during this session).
 
 ---
 
-## Stage 1: Extraction & Handoff (`research start`)
-
-Run the automated `start` command to run health checks, extract the graph, create the `analysis/` branch, and generate the handoff snapshot.
+## Stage 1: Inventory Session (deterministic, no LLM)
 
 ```bash
-pnpm chomp research start --repo <name>
+# 1. Start the session — creates branch research/inventory/<repo>-<date>
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type inventory
+
+# 2. Run the deterministic pattern sweep (health-gated internally)
+TSX_DISABLE_IPC=1 pnpm chomp inventory --repo <name>
 ```
 
-- **If the command FAILS (exit code > 0):** Stop. The repo failed health checks. You must fix the extraction rules (using `fixture-builder` and `parser-builder`) until `pnpm chomp health` passes.
-- **If the command PASSES (exit code 0):** The CLI will print the new branch name and handoff path. Proceed to Stage 2.
+Read the output table:
+- **Occurrences > 0, Status = unhandled** → target for comparison session
+- **Occurrences = 0** → repo doesn't exercise this shape (skip for now)
+- **No sweepable patterns** → seed a pattern first: `chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>`
+
+```bash
+# 3. Close and merge the inventory session
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+```
 
 ---
 
-## Stage 2: Oracle Analysis (`research close`)
+## Stage 2: Comparison Session (AI-assisted, rubric-driven)
 
-Run the automated `close` command to invoke the Gemini Oracle, save the report, clean up the handoff, and merge the branch.
+For each unhandled pattern flagged by the inventory:
 
 ```bash
-pnpm chomp research close --repo <name>
+# 1. Start comparison session targeting a specific file
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type comparison --target <file-slug>
 ```
 
-- **After completion:** The analysis report is saved to `fixtures/research/analysis/<repo>-<date>.md`.
-- Read the key findings from the report and discuss any recommended architecture evolutions or extraction fixes with the user.
+Rubric = every pattern class Phase 1 found present in the target file + the standing checklist in `.context/chomp_extraction_ideal.md`.
+
+For each rubric item, confirm one of:
+- **present-and-correct** → no action
+- **present-and-wrong** → `chomp ledger bug log ...` → Bug Tracker
+- **absent-from-graph (known shape)** → `chomp ledger pattern resolve ...` or update status
+- **absent-from-graph (new shape)** → `chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>` → Pattern Ledger as `unhandled`
+
+Log findings **immediately via CLI** — not as a chat narrative first:
+
+```bash
+# New pattern class discovered
+TSX_DISABLE_IPC=1 pnpm chomp ledger pattern log \
+  --id route.regexp-literal \
+  --ontology CONTRACT \
+  --desc "Express route defined with a RegExp literal instead of a string path" \
+  --sig "app\.(get|post|put|delete|use)\s*\(\s*/" \
+  --repo <name> --session <session-id>
+
+# Correctness bug discovered
+TSX_DISABLE_IPC=1 pnpm chomp ledger bug log \
+  --id dup-evidence-<repo>-<slug> \
+  --desc "Duplicate VIEW_RENDER evidence record for same call site" \
+  --repo <name> --file <path> --line <n> --session <session-id>
+```
+
+```bash
+# 2. Close the comparison session
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+```
+
+---
+
+## Stage 3: Fix Session (visitor implementation)
+
+```bash
+# 1. Start fix session — creates branch fix/<pattern-id>-<date>
+TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type fix --target <pattern-id>
+```
+
+Implement the visitor in `packages/core/src/extractor/visitors/` or `adapters/`.
+Add a fixture in `fixtures/test-repos/<framework>/` with ground-truth `expected.json`.
+
+```bash
+# 2. Run tests
+pnpm test --filter @chomp/core
+
+# 3. Close and merge — health + pnpm test enforced automatically
+TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 1
+TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+
+# 4. Mark the pattern resolved
+TSX_DISABLE_IPC=1 pnpm chomp ledger pattern resolve \
+  --id <pattern-id> --session <session-id> --commit <sha>
+```
+
+---
+
+## Close Criteria (per session type)
+
+| Type | Done when... |
+|---|---|
+| **Inventory** | Every sweepable pattern has an occurrence count for this repo; new candidates handed to comparison |
+| **Comparison** | Every rubric item for the target file has a recorded outcome in Pattern Ledger or Bug Tracker |
+| **Fix** | `chomp health` passes, `pnpm test --filter @chomp/core` passes, targeted pattern/bug has `resolving_session_id` set |
+
+Fix session merge **refuses automatically** if health or tests fail — no manual check needed.

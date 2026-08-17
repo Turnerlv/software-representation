@@ -1,6 +1,6 @@
-<!-- # Software Representation Engine (`chomp`) — Agent Guidelines & System Context
+# Software Representation Engine (`chomp`) — Agent Guidelines & System Context
 
-This document outlines the core principles, data ontology, architecture, and scope for **chomp** (Software Representation Engine), derived from the foundational thesis ([`SR_ledger_2.1.md`](file://.context/SR_ledger_2.1.md)) and capstone specification ([`20260728_software_representation.pdf`](file://.context/20260728_software_representation.pdf)).
+This document is the authoritative reference for AI agents working on `chomp`. It defines the project's core philosophy, ontology, architecture, and research methodology.
 
 ---
 
@@ -28,7 +28,9 @@ This document outlines the core principles, data ontology, architecture, and sco
    - **Behavior (What happens?):** Execution paths and telemetry. *(Future runtime enrichment)*
    - **Rationale (Why does it work this way?):** Human decisions, design tradeoffs, historical context.
 4. **AI & Discovery Progression:**
+
    $$\text{AI Proposes} \longrightarrow \text{Evidence Corroborates} \longrightarrow \text{Humans Validate}$$
+
    - AI inference remains a hypothesis until corroborated by observable code evidence.
    - **Confidence Scoring** is based on independent evidence corroboration (1 source = low, 2–3 = medium, 4+ = high confidence).
 
@@ -36,7 +38,7 @@ This document outlines the core principles, data ontology, architecture, and sco
 
 ## 3. Structural Data Ontology
 
-The structural model is built around **3 Structural Primitives + Open Connectors**:
+The structural model uses **3 structural primitives + Open Connector as a distinct non-peer category**. Open Connector is NOT a fourth structural primitive on equal footing with Boundary/Contract/Relationship.
 
 | Primitive | Description | Examples |
 | :--- | :--- | :--- |
@@ -44,6 +46,8 @@ The structural model is built around **3 Structural Primitives + Open Connectors
 | **Contracts** | Explicit interfaces for communication between units | REST/GraphQL APIs, Schemas, Types, Events, Queues |
 | **Relationships** | Known structural connections between entities | AST Imports, Function Calls, Dependencies, Composition |
 | **Open Connectors** | Known points extending beyond available evidence | External APIs, Unlinked Databases, Message Brokers |
+
+`packages/core/src/db/schema.ts` is the single source of truth. All documentation describes it — never the reverse.
 
 ---
 
@@ -65,27 +69,32 @@ The structural model is built around **3 Structural Primitives + Open Connectors
 
 ## 5. System Architecture & Tech Stack
 
-`chomp` is structured as a TypeScript monorepo managed via `pnpm` and `turbo`:
+`chomp` is a TypeScript monorepo managed via `pnpm` and `turbo`:
 
 ```
 chomp/
 ├── packages/
 │   ├── core/            # AST parsers (TS compiler API), ontology schemas, extraction engine
-│   └── cli/             # Local CLI ('chomp analyze') for running extraction on repos
+│   └── cli/             # Local CLI ('chomp analyze', 'chomp inventory', 'chomp session')
 ├── apps/
-│   ├── backend/         # Node.js / Express REST API, JWT auth, PostgreSQL / SQLite graph persistence
-│   └── frontend/        # Next.js Explorer UI (Interactive graph view & evidence traceability)
+│   ├── backend/         # Node.js / Express REST API, JWT auth, SQLite graph persistence
+│   └── web/             # Next.js Explorer UI (Interactive graph view & evidence traceability)
 ├── fixtures/
 │   ├── test-repos/      # Committed minimal fixtures for unit tests
-│   └── cloned-repos/    # Git-ignored real-world repos cloned for research (not committed)
+│   ├── cloned-repos/    # Git-ignored real-world repos cloned for research (not committed)
+│   └── research/
+│       ├── registry.json       # Session ledger (schema_version: v4)
+│       ├── pattern_ledger.db   # Coverage gaps — one row per pattern class (git-ignored)
+│       ├── bug_tracker.db      # Correctness defects (git-ignored)
+│       └── sessions/*.md       # Per-session research reports
 └── .context/            # Thesis ledgers, architecture PDFs, project specs
 ```
 
 ### Core Technologies
 - **Monorepo / Build:** `pnpm`, `turbo`, `typescript`
-- **Backend API:** Node.js, Express, JWT, PostgreSQL / SQLite
-- **Frontend Explorer:** React, Next.js, Vanilla CSS / Tailwind (if requested)
-- **Parser Engine:** Tree-sitter / TypeScript AST compiler API
+- **Backend API:** Node.js, Express, JWT, SQLite via `better-sqlite3`
+- **Frontend Explorer:** React, Next.js (`apps/web`)
+- **Parser Engine:** TypeScript AST compiler API
 
 ---
 
@@ -110,45 +119,52 @@ chomp/
 
 ---
 
-## 7. Rules for AI Agents Working on `chomp`
+## 7. Research Methodology (v4)
 
-1. **Preserve Documentation Integrity:** Maintain explicit references to line numbers and evidence sources.
-2. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
-3. **Schema Compliance:** All extracted structures must adhere to the 4 ontology primitives (`Boundaries`, `Contracts`, `Relationships`, `Open Connectors`).
-4. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes. Tests must reference committed fixture files in `fixtures/test-repos/<framework>/` — never use inline `fs.writeFileSync` or temp directories. Each new framework adapter must have its own fixture directory.
+The v4 research loop replaces all previous ad-hoc methodologies. Three formal session types feed each other.
+
+### Session Types
+
+| Type | Branch Convention | AI? | Close Criteria |
+|---|---|---|---|
+| **Inventory** | `research/inventory/<repo>-<date>` | No | Every sweepable pattern has an occurrence count |
+| **Comparison** | `research/compare/<repo>-<slug>-<date>` | Yes (rubric-driven) | Every rubric item for the target file has a recorded outcome |
+| **Fix** | `fix/<pattern-or-bug-id>-<date>` | Optional | `chomp health` passes + `pnpm test` passes + targeted item has resolving session set |
+
+### Two Data Stores — Strictly Separated
+
+**Pattern Ledger** (`fixtures/research/pattern_ledger.db`):
+- One row per **pattern class** (a syntactic shape the extractor doesn't know yet)
+- `chomp inventory` sweeps these using `detection_signature` (ripgrep patterns)
+
+**Bug Tracker** (`fixtures/research/bug_tracker.db`):
+- One row per **correctness defect** in an already-handled pattern
+
+> A missing pattern goes in the Pattern Ledger. A wrong result for a known pattern goes in the Bug Tracker. Never both.
+
+### Entry Point
+
+Always use the **`research-loop`** skill to start a new research session. Do not run ad-hoc `chomp analyze` commands against cloned repos.
 
 ---
 
-## 8. Architecture & Boundary Rules
+## 8. Rules for AI Agents Working on `chomp`
+
+1. **Health Before AI:** Never invoke AI analysis on a repository that fails `chomp health`. The inventory sweep (`chomp inventory`) calls the health gate automatically — do not bypass it.
+2. **Log Immediately:** When a comparison session finds a pattern gap or bug, log it immediately via `chomp ledger pattern log` or `chomp ledger bug log`. Do not write a narrative summary and transcribe later — the compression step loses detail.
+3. **Preserve Documentation Integrity:** Maintain explicit references to line numbers and evidence sources.
+4. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
+5. **Schema Compliance:** All extracted structures must adhere to the 4 ontology primitives. `schema.ts` is the authority.
+6. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes. Tests must reference committed fixture files in `fixtures/test-repos/<framework>/` — never use inline `fs.writeFileSync` or temp directories.
+7. **Controlled Fixtures:** Visitor logic is proven against `fixtures/test-repos/<framework>/expected.json` ground truths, never directly against live cloned repos.
+8. **Do NOT commit:** Cloned repos, `.db` files, or `fixtures/research/handoffs/` directories.
+
+---
+
+## 9. Architecture & Boundary Rules
 
 1. **Ontology Isolation:** Core Ontology (`packages/core/src/types/ontology.ts`) must never import from Ledger, CLI tools, or external system modules.
 2. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
 3. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
-
----
-
-## 9. Research Workflow — Cloning & Evaluating Open-Source Repos
-
-This is the standard cycle for expanding extractor coverage using real-world repositories. The process is orchestrated by the `research-loop` skill, which tracks sessions in `fixtures/research/registry.json`.
-
-```
-[Clone Repo] → [Stage 1: Health Metrics] → [Stage 2: Deep Analysis (AI)] → [Stage 3: Audit & Record]
-```
-
-To run a research session:
-1. Ensure the target repo is registered in `fixtures/research/registry.json` and cloned to `fixtures/cloned-repos/<repo-name>`.
-2. Invoke the **`research-loop`** skill.
-
-The `research-loop` skill will automatically:
-- Run `chomp health` to gate AI reasoning. If metrics fail, the agent is routed to build new controlled fixtures via `fixture-builder`.
-- If health metrics pass, invoke the Oracle (`deep-analysis`) to reason about the structurally sound graph.
-- Record findings and invoke audits.
-
-### Rules for research sessions
-- **Health Before AI:** Never invoke AI analysis (the Oracle) on a repository that fails `chomp health`. AI models hallucinate when given structurally broken graphs.
-- **Controlled Fixtures:** AST parsing logic (`packages/core`) must be developed against deterministic `expected.json` ground truths built by `fixture-builder`, not against cloned open-source repos directly.
-- The `research-loop` skill is the **only** entry point for starting a new research session. Do not run ad-hoc analyze commands against cloned repos.
-- Do NOT commit cloned repos or `.db` files from research runs.
-- Run `pnpm test --filter @chomp/core` before and after every visitor change.
-
-> **Note:** The initial 17 `express` research sessions conducted under the legacy count-based methodology have been marked `"deprecated": true` in `registry.json` and must not be used as baseline comparisons. -->
+4. **Separate Stores:** Pattern Ledger and Bug Tracker are separate SQLite files. No finding lives in both.
+5. **Fix Session Gate:** Fix sessions are the only session type that may change `packages/core` code. Their merge is blocked by `chomp session merge` unless `chomp health` and `pnpm test --filter @chomp/core` both pass.
