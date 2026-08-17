@@ -47,15 +47,20 @@ export interface StructuralEntity {
   /** The specific sub-type of the entity (e.g. 'FILE', 'CLASS', 'HTTP_ENDPOINT'). */
   entityType: string;
   /** The code scope (e.g. 'USER', 'TEST'). */
-  scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG';
+  scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK';
   /** Line-level source evidence for this entity's existence. */
   evidence: EvidenceRecord | EvidenceRecord[];
   
   // Graph edge fields (populated primarily for RELATIONSHIP)
   /** ID of the source entity (e.g. the enclosing boundary). */
   sourceId?: string;
-  /** ID of the target entity (e.g. the canonical canonical module path). */
+  /** ID of the target entity (e.g. the canonical module path). */
   targetId?: string;
+  /**
+   * Lexical containment parent — forms the `Repository → File → Export` hierarchy.
+   * Set on BOUNDARY entities only (e.g. a CJS_EXPORT's parentBoundaryId = its FILE boundary ID).
+   */
+  parentBoundaryId?: string;
   
   // Inference classification
   /** Whether the relationship is deterministically known or probabilistically inferred. */

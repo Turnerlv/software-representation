@@ -1,43 +1,39 @@
 ---
 name: research-loop
-description: Orchestrates a research session against a cloned repository, gating AI analysis behind strict structural health metrics.
+description: Orchestrates a research session against a cloned repository using deterministic CLI commands, gating AI analysis behind strict structural health metrics.
 ---
 
 # `research-loop` Skill
 
-This skill orchestrates a research session against a target repository. It enforces the new health-metric-first methodology.
-
-> **CRITICAL**: The Oracle (AI analysis) must **NOT** be invoked unless the repository passes all structural health metrics. If health metrics fail, the graph is structurally unsound and AI will hallucinate.
+This skill orchestrates a research session against a target repository. It enforces a strict, deterministic, two-step CLI process that prevents AI hallucination by ensuring graphs are structurally sound before analysis.
 
 ## Prerequisites
 
-Before invoking this skill, ensure:
-1. The target repo exists in `fixtures/research/registry.json`.
-2. The repo is cloned at `fixtures/cloned-repos/<repo-name>`.
+1. The target repo must be cloned to `fixtures/cloned-repos/<repo-name>`.
+2. The target repo must be registered in `fixtures/research/registry.json`.
 
-## Stage 1 — Structural Health Check
+---
 
-1. Run the `chomp health` command against the target repo:
-   ```bash
-   pnpm chomp health --repo fixtures/cloned-repos/<repo-name>
-   ```
+## Stage 1: Extraction & Handoff (`research start`)
 
-2. **STOP AND REVIEW:**
-   - Did the health check pass?
-   - **If PASS:** Proceed to Stage 2.
-   - **If FAIL:** Stop. The structural representation is incomplete. Do NOT run AI analysis.
-     - You must build new controlled fixtures for the missing structural patterns using `fixture-builder`.
-     - Implement the fixes in `packages/core` to make the new fixtures pass.
-     - Repeat Stage 1 until `chomp health` passes.
+Run the automated `start` command to run health checks, extract the graph, create the `analysis/` branch, and generate the handoff snapshot.
 
-## Stage 2 — Deep AI Analysis (The Oracle)
+```bash
+pnpm chomp research start --repo <name>
+```
 
-*Only proceed here if `chomp health` passed all metrics.*
+- **If the command FAILS (exit code > 0):** Stop. The repo failed health checks. You must fix the extraction rules (using `fixture-builder` and `parser-builder`) until `pnpm chomp health` passes.
+- **If the command PASSES (exit code 0):** The CLI will print the new branch name and handoff path. Proceed to Stage 2.
 
-1. Run the `deep-analysis` skill to have the Oracle reason about the structurally sound graph.
-2. The output will be saved in `fixtures/research/analysis/`.
+---
 
-## Stage 3 — Audit & Record
+## Stage 2: Oracle Analysis (`research close`)
 
-1. Summarize any key insights or findings from the Oracle in a session report.
-2. If necessary, invoke `system-audit` or `doc-drift-audit` based on changes made during the fixes.
+Run the automated `close` command to invoke the Gemini Oracle, save the report, clean up the handoff, and merge the branch.
+
+```bash
+pnpm chomp research close --repo <name>
+```
+
+- **After completion:** The analysis report is saved to `fixtures/research/analysis/<repo>-<date>.md`.
+- Read the key findings from the report and discuss any recommended architecture evolutions or extraction fixes with the user.

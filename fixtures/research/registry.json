@@ -468,6 +468,25 @@
       "changes": [
         "<description of change>"
       ]
+    },
+    "analysis": {
+      "date": "YYYY-MM-DD",
+      "branch": "analysis/<repo>-<timestamp>",
+      "report_path": "fixtures/research/analysis/<repo>-<date>.md",
+      "health_snapshot": {
+        "connectivity_rate": 98.6,
+        "scope_purity": 100.0
+      },
+      "key_findings": [
+        "string"
+      ]
+    }
+  },
+  "repositories": {
+    "realworld": {
+      "url": "https://github.com/gothinkster/node-express-realworld-example-app",
+      "framework": "express",
+      "status": "active"
     }
   }
 }

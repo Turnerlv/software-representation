@@ -126,7 +126,9 @@ This step-by-step workflow expands Chomp's AST extractor coverage against real-w
 > **Note on `<repo-name>`:** `<repo-name>` refers to the repository **identifier** registered under `repos` in [`fixtures/research/registry.json`](file:///Users/turnervickery/code/chomp/fixtures/research/registry.json) (e.g. `express`), **not** a file path. The CLI automatically maps `<repo-name>` to `fixtures/cloned-repos/<repo-name>` and `fixtures/cloned-repos/<repo-name>.db`.
 
 ```
-[0. Clone Repo] ──> [1. Health Metrics Gate] ──> [2. Deep Analysis (AI)] ──> [3. Audit & Record]
+[0. Clone Repo] ──> [1. Session Start] ──> [2. Prepare Handoff] ──> [3. Manual Studio Audit]
+                                                                              │
+[7. Merge & Bump] <── [6. Session Close] <── [5. Build Fixes] <── [4. Import & Log Gaps]
 ```
 
 ---
@@ -143,49 +145,132 @@ This step-by-step workflow expands Chomp's AST extractor coverage against real-w
 
 ---
 
-### Step 1: Structural Health Metrics Gate
+### Step 1: Start Research Session
 
-- **What it is:** Run the structural health metrics against the cloned repository.
-- **What it does:** Ensures that the extracted structural representation is complete enough to be reasoned about by AI. If this fails, AI analysis must NOT proceed.
+- **What it is:** Initialize a new research session and isolated git branch.
+- **What it does:** Checks extractor version, parses the repository into `fixtures/cloned-repos/<repo-name>.db`, creates a `research/<repo-name>-<timestamp>` branch, generates a session report stub at `fixtures/research/sessions/<session_id>.md`, sets session status to `IN_PROGRESS` in `registry.json`, and commits baseline metrics.
 - **Command to run:**
   ```bash
-  pnpm chomp health --repo fixtures/cloned-repos/<repo-name>
+  TSX_DISABLE_IPC=1 pnpm chomp session start --repo <repo-name>
   ```
-- **Actions to take:**
-  - If **FAIL**: Stop. You must implement AST extraction logic for the missing structural patterns. Proceed to `fixture-builder` to author deterministic `expected.json` ground truths, build the parser fix, verify against the test suite, and run `health` again.
-  - If **PASS**: Proceed to Deep Analysis.
+  *(Add `--force` if a completed session already exists for the current extractor version).*
+- **Files created/modified:**
+  - `fixtures/cloned-repos/<repo-name>.db`
+  - `fixtures/research/sessions/<session_id>.md`
+  - `fixtures/research/registry.json`
 
 ---
 
-### Step 2: Deep Analysis (AI Oracle)
+### Step 2: Export Assets for AI Studio
 
-- **What it is:** Perform manual or automated structural analysis on a healthy graph.
-- **What it does:** Queries the Oracle (e.g., Gemini 1.5 Pro) with Chomp's structurally sound extraction graph to infer semantic architectures, deferred `CALL` resolutions, or missing contexts.
-- **Actions to take:**
-  - Invoke the `deep-analysis` skill to bridge to Google AI Studio.
+- **What it is:** Generate handoff files for manual gap analysis in Google AI Studio.
+- **What it does:** Exports the extracted graph (`current_extraction.json`) and Oracle prompt (`system_prompt.md`) into a handoff directory.
+- **Command to run:**
+  ```bash
+  TSX_DISABLE_IPC=1 pnpm chomp audit prepare --repo <repo-name>
+  ```
+- **Files created:**
+  - `fixtures/research/handoffs/<repo-name>-<date>/current_extraction.json`
+  - `fixtures/research/handoffs/<repo-name>-<date>/system_prompt.md`
 
 ---
 
-### Step 3: Audit & Record
+### Step 3: Run Gap Analysis in Google AI Studio (Manual)
 
-- **What it is:** Record the session and audit system state.
-- **What it does:** Produces deep-analysis output reports and tracks doc-drift.
+- **What it is:** Perform manual structural gap analysis using Google AI Studio.
+- **What it does:** Queries Gemini 1.5 Pro with Chomp's baseline extraction graph and raw source files to identify missing primitives (`BOUNDARY`, `CONTRACT`, `RELATIONSHIP`, `OPEN_CONNECTOR`) or schema evolutions.
 - **Actions to take:**
-  - Log findings in `fixtures/research/analysis/`.
-  - Invoke `system-audit` or `doc-drift-audit`.
+  1. Open [Google AI Studio](https://aistudio.google.com/).
+  2. Upload `fixtures/research/handoffs/<repo-name>-<date>/current_extraction.json` and target repository source files.
+  3. Copy the contents of `fixtures/research/handoffs/<repo-name>-<date>/system_prompt.md` into System Instructions / Prompt.
+  4. Run the model and copy the generated JSON output array.
+  5. Save the output JSON array locally to `fixtures/research/handoffs/<repo-name>-<date>/studio_output.json`.
+- **Files created:** `fixtures/research/handoffs/<repo-name>-<date>/studio_output.json`
 
+---
+
+### Step 4: Import Discoveries & Log Gaps
+
+- **What it is:** Import AI Studio discoveries into SQLite ledger and record logged gaps.
+- **What it does:** Loads `studio_output.json` into `fixtures/cloned-repos/<repo-name>.db`, displays the gap ledger, updates `registry.json`, and commits the session report.
+- **Commands to run:**
+  ```bash
+  # 1. Import discoveries into SQLite ledger
+  TSX_DISABLE_IPC=1 pnpm chomp ledger import --file fixtures/research/handoffs/<repo-name>-<date>/studio_output.json --repo <repo-name>
+
+  # 2. View imported gaps in ledger
+  TSX_DISABLE_IPC=1 pnpm chomp ledger
+
+  # 3. Log gap count and commit session report
+  TSX_DISABLE_IPC=1 pnpm chomp session log-gaps --repo <repo-name> --count <number_of_gaps>
+  ```
+- **Files modified:**
+  - `fixtures/cloned-repos/<repo-name>.db`
+  - `fixtures/research/registry.json`
+  - `fixtures/research/sessions/<session_id>.md`
+
+---
+
+### Step 5: Implement AST Extractor Fixes (`parser-builder`)
+
+- **What it is:** Implement new AST visitor or adapter logic in `@chomp/core` to resolve gaps.
+- **What it does:** Extends TypeScript AST parsing capabilities for discovered patterns, accompanied by committed test fixtures and documentation updates.
+- **Actions & Commands to run:**
+  1. **Write Extractor Logic:**
+     - Framework-agnostic patterns: `packages/core/src/extractor/visitors/<visitorName>.ts`
+     - Framework-specific adapters: `packages/core/src/extractor/adapters/<framework>Adapter.ts`
+     - *(Do not add inline logic directly to `packages/core/src/extractor/index.ts`)*.
+  2. **Add Test Fixture:**
+     - Create minimal fixture files in `fixtures/test-repos/<framework-name>/`.
+  3. **Run Unit Tests:**
+     ```bash
+     pnpm test --filter @chomp/core
+     ```
+  4. **Update Documentation:**
+     - Mark resolved patterns with `✅` in `.agents/skills/parser-eval-harness/SKILL.md` (Sections 1 & 3).
+- **Files modified/created:**
+  - `packages/core/src/extractor/visitors/*` or `adapters/*`
+  - `fixtures/test-repos/<framework-name>/*`
+  - `.agents/skills/parser-eval-harness/SKILL.md`
+
+---
+
+### Step 6: Close Research Session
+
+- **What it is:** Re-analyze the repository and finalize session metrics.
+- **What it does:** Re-runs AST extraction, records post-fix entity counts and resolved gap metrics, sets session status to `COMPLETE` in `registry.json`, and commits the session report.
+- **Command to run:**
+  ```bash
+  TSX_DISABLE_IPC=1 pnpm chomp session close --repo <repo-name> --resolved <number_resolved>
+  ```
+- **Files modified:**
+  - `fixtures/research/registry.json`
+  - `fixtures/research/sessions/<session_id>.md`
+
+---
+
+### Step 7: Merge Branch & Patch Bump Version
+
+- **What it is:** Merge the research branch into `main` and bump `@chomp/core` version.
+- **What it does:** Pushes research branch to remote, checks out `main`, performs a `--no-ff` merge, bumps `@chomp/core` patch version in `packages/core/package.json`, and commits.
+- **Command to run:**
+  ```bash
+  TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <repo-name>
+  ```
+- **Files modified:**
+  - `packages/core/package.json`
+`
 ---
 
 ## Agent Skills
 
-Four skills are available for AI-assisted research and development:
+Three skills are available for AI-assisted research and development:
 
 | Skill | Trigger when... |
 |---|---|
-| `research-loop` | Orchestrating a full research session on a target repository |
-| `fixture-builder` | Building new test fixtures and deterministic `expected.json` ground truths for extraction |
-| `parser-builder` | Implementing new visitor or adapter logic in `@chomp/core` to resolve a fixture gap |
-| `deep-analysis` | Performing strategic AI analysis on a repository that passes health metrics |
+| `parser-eval-harness` | Evaluating a cloned repo's extraction output and identifying AST gaps |
+| `parser-builder` | Implementing new visitor or adapter logic to resolve a logged gap |
+| `architect-mode` | Discussing ontology design, schema changes, or engineering strategy |
 
 ---
 

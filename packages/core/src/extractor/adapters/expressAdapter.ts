@@ -3,6 +3,7 @@
 
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
+import { stableEntityId } from '../index.js';
 
 /**
  * Set of supported Express HTTP routing method names.
@@ -115,6 +116,7 @@ export function extractExpressRouterMount(
         name: `Express Mount: ${pathPrefix} -> ${target}`,
         type: 'RELATIONSHIP',
         entityType: 'MOUNTS',
+        targetId: stableEntityId(`middleware:${target}`, 'BOUNDARY', `Middleware: ${target}`),
         evidence: getEvidence(node),
       };
     }

@@ -57,8 +57,8 @@ export function saveRepresentationGraph(
     );
 
     const insertEntity = db.prepare(`
-      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, entity_type, scope, source_id, target_id, parent_boundary_id, status, confidence, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
@@ -76,7 +76,7 @@ export function saveRepresentationGraph(
     for (const entity of allEntities) {
       const globalEntityId = `${repo.id}:${entity.id}`;
       const metadataStr = entity.metadata ? JSON.stringify(entity.metadata) : null;
-      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.entityType, entity.scope ?? 'USER', entity.sourceId ?? null, entity.targetId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
+      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.entityType, entity.scope ?? 'USER', entity.sourceId ?? null, entity.targetId ?? null, entity.parentBoundaryId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
       
       const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
       for (const ev of evidences) {
@@ -127,9 +127,9 @@ export function getRepresentationGraph(
   const scopesStr = options.scopes?.length ? options.scopes.map(s => `'${s}'`).join(',') : "'USER'";
   const entityRows = db
     .prepare(
-      `SELECT id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ? AND scope IN (${scopesStr})`
+      `SELECT id, name, type, entity_type, scope, source_id, target_id, parent_boundary_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ? AND scope IN (${scopesStr})`
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string | null; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string | null; target_id: string | null; parent_boundary_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
 
   const evidenceRows = db
     .prepare(
@@ -195,6 +195,7 @@ export function getRepresentationGraph(
     
     if (row.source_id) entity.sourceId = row.source_id;
     if (row.target_id) entity.targetId = row.target_id;
+    if (row.parent_boundary_id) entity.parentBoundaryId = row.parent_boundary_id;
     if (row.status) entity.status = row.status;
     if (row.confidence) entity.confidence = row.confidence;
     if (row.metadata) {

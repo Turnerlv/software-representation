@@ -51,6 +51,8 @@ export function visitRelationship(
     
     if (resolvedPath) {
       targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+    } else if (!importLiteral.startsWith('.')) {
+      targetId = stableEntityId(`package:${importLiteral}`, 'BOUNDARY', `Package: ${importLiteral}`);
     }
     
     return {
@@ -78,6 +80,8 @@ export function visitRelationship(
       
       if (resolvedPath) {
         targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+      } else if (!importLiteral.startsWith('.')) {
+        targetId = stableEntityId(`package:${importLiteral}`, 'BOUNDARY', `Package: ${importLiteral}`);
       }
 
       return {
@@ -120,6 +124,8 @@ export function visitRelationship(
       
       if (resolvedPath) {
         targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+      } else if (!importLiteral.startsWith('.')) {
+        targetId = stableEntityId(`package:${importLiteral}`, 'BOUNDARY', `Package: ${importLiteral}`);
       }
 
       return {
@@ -169,12 +175,18 @@ export function visitRelationship(
     node.expression.name.text === 'create' &&
     node.arguments.length > 0
   ) {
+    const argText = node.arguments[0].getText(sourceFile);
+    if (argText === 'null' || argText === 'undefined') {
+      return null; // Explicitly creating a prototype-less object is not a structural dependency
+    }
+    
     return {
       id: nextId(),
-      name: `Inherits: ${node.arguments[0].getText(sourceFile)}`,
+      name: `Inherits: ${argText}`,
       type: 'RELATIONSHIP',
       entityType: 'INHERITS',
       sourceId,
+      targetId: stableEntityId(`prototype:${argText}`, 'BOUNDARY', `Prototype: ${argText}`),
       status: 'DETERMINISTIC',
       confidence: 'HIGH',
       evidence: [
@@ -192,12 +204,14 @@ export function visitRelationship(
     node.expression.name.text === 'setPrototypeOf' &&
     node.arguments.length > 1
   ) {
+    const argText = node.arguments[1].getText(sourceFile);
     return {
       id: nextId(),
-      name: `Inherits: ${node.arguments[1].getText(sourceFile)}`,
+      name: `Inherits: ${argText}`,
       type: 'RELATIONSHIP',
       entityType: 'INHERITS',
       sourceId,
+      targetId: stableEntityId(`prototype:${argText}`, 'BOUNDARY', `Prototype: ${argText}`),
       status: 'DETERMINISTIC',
       confidence: 'HIGH',
       evidence: [

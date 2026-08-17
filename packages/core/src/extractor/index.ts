@@ -46,7 +46,15 @@ export function collectFiles(targetPath: string): string[] {
           entry.name === 'node_modules' ||
           entry.name === '.git' ||
           entry.name === 'dist' ||
-          entry.name === 'build'
+          entry.name === 'build' ||
+          entry.name === 'test' ||
+          entry.name === 'tests' ||
+          entry.name === '__tests__' ||
+          entry.name === '__mocks__' ||
+          entry.name === 'examples' ||
+          entry.name === 'example' ||
+          entry.name === 'benchmarks' ||
+          entry.name === 'benchmark'
         ) {
           continue;
         }
@@ -54,6 +62,10 @@ export function collectFiles(targetPath: string): string[] {
       } else if (entry.isFile()) {
         const ext = path.extname(entry.name).toLowerCase();
         if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
+          const lowerName = entry.name.toLowerCase();
+          if (lowerName.includes('.test.') || lowerName.includes('.spec.')) {
+            continue;
+          }
           files.push(fullPath);
         }
       }
@@ -119,14 +131,21 @@ export function analyzeTarget(
     );
 
     const relativePath = path.relative(process.cwd(), filePath) || filePath;
-    let scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' = 'USER';
+    let scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK' = 'USER';
     const lowerPath = relativePath.toLowerCase();
-    if (lowerPath.includes('/test/') || lowerPath.includes('/tests/') || lowerPath.includes('__tests__') || lowerPath.includes('.test.') || lowerPath.includes('.spec.')) {
+    
+    // Improved scope detection matching path segments properly
+    const pathSegments = lowerPath.split(/[/\\]/);
+    if (pathSegments.includes('test') || pathSegments.includes('tests') || pathSegments.includes('__tests__') || lowerPath.includes('.test.') || lowerPath.includes('.spec.')) {
       scope = 'TEST';
-    } else if (lowerPath.includes('mock') || lowerPath.includes('__mocks__')) {
+    } else if (pathSegments.includes('mock') || pathSegments.includes('mocks') || pathSegments.includes('__mocks__')) {
       scope = 'MOCK';
-    } else if (lowerPath.includes('config')) {
+    } else if (pathSegments.includes('config') || pathSegments.includes('configs')) {
       scope = 'CONFIG';
+    } else if (pathSegments.includes('example') || pathSegments.includes('examples')) {
+      scope = 'EXAMPLE';
+    } else if (pathSegments.includes('benchmark') || pathSegments.includes('benchmarks')) {
+      scope = 'BENCHMARK';
     }
 
     const fileId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
@@ -165,6 +184,8 @@ export function analyzeTarget(
       if (boundaryEntity) {
         boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
         boundaryEntity.sourceId = fileId;
+        // parentBoundaryId explicitly models the lexical containment hierarchy (File → Export/Class)
+        boundaryEntity.parentBoundaryId = fileId;
         boundaryEntity.scope = scope;
         boundaries.push(boundaryEntity);
       }

@@ -14,7 +14,7 @@ export function registerAnalyzeCommand(program: Command) {
   program
     .command("analyze <path>")
     .description("Analyze a TypeScript/JavaScript source file or directory")
-    .option("--db <path>", "Path to SQLite database file (default: apps/backend/data/chomp.db)")
+    .option("--db <path>", "Path to SQLite database file (default: fixtures/cloned-repos/<repoName>.db)")
     .action((inputPath: string, options: { db?: string }) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const targetPath = resolve(baseDir, inputPath);
@@ -27,7 +27,9 @@ export function registerAnalyzeCommand(program: Command) {
       console.log(`Analyzing structural entities in: ${targetPath}...`);
       const graph = analyzeTarget(targetPath);
 
-      const dbPath = resolveDbPath(baseDir, options.db);
+      const dbPath = options.db 
+        ? resolve(baseDir, options.db)
+        : resolve(baseDir, `fixtures/cloned-repos/${repoName}.db`);
       const db = initDatabase(dbPath);
 
       const repoInfo = {

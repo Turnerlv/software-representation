@@ -49,6 +49,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       scope TEXT NOT NULL DEFAULT 'USER',
       source_id TEXT,
       target_id TEXT,
+      parent_boundary_id TEXT,
       status TEXT,
       confidence TEXT,
       metadata TEXT,
@@ -92,6 +93,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN target_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE structural_entities ADD COLUMN parent_boundary_id TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE structural_entities ADD COLUMN metadata TEXT;"); } catch (e) {}

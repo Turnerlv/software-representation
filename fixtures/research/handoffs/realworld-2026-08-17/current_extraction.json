@@ -1,0 +1,3801 @@
+{
+  "extractorVersion": "1.0.0",
+  "analyzedAt": "2026-08-16T16:54:54.740Z",
+  "boundaries": [
+    {
+      "id": "3158a02067f2",
+      "name": "File: fixtures/cloned-repos/realworld/e2e/jest.config.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/jest.config.ts"
+      }
+    },
+    {
+      "id": "69e9b6dd85f4",
+      "name": "File: fixtures/cloned-repos/realworld/e2e/src/support/global-setup.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-setup.ts"
+      }
+    },
+    {
+      "id": "f0027a037275",
+      "name": "File: fixtures/cloned-repos/realworld/e2e/src/support/global-teardown.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-teardown.ts"
+      }
+    },
+    {
+      "id": "6da753e744fa",
+      "name": "File: fixtures/cloned-repos/realworld/e2e/src/support/test-setup.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/test-setup.ts"
+      }
+    },
+    {
+      "id": "5691e0220061",
+      "name": "File: fixtures/cloned-repos/realworld/jest.config.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/jest.config.ts"
+      }
+    },
+    {
+      "id": "ca7380153950",
+      "name": "File: fixtures/cloned-repos/realworld/jest.preset.js",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/jest.preset.js"
+      }
+    },
+    {
+      "id": "1360abe39ffb",
+      "name": "CJS Export: default",
+      "type": "BOUNDARY",
+      "entityType": "CJS_EXPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/jest.preset.js",
+        "lineNumber": 3,
+        "snippet": "module.exports = { ...nxPreset }"
+      },
+      "sourceId": "ca7380153950"
+    },
+    {
+      "id": "244fd69b9554",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/models/http-exception.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/models/http-exception.model.ts"
+      }
+    },
+    {
+      "id": "596783a5a9d9",
+      "name": "Class: HttpException",
+      "type": "BOUNDARY",
+      "entityType": "CLASS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/models/http-exception.model.ts",
+        "lineNumber": 1,
+        "snippet": "class HttpException extends Error { errorCode: number; constructor( erro"
+      },
+      "sourceId": "244fd69b9554"
+    },
+    {
+      "id": "bd120afa0cee",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts"
+      }
+    },
+    {
+      "id": "ef315449b611",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/article.mapper.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.mapper.ts"
+      }
+    },
+    {
+      "id": "6f002c93c71b",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/article.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.model.ts"
+      }
+    },
+    {
+      "id": "212eae6a6028",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts"
+      }
+    },
+    {
+      "id": "4f94aa36ea97",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/author.mapper.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/author.mapper.ts"
+      }
+    },
+    {
+      "id": "71db7f5cbcad",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/article/comment.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/comment.model.ts"
+      }
+    },
+    {
+      "id": "0609e6f5c59a",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts"
+      }
+    },
+    {
+      "id": "24acfed7b236",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts"
+      }
+    },
+    {
+      "id": "d96febbe6b7b",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts"
+      }
+    },
+    {
+      "id": "9815a4fd3392",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/register-input.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/register-input.model.ts"
+      }
+    },
+    {
+      "id": "2c5c629b241c",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/registered-user.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/registered-user.model.ts"
+      }
+    },
+    {
+      "id": "1d44121d3144",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/token.utils.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/token.utils.ts"
+      }
+    },
+    {
+      "id": "440a2d7d1a31",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/user-request.d.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user-request.d.ts"
+      }
+    },
+    {
+      "id": "56d55dbecb52",
+      "name": "Module: Express",
+      "type": "BOUNDARY",
+      "entityType": "MODULE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user-request.d.ts",
+        "lineNumber": 1,
+        "snippet": "declare namespace Express { export interface Request { auth?: { user"
+      },
+      "sourceId": "440a2d7d1a31"
+    },
+    {
+      "id": "4c437abf0c4d",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/auth/user.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user.model.ts"
+      }
+    },
+    {
+      "id": "e80a3c7177a4",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts"
+      }
+    },
+    {
+      "id": "b004e7ab9e1b",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/profile/profile.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.model.ts"
+      }
+    },
+    {
+      "id": "200f9f08131f",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts"
+      }
+    },
+    {
+      "id": "a352575edeea",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/profile/profile.utils.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.utils.ts"
+      }
+    },
+    {
+      "id": "9250ab4a9a01",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts"
+      }
+    },
+    {
+      "id": "16b8761f1a13",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts"
+      }
+    },
+    {
+      "id": "1e5604651bbb",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/tag/tag.model.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.model.ts"
+      }
+    },
+    {
+      "id": "515769e355ca",
+      "name": "File: fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts"
+      }
+    },
+    {
+      "id": "8eb224fde196",
+      "name": "File: fixtures/cloned-repos/realworld/src/main.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts"
+      }
+    },
+    {
+      "id": "ab7eba14b1c6",
+      "name": "File: fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts"
+      }
+    },
+    {
+      "id": "5aec0352bc00",
+      "name": "Module: global",
+      "type": "BOUNDARY",
+      "entityType": "MODULE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+        "lineNumber": 3,
+        "snippet": "declare global { namespace NodeJS { interface Global {} } }"
+      },
+      "sourceId": "ab7eba14b1c6"
+    },
+    {
+      "id": "5801bc4114b2",
+      "name": "Module: NodeJS",
+      "type": "BOUNDARY",
+      "entityType": "MODULE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+        "lineNumber": 4,
+        "snippet": "namespace NodeJS { interface Global {} }"
+      },
+      "sourceId": "ab7eba14b1c6"
+    },
+    {
+      "id": "b42bba0e9c73",
+      "name": "File: fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+      "type": "BOUNDARY",
+      "entityType": "FILE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts"
+      }
+    }
+  ],
+  "contracts": [
+    {
+      "id": "f1972344bfdc",
+      "name": "CJS Export: default",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_FUNCTION",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-setup.ts",
+        "lineNumber": 4,
+        "snippet": "module.exports = async function () { // Start services that that the app needs"
+      },
+      "sourceId": "69e9b6dd85f4"
+    },
+    {
+      "id": "86d163f16166",
+      "name": "CJS Export: default",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_FUNCTION",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-teardown.ts",
+        "lineNumber": 3,
+        "snippet": "module.exports = async function () { // Put clean up logic here (e.g. stopping"
+      },
+      "sourceId": "f0027a037275"
+    },
+    {
+      "id": "d2d5716cc5ed",
+      "name": "CJS Export: default",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_FUNCTION",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/test-setup.ts",
+        "lineNumber": 5,
+        "snippet": "module.exports = async function () { // Configure axios for tests to use. co"
+      },
+      "sourceId": "6da753e744fa"
+    },
+    {
+      "id": "4cd79088375e",
+      "name": "Express Route: GET /articles",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 30,
+        "snippet": "router.get('/articles', auth.optional, async (req: Request, res: Response, next:"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "8b8cb23500f2",
+      "name": "Express Route: GET /articles/feed",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 45,
+        "snippet": "router.get( '/articles/feed', auth.required, async (req: Request, res: Res"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "5e6a34c7f4e0",
+      "name": "Express Route: POST /articles",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 71,
+        "snippet": "router.post('/articles', auth.required, async (req: Request, res: Response, next"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "f2b9be289e1b",
+      "name": "Express Route: GET /articles/:slug",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 87,
+        "snippet": "router.get( '/articles/:slug', auth.optional, async (req: Request, res: Re"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "54c78992799f",
+      "name": "Express Route: PUT /articles/:slug",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 110,
+        "snippet": "router.put( '/articles/:slug', auth.required, async (req: Request, res: Re"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "c920e6d57c21",
+      "name": "Express Route: DELETE /articles/:slug",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 129,
+        "snippet": "router.delete( '/articles/:slug', auth.required, async (req: Request, res:"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "c4c4aed5b615",
+      "name": "Express Route: GET /articles/:slug/comments",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 149,
+        "snippet": "router.get( '/articles/:slug/comments', auth.optional, async (req: Request"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "880f434ec6ab",
+      "name": "Express Route: POST /articles/:slug/comments",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 170,
+        "snippet": "router.post( '/articles/:slug/comments', auth.required, async (req: Reques"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "7c785066f782",
+      "name": "Express Route: DELETE /articles/:slug/comments/:id",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 190,
+        "snippet": "router.delete( '/articles/:slug/comments/:id', auth.required, async (req:"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "5bb7ad11c732",
+      "name": "Express Route: POST /articles/:slug/favorite",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 210,
+        "snippet": "router.post( '/articles/:slug/favorite', auth.required, async (req: Reques"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "873cb21ce5ce",
+      "name": "Express Route: DELETE /articles/:slug/favorite",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 230,
+        "snippet": "router.delete( '/articles/:slug/favorite', auth.required, async (req: Requ"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "a7459d007aac",
+      "name": "Interface: Article",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.model.ts",
+        "lineNumber": 3,
+        "snippet": "export interface Article { id: number; title: string; slug: string; desc"
+      },
+      "sourceId": "6f002c93c71b"
+    },
+    {
+      "id": "da4bcd3a6c72",
+      "name": "Interface: Comment",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/comment.model.ts",
+        "lineNumber": 3,
+        "snippet": "export interface Comment { id: number; createdAt: Date; updatedAt: Date;"
+      },
+      "sourceId": "71db7f5cbcad"
+    },
+    {
+      "id": "f8ca53f8861b",
+      "name": "Express Route: POST /users",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 14,
+        "snippet": "router.post('/users', async (req: Request, res: Response, next: NextFunction) =>"
+      },
+      "sourceId": "0609e6f5c59a"
+    },
+    {
+      "id": "e4a1999631ee",
+      "name": "Express Route: POST /users/login",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 30,
+        "snippet": "router.post('/users/login', async (req: Request, res: Response, next: NextFuncti"
+      },
+      "sourceId": "0609e6f5c59a"
+    },
+    {
+      "id": "9130c10f2cec",
+      "name": "Express Route: GET /user",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 45,
+        "snippet": "router.get('/user', auth.required, async (req: Request, res: Response, next: Nex"
+      },
+      "sourceId": "0609e6f5c59a"
+    },
+    {
+      "id": "9a54306fff9e",
+      "name": "Express Route: PUT /user",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 61,
+        "snippet": "router.put('/user', auth.required, async (req: Request, res: Response, next: Nex"
+      },
+      "sourceId": "0609e6f5c59a"
+    },
+    {
+      "id": "02e8c6952916",
+      "name": "Interface: RegisterInput",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/register-input.model.ts",
+        "lineNumber": 1,
+        "snippet": "export interface RegisterInput { email: string; username: string; password"
+      },
+      "sourceId": "9815a4fd3392"
+    },
+    {
+      "id": "188cf171dd6a",
+      "name": "Interface: RegisteredUser",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/registered-user.model.ts",
+        "lineNumber": 1,
+        "snippet": "export interface RegisteredUser { id: number; email: string; username: str"
+      },
+      "sourceId": "2c5c629b241c"
+    },
+    {
+      "id": "713f519dbbbc",
+      "name": "Interface: Request",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user-request.d.ts",
+        "lineNumber": 2,
+        "snippet": "export interface Request { auth?: { user?: { id?: number;"
+      },
+      "sourceId": "440a2d7d1a31"
+    },
+    {
+      "id": "fa4f22aaa04f",
+      "name": "Interface: User",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user.model.ts",
+        "lineNumber": 4,
+        "snippet": "export interface User { id: number; username: string; email: string; pas"
+      },
+      "sourceId": "4c437abf0c4d"
+    },
+    {
+      "id": "e1c1be4d664c",
+      "name": "Express Route: GET /profiles/:username",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 14,
+        "snippet": "router.get( '/profiles/:username', auth.optional, async (req: Request, res"
+      },
+      "sourceId": "e80a3c7177a4"
+    },
+    {
+      "id": "75259d4f877d",
+      "name": "Express Route: POST /profiles/:username/follow",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 34,
+        "snippet": "router.post( '/profiles/:username/follow', auth.required, async (req: Requ"
+      },
+      "sourceId": "e80a3c7177a4"
+    },
+    {
+      "id": "1ec267c57ee5",
+      "name": "Express Route: DELETE /profiles/:username/follow",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 54,
+        "snippet": "router.delete( '/profiles/:username/follow', auth.required, async (req: Re"
+      },
+      "sourceId": "e80a3c7177a4"
+    },
+    {
+      "id": "2c16e54b1d27",
+      "name": "Interface: Profile",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.model.ts",
+        "lineNumber": 1,
+        "snippet": "export interface Profile { username: string; bio: string; image: string;"
+      },
+      "sourceId": "b004e7ab9e1b"
+    },
+    {
+      "id": "67f6409b544d",
+      "name": "Express Route: GET /tags",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 13,
+        "snippet": "router.get('/tags', auth.optional, async (req: Request, res: Response, next: Nex"
+      },
+      "sourceId": "16b8761f1a13"
+    },
+    {
+      "id": "7ac67f5be0de",
+      "name": "Interface: Tag",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.model.ts",
+        "lineNumber": 1,
+        "snippet": "export interface Tag { name: string; }"
+      },
+      "sourceId": "1e5604651bbb"
+    },
+    {
+      "id": "bc64df3182de",
+      "name": "Express Route: GET /",
+      "type": "CONTRACT",
+      "entityType": "HTTP_ENDPOINT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 21,
+        "snippet": "app.get('/', (req: express.Request, res: express.Response) => { res.json({ sta"
+      },
+      "sourceId": "8eb224fde196"
+    },
+    {
+      "id": "14ed272078ce",
+      "name": "Interface: Global",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+        "lineNumber": 5,
+        "snippet": "interface Global {}"
+      },
+      "sourceId": "ab7eba14b1c6"
+    },
+    {
+      "id": "4bc884f0be9b",
+      "name": "Interface: CustomNodeJsGlobal",
+      "type": "CONTRACT",
+      "entityType": "EXPORTED_TYPE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+        "lineNumber": 10,
+        "snippet": "interface CustomNodeJsGlobal extends NodeJS.Global { prisma: PrismaClient; }"
+      },
+      "sourceId": "ab7eba14b1c6"
+    }
+  ],
+  "relationships": [
+    {
+      "id": "2048069312a7",
+      "name": "Call: console.log()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-setup.ts",
+        "lineNumber": 6,
+        "snippet": "console.log('\\nSetting up...\\n')",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "69e9b6dd85f4",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "eaaf673554e2",
+      "name": "Call: console.log()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/global-teardown.ts",
+        "lineNumber": 6,
+        "snippet": "console.log(globalThis.__TEARDOWN_MESSAGE__)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "f0027a037275",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "63efe9656b2e",
+      "name": "Import: axios",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/e2e/src/support/test-setup.ts",
+        "lineNumber": 3,
+        "snippet": "import axios from 'axios';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "6da753e744fa",
+      "targetId": "4cf93d2f0980",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "bf6625a1c4a4",
+      "name": "Require: @nx/jest/preset",
+      "type": "RELATIONSHIP",
+      "entityType": "REQUIRE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/jest.preset.js",
+        "lineNumber": 1,
+        "snippet": "require('@nx/jest/preset')",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "ca7380153950",
+      "targetId": "65ffa3be5ee7",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "74d21f739779",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 1,
+        "snippet": "import { NextFunction, Request, Response, Router } from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "bd120afa0cee",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "8e4f214315e6",
+      "name": "Import: ../auth/auth",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 2,
+        "snippet": "import auth from '../auth/auth';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "bd120afa0cee",
+      "targetId": "fef27d2023df",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "8edcae1cc169",
+      "name": "Import: ./article.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 3,
+        "snippet": "import { addComment, createArticle, deleteArticle, deleteComment, favo",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "bd120afa0cee",
+      "targetId": "f5584dd49460",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "beddb5c4d934",
+      "name": "Call: router.get()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 30,
+          "snippet": "router.get('/articles', auth.optional, async (req: Request, res: Response, next:",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 45,
+          "snippet": "router.get( '/articles/feed', auth.required, async (req: Request, res: Res",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 87,
+          "snippet": "router.get( '/articles/:slug', auth.optional, async (req: Request, res: Re",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 149,
+          "snippet": "router.get( '/articles/:slug/comments', auth.optional, async (req: Request",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "5ce1afa7ef27",
+      "name": "Call: res.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 33,
+          "snippet": "res.json(result)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 55,
+          "snippet": "res.json(result)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 74,
+          "snippet": "res.status(201).json({ article })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 93,
+          "snippet": "res.json({ article })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 116,
+          "snippet": "res.json({ article })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 155,
+          "snippet": "res.json({ comments })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 176,
+          "snippet": "res.json({ comment })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 196,
+          "snippet": "res.status(200).json({})",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 216,
+          "snippet": "res.json({ article })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 236,
+          "snippet": "res.json({ article })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "d1204a11eb4a",
+      "name": "Call: router.post()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 71,
+          "snippet": "router.post('/articles', auth.required, async (req: Request, res: Response, next",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 170,
+          "snippet": "router.post( '/articles/:slug/comments', auth.required, async (req: Reques",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 210,
+          "snippet": "router.post( '/articles/:slug/favorite', auth.required, async (req: Reques",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "9bd709d6a795",
+      "name": "Call: res.status()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 74,
+          "snippet": "res.status(201)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 196,
+          "snippet": "res.status(200)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "92b902d52677",
+      "name": "Call: router.put()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 110,
+        "snippet": "router.put( '/articles/:slug', auth.required, async (req: Request, res: Re",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "4ab474faf795",
+      "name": "Call: router.delete()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 129,
+          "snippet": "router.delete( '/articles/:slug', auth.required, async (req: Request, res:",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 190,
+          "snippet": "router.delete( '/articles/:slug/comments/:id', auth.required, async (req:",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 230,
+          "snippet": "router.delete( '/articles/:slug/favorite', auth.required, async (req: Requ",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "95f0f25bd90c",
+      "name": "Call: res.sendStatus()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 135,
+        "snippet": "res.sendStatus(204)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "bd120afa0cee",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "682ceae5bc29",
+      "name": "Import: ./author.mapper",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.mapper.ts",
+        "lineNumber": 1,
+        "snippet": "import authorMapper from './author.mapper';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "ef315449b611",
+      "targetId": "09aee637ff70",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "e9377302e85f",
+      "name": "Call: article.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.mapper.ts",
+        "lineNumber": 8,
+        "snippet": "article.tagList.map((tag: any) => tag.name)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "ef315449b611",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "3a2356b8b706",
+      "name": "Call: article.some()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.mapper.ts",
+        "lineNumber": 11,
+        "snippet": "article.favoritedBy.some((item: any) => item.id === id)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "ef315449b611",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "ea6cf655d5cc",
+      "name": "Import: ./comment.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.model.ts",
+        "lineNumber": 1,
+        "snippet": "import { Comment } from './comment.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "6f002c93c71b",
+      "targetId": "4ad4e813af49",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "5b9f5b0c3ca1",
+      "name": "Import: slugify",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 1,
+        "snippet": "import slugify from 'slugify';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "43219996add8",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "64539ee50c06",
+      "name": "Import: ../../../prisma/prisma-client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 2,
+        "snippet": "import prisma from '../../../prisma/prisma-client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "85d3d88d8254",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "93620008a2ff",
+      "name": "Import: ../../models/http-exception.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 3,
+        "snippet": "import HttpException from '../../models/http-exception.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "ae097558ca6e",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "24d96d7811c3",
+      "name": "Import: ../profile/profile.utils",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 4,
+        "snippet": "import profileMapper from '../profile/profile.utils';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "4c5397cb6a7b",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "7791d14d656e",
+      "name": "Import: ./article.mapper",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 5,
+        "snippet": "import articleMapper from './article.mapper';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "1e18d9f3b1ca",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "9602b21d3361",
+      "name": "Import: ../tag/tag.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 6,
+        "snippet": "import { Tag } from '../tag/tag.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "targetId": "7ce02b72fb47",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "f8e3d7c8eca8",
+      "name": "Call: orAuthorQuery.push()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 13,
+          "snippet": "orAuthorQuery.push({ demo: { equals: true, }, })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 20,
+          "snippet": "orAuthorQuery.push({ id: { equals: id, }, })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "bc2f7145befb",
+      "name": "Call: andAuthorQuery.push()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 28,
+        "snippet": "andAuthorQuery.push({ username: { equals: query.author, },",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "03165707afa9",
+      "name": "Call: queries.push()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 42,
+          "snippet": "queries.push(authorQuery)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 45,
+          "snippet": "queries.push({ tagList: { some: { name: query.tag,",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 55,
+          "snippet": "queries.push({ favoritedBy: { some: { username: {",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 419,
+          "snippet": "queries.push({ author: { demo: true, }, })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 426,
+          "snippet": "queries.push({ author: { id, }, })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "723c6d1c40fe",
+      "name": "Call: articles.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 108,
+          "snippet": "articles.map((article: any) => articleMapper(article, id))",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 157,
+          "snippet": "articles.map((article: any) => articleMapper(article, id))",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "fdeb925accfa",
+      "name": "Call: Array.isArray()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 164,
+          "snippet": "Array.isArray(tagList)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 336,
+          "snippet": "Array.isArray(article.tagList)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "b31c631816a8",
+      "name": "Call: tags.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 204,
+        "snippet": "tags.map((tag: string) => ({ create: { name: tag }, where: {",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "c45c48557262",
+      "name": "Call: article.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 337,
+          "snippet": "article.tagList.map((tag: string) => ({ create: { name: tag },",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 600,
+          "snippet": "article?.tagList.map((tag: Tag) => tag.name)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 646,
+          "snippet": "article?.tagList.map((tag: Tag) => tag.name)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "04747db8460c",
+      "name": "Call: comments.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 460,
+        "snippet": "comments?.comments.map((comment: any) => ({ ...comment, author: {",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "91e61cd2a25e",
+      "name": "Call: comment.some()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 466,
+          "snippet": "comment.author.followedBy.some((follow: any) => follow.id === id)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 522,
+          "snippet": "comment.author.followedBy.some((follow: any) => follow.id === id)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "ca531d7a8753",
+      "name": "Call: article.some()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 601,
+          "snippet": "article.favoritedBy.some((favorited: any) => favorited.id === id)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 647,
+          "snippet": "article.favoritedBy.some((favorited: any) => favorited.id === id)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "212eae6a6028",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "0301fb6539e9",
+      "name": "Import: ../auth/user.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/author.mapper.ts",
+        "lineNumber": 1,
+        "snippet": "import { User } from '../auth/user.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "4f94aa36ea97",
+      "targetId": "b345afa3becd",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "fdc81d3bec47",
+      "name": "Call: author.some()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/author.mapper.ts",
+        "lineNumber": 8,
+        "snippet": "author?.followedBy.some((followingUser: Partial<User>) => followingUser.id === i",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "4f94aa36ea97",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "14ef79c2500f",
+      "name": "Import: ./article.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/comment.model.ts",
+        "lineNumber": 1,
+        "snippet": "import { Article } from './article.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "71db7f5cbcad",
+      "targetId": "c67733c4aa9c",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "969caa9833f5",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 1,
+        "snippet": "import { NextFunction, Request, Response, Router } from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "5197e8bcae98",
+      "name": "Import: ./auth",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 2,
+        "snippet": "import auth from './auth';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "targetId": "fef27d2023df",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "fc4a84cc2641",
+      "name": "Import: ./auth.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 3,
+        "snippet": "import { createUser, getCurrentUser, login, updateUser } from './auth.service';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "targetId": "0ba4b546eaed",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "101b43f20b92",
+      "name": "Call: router.post()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 14,
+          "snippet": "router.post('/users', async (req: Request, res: Response, next: NextFunction) =>",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 30,
+          "snippet": "router.post('/users/login', async (req: Request, res: Response, next: NextFuncti",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "0609e6f5c59a",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "84210d7ee9c0",
+      "name": "Call: res.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 17,
+          "snippet": "res.status(201).json({ user })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 33,
+          "snippet": "res.json({ user })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 48,
+          "snippet": "res.json({ user })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 64,
+          "snippet": "res.json({ user })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "0609e6f5c59a",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "f16bf8690c82",
+      "name": "Call: res.status()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 17,
+        "snippet": "res.status(201)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "3a8139ee83ee",
+      "name": "Call: router.get()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 45,
+        "snippet": "router.get('/user', auth.required, async (req: Request, res: Response, next: Nex",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "c34c5bdc7fec",
+      "name": "Call: router.put()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+        "lineNumber": 61,
+        "snippet": "router.put('/user', auth.required, async (req: Request, res: Response, next: Nex",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "0609e6f5c59a",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "0072c32d4b60",
+      "name": "Import: bcryptjs",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 1,
+        "snippet": "import * as bcrypt from 'bcryptjs';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "72f56e404dab",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "b939997cdc56",
+      "name": "Import: ./register-input.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 2,
+        "snippet": "import { RegisterInput } from './register-input.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "e2c8e05911de",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "40f9605bee06",
+      "name": "Import: ../../../prisma/prisma-client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 3,
+        "snippet": "import prisma from '../../../prisma/prisma-client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "85d3d88d8254",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "04303ea52470",
+      "name": "Import: ../../models/http-exception.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 4,
+        "snippet": "import HttpException from '../../models/http-exception.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "ae097558ca6e",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "8a22ff4318c8",
+      "name": "Import: ./registered-user.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 5,
+        "snippet": "import { RegisteredUser } from './registered-user.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "b165662f11b9",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "2f45c43f7757",
+      "name": "Import: ./token.utils",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 6,
+        "snippet": "import generateToken from './token.utils';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "03a2fabdeee8",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "9d43510f497c",
+      "name": "Import: ./user.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 7,
+        "snippet": "import { User } from './user.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "24acfed7b236",
+      "targetId": "b345afa3becd",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "07b36b78a464",
+      "name": "Call: input.trim()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 39,
+          "snippet": "input.email?.trim()",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 40,
+          "snippet": "input.username?.trim()",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 41,
+          "snippet": "input.password?.trim()",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "24acfed7b236",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "873a8a0592ae",
+      "name": "Call: bcrypt.hash()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 1,
+          "snippet": "import * as bcrypt from 'bcryptjs';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 58,
+          "snippet": "bcrypt.hash(password, 10)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 156,
+          "snippet": "bcrypt.hash(password, 10)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "24acfed7b236",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "9a43a7fca6aa",
+      "name": "Call: userPayload.trim()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 85,
+          "snippet": "userPayload.email?.trim()",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 86,
+          "snippet": "userPayload.password?.trim()",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "24acfed7b236",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "d7bd4ea1f140",
+      "name": "Call: bcrypt.compare()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 1,
+          "snippet": "import * as bcrypt from 'bcryptjs';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 111,
+          "snippet": "bcrypt.compare(password, user.password)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "24acfed7b236",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "d52f76e67f97",
+      "name": "Import: express-jwt",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+        "lineNumber": 1,
+        "snippet": "import { expressjwt as jwt } from 'express-jwt';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "d96febbe6b7b",
+      "targetId": "26ef47a41550",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "087ee18a183a",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+        "lineNumber": 2,
+        "snippet": "import * as express from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "d96febbe6b7b",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "8af0d7e2ebdc",
+      "name": "Call: req.split()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+          "lineNumber": 6,
+          "snippet": "req.headers.authorization.split(' ')",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+          "lineNumber": 7,
+          "snippet": "req.headers.authorization.split(' ')",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.ts",
+          "lineNumber": 9,
+          "snippet": "req.headers.authorization.split(' ')",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "d96febbe6b7b",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "6db8506f07a6",
+      "name": "Import: jsonwebtoken",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/token.utils.ts",
+        "lineNumber": 1,
+        "snippet": "import * as jwt from 'jsonwebtoken';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "1d44121d3144",
+      "targetId": "ed8341d5b2a0",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "e17e449ad7bd",
+      "name": "Call: jwt.sign()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/token.utils.ts",
+          "lineNumber": 1,
+          "snippet": "import * as jwt from 'jsonwebtoken';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/token.utils.ts",
+          "lineNumber": 4,
+          "snippet": "jwt.sign({ user: { id } }, process.env.JWT_SECRET || 'superSecret', { expire",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "1d44121d3144",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "da063df138ae",
+      "name": "Import: ../article/article.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user.model.ts",
+        "lineNumber": 1,
+        "snippet": "import { Article } from '../article/article.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "4c437abf0c4d",
+      "targetId": "c67733c4aa9c",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "7b741cdc2752",
+      "name": "Import: ../article/comment.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/user.model.ts",
+        "lineNumber": 2,
+        "snippet": "import { Comment } from '../article/comment.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "4c437abf0c4d",
+      "targetId": "4ad4e813af49",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "43fe2810a52c",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 1,
+        "snippet": "import { NextFunction, Request, Response, Router } from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "46149813b84f",
+      "name": "Import: ../auth/auth",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 2,
+        "snippet": "import auth from '../auth/auth';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "targetId": "fef27d2023df",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "c3e927c37db5",
+      "name": "Import: ./profile.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 3,
+        "snippet": "import { followUser, getProfile, unfollowUser } from './profile.service';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "targetId": "4dabc64f51e4",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "cbaae4825b53",
+      "name": "Call: router.get()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 14,
+        "snippet": "router.get( '/profiles/:username', auth.optional, async (req: Request, res",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "d1925e53dc35",
+      "name": "Call: res.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 20,
+          "snippet": "res.json({ profile })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 40,
+          "snippet": "res.json({ profile })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 60,
+          "snippet": "res.json({ profile })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "e80a3c7177a4",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "914a563dce74",
+      "name": "Call: router.post()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 34,
+        "snippet": "router.post( '/profiles/:username/follow', auth.required, async (req: Requ",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "39ae43c0ceb5",
+      "name": "Call: router.delete()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+        "lineNumber": 54,
+        "snippet": "router.delete( '/profiles/:username/follow', auth.required, async (req: Re",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "e80a3c7177a4",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "16ac1783ad13",
+      "name": "Import: ../../../prisma/prisma-client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+        "lineNumber": 1,
+        "snippet": "import prisma from '../../../prisma/prisma-client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "200f9f08131f",
+      "targetId": "85d3d88d8254",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "1568ec627b2e",
+      "name": "Import: ./profile.utils",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+        "lineNumber": 2,
+        "snippet": "import profileMapper from './profile.utils';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "200f9f08131f",
+      "targetId": "4c5397cb6a7b",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "9028dc6e8904",
+      "name": "Import: ../../models/http-exception.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+        "lineNumber": 3,
+        "snippet": "import HttpException from '../../models/http-exception.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "200f9f08131f",
+      "targetId": "ae097558ca6e",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "7bd7d11baa0d",
+      "name": "Import: ../auth/user.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.utils.ts",
+        "lineNumber": 1,
+        "snippet": "import { User } from '../auth/user.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "a352575edeea",
+      "targetId": "b345afa3becd",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "69110123cc59",
+      "name": "Import: ./profile.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.utils.ts",
+        "lineNumber": 2,
+        "snippet": "import { Profile } from './profile.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "a352575edeea",
+      "targetId": "bee8e0b19e98",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "2aae05138376",
+      "name": "Call: user.some()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.utils.ts",
+        "lineNumber": 9,
+        "snippet": "user?.followedBy.some((followingUser: Partial<User>) => followingUser.id === id)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "a352575edeea",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "9148af1c04b6",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 1,
+        "snippet": "import { Router } from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "bf012b391a3d",
+      "name": "Import: ./tag/tag.controller",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 2,
+        "snippet": "import tagsController from './tag/tag.controller';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "efec318926fd",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "3ea5d071d0dd",
+      "name": "Import: ./article/article.controller",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 3,
+        "snippet": "import articlesController from './article/article.controller';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "b3bc202f25e9",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "afa7edb8eb1e",
+      "name": "Import: ./auth/auth.controller",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 4,
+        "snippet": "import authController from './auth/auth.controller';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "d77dda2d8815",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a64e21d57ecc",
+      "name": "Import: ./profile/profile.controller",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 5,
+        "snippet": "import profileController from './profile/profile.controller';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "af46eddd52ba",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a0dac0efcfe2",
+      "name": "Express Mount: Root -> authController",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 7,
+        "snippet": "Router() .use(tagsController) .use(articlesController) .use(profileControl"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "4ccfc41a6677",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a2540316f54a",
+      "name": "Express Mount: Root -> profileController",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 7,
+        "snippet": "Router() .use(tagsController) .use(articlesController) .use(profileControl"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "8fc4f5b8aa97",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "94719a025f94",
+      "name": "Express Mount: Root -> articlesController",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 7,
+        "snippet": "Router() .use(tagsController) .use(articlesController)"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "0886cf3148e6",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "217b1a1c0532",
+      "name": "Express Mount: Root -> tagsController",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 7,
+        "snippet": "Router() .use(tagsController)"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "0170b55a5d29",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a08d55a9d31b",
+      "name": "Express Mount: /api -> api",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/routes.ts",
+        "lineNumber": 13,
+        "snippet": "Router().use('/api', api)"
+      },
+      "sourceId": "9250ab4a9a01",
+      "targetId": "b82ea8929c11",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "7b7e6e8674c1",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 1,
+        "snippet": "import { NextFunction, Request, Response, Router } from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "16b8761f1a13",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "055b518468f1",
+      "name": "Import: ../auth/auth",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 2,
+        "snippet": "import auth from '../auth/auth';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "16b8761f1a13",
+      "targetId": "fef27d2023df",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "3aeebaff60a5",
+      "name": "Import: ./tag.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 3,
+        "snippet": "import getTags from './tag.service';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "16b8761f1a13",
+      "targetId": "e72818a5e634",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "180fde03c3bc",
+      "name": "Call: router.get()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 13,
+        "snippet": "router.get('/tags', auth.optional, async (req: Request, res: Response, next: Nex",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "16b8761f1a13",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "a474838ea33e",
+      "name": "Call: res.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 16,
+        "snippet": "res.json({ tags })",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "16b8761f1a13",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "d021efe97b26",
+      "name": "Import: ../../../prisma/prisma-client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+        "lineNumber": 1,
+        "snippet": "import prisma from '../../../prisma/prisma-client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "515769e355ca",
+      "targetId": "85d3d88d8254",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "ab4a1def01bf",
+      "name": "Import: ./tag.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+        "lineNumber": 2,
+        "snippet": "import { Tag } from './tag.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "515769e355ca",
+      "targetId": "7ce02b72fb47",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "d11679c2b553",
+      "name": "Call: queries.push()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+          "lineNumber": 6,
+          "snippet": "queries.push({ demo: true })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+          "lineNumber": 9,
+          "snippet": "queries.push({ id: { equals: id, }, })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "515769e355ca",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "273fb2c45774",
+      "name": "Call: tags.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+        "lineNumber": 37,
+        "snippet": "tags.map((tag: Tag) => tag.name)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "515769e355ca",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "e831535c4d61",
+      "name": "Import: express",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 1,
+        "snippet": "import express from 'express';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "d7adbb6265a2",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "9f571195ee22",
+      "name": "Import: cors",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 2,
+        "snippet": "import cors from 'cors';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "874bc4b2ecee",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a79fd428d62b",
+      "name": "Import: body-parser",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 3,
+        "snippet": "import * as bodyParser from 'body-parser';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "4226518b4e28",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "590f4c403434",
+      "name": "Import: ./app/routes/routes",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 4,
+        "snippet": "import routes from './app/routes/routes';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "e5e120981b56",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "e45698c04169",
+      "name": "Import: ./app/models/http-exception.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 5,
+        "snippet": "import HttpException from './app/models/http-exception.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "ae097558ca6e",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "49c7666271d8",
+      "name": "Express Mount: Root -> cors()",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 13,
+        "snippet": "app.use(cors())"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "ed54c01fa6fa",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "55e9f7e00a00",
+      "name": "Express Mount: Root -> bodyParser.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 14,
+        "snippet": "app.use(bodyParser.json())"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "bb567b1974e1",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "11f95151e172",
+      "name": "Call: bodyParser.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 3,
+          "snippet": "import * as bodyParser from 'body-parser';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 14,
+          "snippet": "bodyParser.json()",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "5240800287d6",
+      "name": "Express Mount: Root -> bodyParser.urlencoded()",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 15,
+        "snippet": "app.use(bodyParser.urlencoded({ extended: true }))"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "4875ed863a8d",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "f862acc14eb7",
+      "name": "Call: bodyParser.urlencoded()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 3,
+          "snippet": "import * as bodyParser from 'body-parser';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 15,
+          "snippet": "bodyParser.urlencoded({ extended: true })",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "f4769a6c5a07",
+      "name": "Express Mount: Root -> routes",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 16,
+        "snippet": "app.use(routes)"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "2e7a36a074f0",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "b300afa726bd",
+      "name": "Express Mount: Root -> express.static()",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 19,
+        "snippet": "app.use(express.static(__dirname + '/assets'))"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "79a51acd13e5",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "48c2376829b0",
+      "name": "Call: express.static()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 1,
+          "snippet": "import express from 'express';",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 19,
+          "snippet": "express.static(__dirname + '/assets')",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "c2348b49fa16",
+      "name": "Call: app.get()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 21,
+        "snippet": "app.get('/', (req: express.Request, res: express.Response) => { res.json({ sta",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "62fb52e5cb4b",
+      "name": "Call: res.json()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 22,
+          "snippet": "res.json({ status: 'API is running on /api' })",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 35,
+          "snippet": "res.status(401).json({ status: 'error', message: 'missing author",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 42,
+          "snippet": "res.status(err.errorCode).json(err.message)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 44,
+          "snippet": "res.status(500).json(err.message)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "3dbc360b2516",
+      "name": "Express Mount: Root -> Inline Middleware",
+      "type": "RELATIONSHIP",
+      "entityType": "MOUNTS",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 26,
+        "snippet": "app.use( ( err: Error | HttpException, req: express.Request, res:"
+      },
+      "sourceId": "8eb224fde196",
+      "targetId": "2caa7df10258",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "cbfccb54dbbb",
+      "name": "Call: res.status()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 35,
+          "snippet": "res.status(401)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 42,
+          "snippet": "res.status(err.errorCode)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+          "lineNumber": 44,
+          "snippet": "res.status(500)",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "dca46a9825a1",
+      "name": "Call: app.listen()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 55,
+        "snippet": "app.listen(PORT, () => { console.info(`server up on port ${PORT}`); })",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "8d97ee8e2d2f",
+      "name": "Call: console.info()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 56,
+        "snippet": "console.info(`server up on port ${PORT}`)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "8eb224fde196",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "ce1ef5f4a8bb",
+      "name": "Import: @prisma/client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/prisma-client.ts",
+        "lineNumber": 1,
+        "snippet": "import { PrismaClient } from '@prisma/client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "ab7eba14b1c6",
+      "targetId": "28006ed0cd14",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a78c777fb7fa",
+      "name": "Import: @ngneat/falso",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 1,
+        "snippet": "import { randEmail, randFullName, randLines, randParagraph, randPasswo",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "targetId": "330b9f3c06de",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "66532be03653",
+      "name": "Import: @prisma/client",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 9,
+        "snippet": "import { PrismaClient } from '@prisma/client';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "targetId": "28006ed0cd14",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "ea85ea364370",
+      "name": "Import: ../app/routes/auth/registered-user.model",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 10,
+        "snippet": "import { RegisteredUser } from '../app/routes/auth/registered-user.model';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "targetId": "b165662f11b9",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "a5b17323f57b",
+      "name": "Import: ../app/routes/auth/auth.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 11,
+        "snippet": "import { createUser } from '../app/routes/auth/auth.service';",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "targetId": "0ba4b546eaed",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "b1c95598c4f9",
+      "name": "Import: ../app/routes/article/article.service",
+      "type": "RELATIONSHIP",
+      "entityType": "IMPORT",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 12,
+        "snippet": "import { addComment, createArticle } from '../app/routes/article/article.service",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "targetId": "f5584dd49460",
+      "status": "DETERMINISTIC",
+      "confidence": "HIGH"
+    },
+    {
+      "id": "09194d6165b8",
+      "name": "Call: randLines.join()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 1,
+          "snippet": "import { randEmail, randFullName, randLines, randParagraph, randPasswo",
+          "evidenceRole": "import-match"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 30,
+          "snippet": "randLines({ length: 10 }).join(' ')",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "MEDIUM"
+    },
+    {
+      "id": "8c33421223c5",
+      "name": "Call: Promise.all()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 41,
+          "snippet": "Promise.all(Array.from({length: 12}, () => generateUser()))",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 46,
+          "snippet": "Promise.all(Array.from({length: 12}, () => generateArticle(user.id)))",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 50,
+          "snippet": "Promise.all(users.map(userItem => generateComment(userItem.id, article.slug)))",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "58f7b9909380",
+      "name": "Call: Array.from()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 41,
+          "snippet": "Array.from({length: 12}, () => generateUser())",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 46,
+          "snippet": "Array.from({length: 12}, () => generateArticle(user.id))",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "35a691fb64c3",
+      "name": "Call: users.map()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 42,
+          "snippet": "users?.map(user => user)",
+          "evidenceRole": "syntax-call"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 50,
+          "snippet": "users.map(userItem => generateComment(userItem.id, article.slug))",
+          "evidenceRole": "syntax-call"
+        }
+      ],
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "729d5de65798",
+      "name": "Call: console.error()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 54,
+        "snippet": "console.error(e)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "2b57fdae9609",
+      "name": "Call: main.catch()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 59,
+        "snippet": "main() .then(async () => { await prisma.$disconnect(); }) .catch(async",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "20af07f10579",
+      "name": "Call: main.then()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 59,
+        "snippet": "main() .then(async () => { await prisma.$disconnect(); })",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    },
+    {
+      "id": "b4fc968e748c",
+      "name": "Call: process.exit()",
+      "type": "RELATIONSHIP",
+      "entityType": "CALL",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+        "lineNumber": 65,
+        "snippet": "process.exit(1)",
+        "evidenceRole": "syntax-call"
+      },
+      "sourceId": "b42bba0e9c73",
+      "status": "INFERRED",
+      "confidence": "LOW"
+    }
+  ],
+  "openConnectors": [
+    {
+      "id": "818a8fee64f3",
+      "name": "Express HTTP Response: json",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 33,
+          "snippet": "res.json(result)"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 55,
+          "snippet": "res.json(result)"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 93,
+          "snippet": "res.json({ article })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 116,
+          "snippet": "res.json({ article })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 155,
+          "snippet": "res.json({ comments })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 176,
+          "snippet": "res.json({ comment })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 216,
+          "snippet": "res.json({ article })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+          "lineNumber": 236,
+          "snippet": "res.json({ article })"
+        }
+      ],
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "02712ee340c5",
+      "name": "Express HTTP Response: sendStatus",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.controller.ts",
+        "lineNumber": 135,
+        "snippet": "res.sendStatus(204)"
+      },
+      "sourceId": "bd120afa0cee"
+    },
+    {
+      "id": "9c5fad335eb2",
+      "name": "DB Call: prisma.article.count",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 71,
+          "snippet": "prisma.article.count({ where: { AND: andQueries, }, })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 114,
+          "snippet": "prisma.article.count({ where: { author: { followedBy: { some:"
+        }
+      ],
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "1cb43e2a61d6",
+      "name": "DB Call: prisma.article.findMany",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 77,
+          "snippet": "prisma.article.findMany({ where: { AND: andQueries }, orderBy: { c"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 122,
+          "snippet": "prisma.article.findMany({ where: { author: { followedBy: { som"
+        }
+      ],
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "3530df6f569c",
+      "name": "DB Call: prisma.article.findUnique",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 180,
+          "snippet": "prisma.article.findUnique({ where: { slug, }, select: {"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 242,
+          "snippet": "prisma.article.findUnique({ where: { slug, }, include: {"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 433,
+          "snippet": "prisma.article.findUnique({ where: { slug, }, include: {"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 478,
+          "snippet": "prisma.article.findUnique({ where: { slug, }, select: {"
+        }
+      ],
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "f535bb330a26",
+      "name": "DB Call: prisma.article.create",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 197,
+        "snippet": "prisma.article.create({ data: { title, description, body,"
+      },
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "70f80544abdb",
+      "name": "DB Call: prisma.article.update",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 277,
+          "snippet": "prisma.article.update({ where: { slug, }, data: { tagLis"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 345,
+          "snippet": "prisma.article.update({ where: { slug, }, data: { ...(ar"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 563,
+          "snippet": "prisma.article.update({ where: { slug: slugPayload, }, data: {"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 609,
+          "snippet": "prisma.article.update({ where: { slug: slugPayload, }, data: {"
+        }
+      ],
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "8cd7f67b9325",
+      "name": "DB Call: prisma.article.findFirst",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 292,
+          "snippet": "prisma.article.findFirst({ where: { slug, }, select: { a"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 320,
+          "snippet": "prisma.article.findFirst({ where: { slug: newSlug, },"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+          "lineNumber": 386,
+          "snippet": "prisma.article.findFirst({ where: { slug, }, select: { a"
+        }
+      ],
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "80994585ff3f",
+      "name": "DB Call: prisma.article.delete",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 409,
+        "snippet": "prisma.article.delete({ where: { slug, }, })"
+      },
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "fd535b1b268f",
+      "name": "DB Call: prisma.comment.create",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 487,
+        "snippet": "prisma.comment.create({ data: { body, article: { connect"
+      },
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "e05f56060abe",
+      "name": "DB Call: prisma.comment.findFirst",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 528,
+        "snippet": "prisma.comment.findFirst({ where: { id, author: { id: us"
+      },
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "da2d67e8cbba",
+      "name": "DB Call: prisma.comment.delete",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/article/article.service.ts",
+        "lineNumber": 555,
+        "snippet": "prisma.comment.delete({ where: { id, }, })"
+      },
+      "sourceId": "212eae6a6028"
+    },
+    {
+      "id": "57f8e475a695",
+      "name": "Express HTTP Response: json",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 33,
+          "snippet": "res.json({ user })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 48,
+          "snippet": "res.json({ user })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.controller.ts",
+          "lineNumber": 64,
+          "snippet": "res.json({ user })"
+        }
+      ],
+      "sourceId": "0609e6f5c59a"
+    },
+    {
+      "id": "ae602cd94142",
+      "name": "DB Call: prisma.user.findUnique",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 10,
+          "snippet": "prisma.user.findUnique({ where: { email, }, select: { id"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 19,
+          "snippet": "prisma.user.findUnique({ where: { username, }, select: {"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 96,
+          "snippet": "prisma.user.findUnique({ where: { email, }, select: { id"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+          "lineNumber": 132,
+          "snippet": "prisma.user.findUnique({ where: { id, }, select: { id: t"
+        }
+      ],
+      "sourceId": "24acfed7b236"
+    },
+    {
+      "id": "c4a5fe0c7346",
+      "name": "DB Call: prisma.user.create",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 60,
+        "snippet": "prisma.user.create({ data: { username, email, password: ha"
+      },
+      "sourceId": "24acfed7b236"
+    },
+    {
+      "id": "d8d4a4749e32",
+      "name": "DB Call: prisma.user.update",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/auth/auth.service.ts",
+        "lineNumber": 159,
+        "snippet": "prisma.user.update({ where: { id: id, }, data: { ...(ema"
+      },
+      "sourceId": "24acfed7b236"
+    },
+    {
+      "id": "f20bdaf2fb79",
+      "name": "Express HTTP Response: json",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 20,
+          "snippet": "res.json({ profile })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 40,
+          "snippet": "res.json({ profile })"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.controller.ts",
+          "lineNumber": 60,
+          "snippet": "res.json({ profile })"
+        }
+      ],
+      "sourceId": "e80a3c7177a4"
+    },
+    {
+      "id": "be9e8796b43b",
+      "name": "DB Call: prisma.user.findUnique",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+        "lineNumber": 6,
+        "snippet": "prisma.user.findUnique({ where: { username: usernamePayload, },"
+      },
+      "sourceId": "200f9f08131f"
+    },
+    {
+      "id": "0a04f0124d54",
+      "name": "DB Call: prisma.user.update",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+          "lineNumber": 23,
+          "snippet": "prisma.user.update({ where: { username: usernamePayload, }, da"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/app/routes/profile/profile.service.ts",
+          "lineNumber": 43,
+          "snippet": "prisma.user.update({ where: { username: usernamePayload, }, da"
+        }
+      ],
+      "sourceId": "200f9f08131f"
+    },
+    {
+      "id": "ecaa8675935f",
+      "name": "Express HTTP Response: json",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.controller.ts",
+        "lineNumber": 16,
+        "snippet": "res.json({ tags })"
+      },
+      "sourceId": "16b8761f1a13"
+    },
+    {
+      "id": "3650966b41fb",
+      "name": "DB Call: prisma.tag.findMany",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/app/routes/tag/tag.service.ts",
+        "lineNumber": 16,
+        "snippet": "prisma.tag.findMany({ where: { articles: { some: { a"
+      },
+      "sourceId": "515769e355ca"
+    },
+    {
+      "id": "11919ae5f635",
+      "name": "Express HTTP Response: json",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "HTTP_RESPONSE",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 22,
+        "snippet": "res.json({ status: 'API is running on /api' })"
+      },
+      "sourceId": "8eb224fde196"
+    },
+    {
+      "id": "dc342228b1e2",
+      "name": "Express App Listen",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "NETWORK_LISTEN",
+      "scope": "USER",
+      "evidence": {
+        "filePath": "fixtures/cloned-repos/realworld/src/main.ts",
+        "lineNumber": 55,
+        "snippet": "app.listen(PORT, () => { console.info(`server up on port ${PORT}`); })"
+      },
+      "sourceId": "8eb224fde196"
+    },
+    {
+      "id": "5ec937339dd2",
+      "name": "DB Call: prisma.$disconnect",
+      "type": "OPEN_CONNECTOR",
+      "entityType": "DB_QUERY",
+      "scope": "USER",
+      "evidence": [
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 61,
+          "snippet": "prisma.$disconnect()"
+        },
+        {
+          "filePath": "fixtures/cloned-repos/realworld/src/prisma/seed.ts",
+          "lineNumber": 64,
+          "snippet": "prisma.$disconnect()"
+        }
+      ],
+      "sourceId": "b42bba0e9c73"
+    }
+  ]
+}

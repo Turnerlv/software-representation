@@ -8,6 +8,7 @@ import { registerSessionCommand } from "./commands/session.js";
 import { registerAuditCommand } from "./commands/audit.js";
 import { registerLedgerCommand } from "./commands/ledger.js";
 import { registerHealthCommand } from "./commands/health.js";
+import { registerResearchCommand } from "./commands/research.js";
 
 const program = new Command();
 
@@ -20,5 +21,6 @@ registerSessionCommand(program);
 registerAuditCommand(program);
 registerLedgerCommand(program);
 registerHealthCommand(program);
+registerResearchCommand(program);
 
 program.parse(process.argv);
