@@ -585,6 +585,32 @@
           "gaps_resolved": 0,
           "status": "COMPLETE",
           "type": "inventory"
+        },
+        {
+          "session_id": "2026-08-18-130942-realworld",
+          "branch": "research/compare/realworld-src/app/routes/routes.ts-2026-08-18-130942",
+          "date": "2026-08-18T05:09:42.324Z",
+          "extractor_version": "0.2.6",
+          "report_path": "fixtures/research/sessions/v0.2.6-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "comparison",
+          "target": "src/app/routes/routes.ts"
         }
       ]
     }
