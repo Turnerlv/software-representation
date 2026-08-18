@@ -1,8 +1,9 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, appendFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { Command } from "commander";
 import { initDatabase, getLedgerSummary, getAllLedgerEntries, logExtractionGap } from "@chomp/core";
+import { readRegistry } from "../utils/registry.js";
 import {
   initPatternLedger,
   logPattern,
@@ -30,6 +31,26 @@ function resolvePatternLedgerPath(workspaceRoot: string): string {
 
 function resolveBugTrackerPath(workspaceRoot: string): string {
   return resolve(workspaceRoot, "fixtures/research/bug_tracker.db");
+}
+
+function appendToSessionReportById(workspaceRoot: string, sessionId: string | undefined, message: string) {
+  if (!sessionId) return;
+  try {
+    const registry = readRegistry(resolve(workspaceRoot, "fixtures/research/registry.json"));
+    let targetSession: any = null;
+    for (const repo of Object.values(registry.repos)) {
+      targetSession = (repo as any).sessions?.find((s: any) => s.session_id === sessionId);
+      if (targetSession) break;
+    }
+    if (targetSession && targetSession.report_path) {
+      const reportAbsPath = resolve(workspaceRoot, targetSession.report_path);
+      if (existsSync(reportAbsPath)) {
+        appendFileSync(reportAbsPath, `- 📝 [Ledger] ${message}\n`, "utf8");
+      }
+    }
+  } catch (e) {
+    // silently fail if we can't write to the report
+  }
 }
 
 
@@ -277,6 +298,7 @@ export function registerLedgerCommand(program: Command) {
           first_seen_line: options.line ? parseInt(options.line, 10) : null,
         });
         console.log(`✅ Pattern logged: ${entry.pattern_id} [${entry.status}]`);
+        appendToSessionReportById(workspaceRoot, options.session, `Logged new pattern: \`${entry.pattern_id}\` (${entry.ontology_category}) -> ${entry.status}`);
       } catch (err: any) {
         if (err.message?.includes("UNIQUE constraint failed")) {
           console.error(`Pattern '${options.id}' already exists. Use 'chomp ledger pattern resolve' to update it.`);
@@ -308,6 +330,7 @@ export function registerLedgerCommand(program: Command) {
         process.exit(1);
       }
       console.log(`✅ Pattern resolved: ${entry.pattern_id} → handled (session: ${options.session})`);
+      appendToSessionReportById(workspaceRoot, options.session, `Resolved pattern: \`${entry.pattern_id}\` -> handled`);
     });
 
   patternCmd
@@ -415,6 +438,7 @@ export function registerLedgerCommand(program: Command) {
           found_session_id: options.session,
         });
         console.log(`✅ Bug logged: ${entry.bug_id} [${entry.status}]`);
+        appendToSessionReportById(workspaceRoot, options.session, `Logged correctness defect: \`${entry.bug_id}\``);
       } catch (err: any) {
         if (err.message?.includes("UNIQUE constraint failed")) {
           console.error(`Bug '${options.id}' already exists.`);
@@ -446,6 +470,7 @@ export function registerLedgerCommand(program: Command) {
         process.exit(1);
       }
       console.log(`✅ Bug fixed: ${entry.bug_id} (session: ${options.session})`);
+      appendToSessionReportById(workspaceRoot, options.session, `Fixed defect: \`${entry.bug_id}\``);
     });
 
   bugCmd

@@ -20,6 +20,12 @@ app.get('/', (req, res) => {
   res.send('Hello World');
 });
 
+function requireAuth(req, res, next) { next(); }
+
+app.get('/protected', requireAuth, (req, res) => {
+  res.send('Secret data');
+});
+
 app.post('/login', (req, res) => {
   res.format({
     'application/json': () => res.json({ token: 'abc123' }),
