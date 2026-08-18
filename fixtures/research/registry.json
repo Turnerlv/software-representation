@@ -426,15 +426,15 @@
               "OPEN_CONNECTOR": 4
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
             }
           },
           "gaps_logged": 0,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS",
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
           "type": "fix",
           "target": "duplicate-view-render-evidence"
         }
