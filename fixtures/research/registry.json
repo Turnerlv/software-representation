@@ -662,6 +662,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "src/main.ts"
+        },
+        {
+          "session_id": "2026-08-18-132424-realworld",
+          "branch": "research/compare/realworld-src/app/routes/article/article.controller.ts-2026-08-18-132424",
+          "date": "2026-08-18T05:24:24.123Z",
+          "extractor_version": "0.2.6",
+          "report_path": "fixtures/research/sessions/v0.2.6-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 131,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "comparison",
+          "target": "src/app/routes/article/article.controller.ts"
         }
       ]
     }
