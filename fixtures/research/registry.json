@@ -411,6 +411,32 @@
           "gaps_resolved": 5,
           "status": "COMPLETE",
           "deprecated": true
+        },
+        {
+          "session_id": "2026-08-18-134151-express",
+          "branch": "fix/duplicate-view-render-evidence-2026-08-18-134151",
+          "date": "2026-08-18T05:41:51.402Z",
+          "extractor_version": "0.2.6",
+          "report_path": "fixtures/research/sessions/v0.2.6-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 4
+            },
+            "after": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "duplicate-view-render-evidence"
         }
       ],
       "analyses": [
