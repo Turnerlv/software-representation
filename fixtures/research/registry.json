@@ -488,6 +488,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "route.regexp-literal"
+        },
+        {
+          "session_id": "2026-08-20-074047-express",
+          "branch": "research/compare/express-test/app.router.js-2026-08-20-074047",
+          "date": "2026-08-19T23:40:47.402Z",
+          "extractor_version": "0.2.7",
+          "report_path": "fixtures/research/sessions/v0.2.7-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "comparison",
+          "target": "test/app.router.js"
         }
       ],
       "analyses": [
