@@ -514,6 +514,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "test/app.router.js"
+        },
+        {
+          "session_id": "2026-08-20-074145-express",
+          "branch": "fix/export.cjs-property-assignment-2026-08-20-074145",
+          "date": "2026-08-19T23:41:45.200Z",
+          "extractor_version": "0.2.7",
+          "report_path": "fixtures/research/sessions/v0.2.7-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            },
+            "after": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "export.cjs-property-assignment"
         }
       ],
       "analyses": [
