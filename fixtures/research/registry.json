@@ -540,6 +540,32 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "export.cjs-property-assignment"
+        },
+        {
+          "session_id": "2026-08-20-074529-express",
+          "branch": "fix/route.regexp-literal-2026-08-20-074529",
+          "date": "2026-08-19T23:45:29.574Z",
+          "extractor_version": "0.2.8",
+          "report_path": "fixtures/research/sessions/v0.2.8-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            },
+            "after": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "route.regexp-literal"
         }
       ],
       "analyses": [
