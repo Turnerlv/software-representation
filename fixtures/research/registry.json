@@ -437,6 +437,31 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "duplicate-view-render-evidence"
+        },
+        {
+          "session_id": "2026-08-20-073929-express",
+          "branch": "research/inventory/express-2026-08-20-073929",
+          "date": "2026-08-19T23:39:29.969Z",
+          "extractor_version": "0.2.7",
+          "report_path": "fixtures/research/sessions/v0.2.7-express.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            },
+            "after": {
+              "BOUNDARY": 78,
+              "CONTRACT": 87,
+              "RELATIONSHIP": 166,
+              "OPEN_CONNECTOR": 3
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
         }
       ],
       "analyses": [
