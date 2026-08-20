@@ -941,15 +941,15 @@
               "OPEN_CONNECTOR": 281
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 281
             }
           },
           "gaps_logged": 0,
           "gaps_resolved": 0,
-          "status": "IN_PROGRESS",
+          "status": "COMPLETE",
           "type": "inventory"
         }
       ]
