@@ -926,6 +926,31 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "relationship.function-call"
+        },
+        {
+          "session_id": "2026-08-20-084506-nodebb",
+          "branch": "research/inventory/nodebb-2026-08-20-084506",
+          "date": "2026-08-20T00:45:06.809Z",
+          "extractor_version": "0.2.10",
+          "report_path": "fixtures/research/sessions/v0.2.10-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 281
+            },
+            "after": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 281
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
         }
       ]
     }
