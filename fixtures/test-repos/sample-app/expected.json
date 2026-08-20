@@ -1,0 +1,50 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/sample-app/types.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/sample-app/userService.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Class: UserService",
+      "entityType": "CLASS"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Interface: User",
+      "entityType": "EXPORTED_TYPE"
+    },
+    {
+      "name": "Type: UserCredentials",
+      "entityType": "EXPORTED_TYPE"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Import: ./types",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Call: JSON.stringify()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: dbResponse.json()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "HTTP Call: fetch",
+      "entityType": "HTTP_FETCH"
+    },
+    {
+      "name": "HTTP Call: fetch",
+      "entityType": "HTTP_FETCH"
+    }
+  ]
+}

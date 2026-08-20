@@ -1,0 +1,33 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/function-calls/index.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/function-calls/utils.ts",
+      "entityType": "FILE"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Exported Function: calculateSum",
+      "entityType": "EXPORTED_FUNCTION"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Import: ./utils",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Call: calculateSum()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: console.log()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": []
+}

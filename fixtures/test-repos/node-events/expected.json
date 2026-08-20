@@ -1,0 +1,46 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/node-events/index.js",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: events",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "Class: MyEmitter",
+      "entityType": "CLASS"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Event Listener: event",
+      "entityType": "EVENT_LISTENER"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Require: events",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Call: myEmitter.on()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: console.log()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: myEmitter.emit()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Event Emit: event",
+      "entityType": "EVENT_EMIT"
+    }
+  ]
+}

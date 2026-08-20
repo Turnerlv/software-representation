@@ -1,0 +1,74 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/layered-app/controller.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: express",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/layered-app/db.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Class: Database",
+      "entityType": "CLASS"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/layered-app/service.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Class: UserService",
+      "entityType": "CLASS"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Express Route: GET /users/:id",
+      "entityType": "HTTP_ENDPOINT"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Import: ./service.js",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Import: express",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Call: express()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: userService.getUser()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Import: ./db.js",
+      "entityType": "IMPORT"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "HTTP Call: fetch",
+      "entityType": "HTTP_FETCH"
+    }
+  ]
+}

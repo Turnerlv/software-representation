@@ -1,0 +1,522 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/express-app/app.js",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: express",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "Middleware: express.json()",
+      "entityType": "MIDDLEWARE"
+    },
+    {
+      "name": "Middleware: express.urlencoded()",
+      "entityType": "MIDDLEWARE"
+    },
+    {
+      "name": "Middleware: Inline Middleware",
+      "entityType": "MIDDLEWARE"
+    },
+    {
+      "name": "CJS Export: default",
+      "entityType": "CJS_EXPORT"
+    },
+    {
+      "name": "CJS Export: request",
+      "entityType": "CJS_EXPORT"
+    },
+    {
+      "name": "CJS Export: response",
+      "entityType": "CJS_EXPORT"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/express-app/inheritance.js",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: http",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "Package: events",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/express-app/routes/api.js",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: express",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "CJS Export: default",
+      "entityType": "CJS_EXPORT"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/express-app/routes/users.js",
+      "entityType": "FILE"
+    },
+    {
+      "name": "Package: express",
+      "entityType": "EXTERNAL_PACKAGE"
+    },
+    {
+      "name": "CJS Export: default",
+      "entityType": "CJS_EXPORT"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Express Param: user",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /protected",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /^\\/user\\/[0-9]+$/",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: POST /login",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Content Negotiation: application/json, default",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: ROUTE /settings",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /download",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /view",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /redirect",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "CJS Export: init",
+      "entityType": "EXPORTED_FUNCTION"
+    },
+    {
+      "name": "Dynamic Export: app[method]",
+      "entityType": "CJS_METHOD"
+    },
+    {
+      "name": "CJS Export: header",
+      "entityType": "EXPORTED_FUNCTION"
+    },
+    {
+      "name": "CJS Export: status",
+      "entityType": "EXPORTED_FUNCTION"
+    },
+    {
+      "name": "Property Getter: protocol",
+      "entityType": "PROPERTY_GETTER"
+    },
+    {
+      "name": "Express Route: GET /cookie",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Property Getter: name",
+      "entityType": "PROPERTY_GETTER"
+    },
+    {
+      "name": "Property Getter: ip",
+      "entityType": "PROPERTY_GETTER"
+    },
+    {
+      "name": "Prototype Method: View.prototype.lookup",
+      "entityType": "PROTOTYPE_METHOD"
+    },
+    {
+      "name": "Express Route: GET /items",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: POST /items",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: DELETE /items/:id",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: GET /:id",
+      "entityType": "HTTP_ENDPOINT"
+    },
+    {
+      "name": "Express Route: PUT /:id",
+      "entityType": "HTTP_ENDPOINT"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Require: express",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Require: ./routes/api",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Require: ./routes/users",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Call: express()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Express Mount: Root -> express.json()",
+      "entityType": "INTERCEPTS"
+    },
+    {
+      "name": "Call: express.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Express Mount: Root -> express.urlencoded()",
+      "entityType": "INTERCEPTS"
+    },
+    {
+      "name": "Call: express.urlencoded()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.param()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: next()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: next()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Express Mount: /protected -> requireAuth",
+      "entityType": "INTERCEPTS"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Express Mount: /^\\/api.*/ -> Inline Middleware",
+      "entityType": "INTERCEPTS"
+    },
+    {
+      "name": "Call: next()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.post()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.format()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.sendStatus()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.post()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.route()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Express Mount: /api -> apiRouter",
+      "entityType": "MOUNTS"
+    },
+    {
+      "name": "Express Mount: /users -> usersRouter",
+      "entityType": "MOUNTS"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.download()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.render()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.redirect()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Object.defineProperty()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.cookie()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.clearCookie()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: req.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Object.defineProperty()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: defineGetter()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.emit()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: app.listen()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Require: http",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Inherits: http.IncomingMessage.prototype",
+      "entityType": "INHERITS"
+    },
+    {
+      "name": "Inherits: http.IncomingMessage.prototype",
+      "entityType": "INHERITS"
+    },
+    {
+      "name": "Require: events",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Mixes: EventEmitter",
+      "entityType": "MIXES"
+    },
+    {
+      "name": "Require: express",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Call: express.Router()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.post()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.status()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.delete()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.send()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.status()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Require: express",
+      "entityType": "REQUIRE"
+    },
+    {
+      "name": "Call: express.Router()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.get()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: router.put()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: res.json()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Express HTTP Response: send",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: send",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: send",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: sendStatus",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: send",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: send",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express File Response: download",
+      "entityType": "FILE_RESPONSE"
+    },
+    {
+      "name": "Express View Render",
+      "entityType": "VIEW_RENDER"
+    },
+    {
+      "name": "Express Redirect",
+      "entityType": "REDIRECT"
+    },
+    {
+      "name": "Express Response Cookie: remember",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express Response Cookie: remember",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Event Emit: mount",
+      "entityType": "EVENT_EMIT"
+    },
+    {
+      "name": "Express App Listen",
+      "entityType": "NETWORK_LISTEN"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    }
+  ]
+}

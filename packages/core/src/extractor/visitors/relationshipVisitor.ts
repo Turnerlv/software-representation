@@ -432,5 +432,153 @@ export function visitRelationship(
     }
   }
 
+  // Inferred Function Calls (e.g. createUser())
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+    const rootText = node.expression.text;
+    
+    // Skip known open connectors or require
+    if (rootText === 'require' || HTTP_CLIENT_IDENTIFIERS.has(rootText) || DB_CLIENT_IDENTIFIERS.has(rootText)) {
+      return null;
+    }
+
+    // Check if it matches a local import
+    let matchingImport: ts.ImportDeclaration | null = null;
+    for (const statement of sourceFile.statements) {
+      if (ts.isImportDeclaration(statement)) {
+        const importClause = statement.importClause;
+        if (importClause) {
+          if (importClause.name && importClause.name.text === rootText) {
+            matchingImport = statement;
+            break;
+          }
+          if (importClause.namedBindings) {
+            if (ts.isNamedImports(importClause.namedBindings)) {
+              if (importClause.namedBindings.elements.some(e => e.name.text === rootText)) {
+                matchingImport = statement;
+                break;
+              }
+            } else if (ts.isNamespaceImport(importClause.namedBindings)) {
+              if (importClause.namedBindings.name.text === rootText) {
+                matchingImport = statement;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const callEvidence = { ...getEvidence(node), evidenceRole: 'syntax-call' as const };
+    const evidences: EvidenceRecord[] = [callEvidence];
+
+    if (matchingImport && ts.isStringLiteral(matchingImport.moduleSpecifier)) {
+      const importLiteral = matchingImport.moduleSpecifier.text;
+      const importStart = matchingImport.getStart(sourceFile);
+      const { line: importLine } = sourceFile.getLineAndCharacterOfPosition(importStart);
+      
+      evidences.push({
+        filePath: callEvidence.filePath,
+        lineNumber: importLine + 1,
+        snippet: matchingImport.getText(sourceFile).slice(0, 80).replace(/\s+/g, ' ').trim(),
+        evidenceRole: 'import-match'
+      });
+
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      if (resolvedPath) {
+        const targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+        const absoluteTargetPath = path.resolve(repoRoot, resolvedPath);
+        
+        // Verify export in target module
+        let exportFound = false;
+        let targetEvidence: EvidenceRecord | null = null;
+        
+        if (fs.existsSync(absoluteTargetPath)) {
+          try {
+            const targetSourceText = fs.readFileSync(absoluteTargetPath, 'utf8');
+            const targetSourceFile = ts.createSourceFile(absoluteTargetPath, targetSourceText, ts.ScriptTarget.Latest, true);
+            
+            const visitTarget = (targetNode: ts.Node) => {
+              if (exportFound) return;
+              
+              if (
+                (ts.isFunctionDeclaration(targetNode) || 
+                 ts.isVariableDeclaration(targetNode) ||
+                 ts.isPropertySignature(targetNode) ||
+                 ts.isPropertyDeclaration(targetNode) ||
+                 ts.isPropertyAssignment(targetNode)) &&
+                targetNode.name &&
+                ts.isIdentifier(targetNode.name) &&
+                targetNode.name.text === rootText
+              ) {
+                 exportFound = true;
+                 const start = targetNode.getStart(targetSourceFile);
+                 const { line } = targetSourceFile.getLineAndCharacterOfPosition(start);
+                 targetEvidence = {
+                   filePath: resolvedPath,
+                   lineNumber: line + 1,
+                   snippet: targetNode.getText(targetSourceFile).slice(0, 80).replace(/\s+/g, ' ').trim(),
+                   evidenceRole: 'target-signature'
+                 };
+              }
+              ts.forEachChild(targetNode, visitTarget);
+            }
+            visitTarget(targetSourceFile);
+          } catch (e) {
+            // Ignore parse errors on target file
+          }
+        }
+
+        if (exportFound && targetEvidence) {
+          evidences.push(targetEvidence);
+          return {
+            id: nextId(),
+            name: `Call: ${rootText}()`,
+            type: 'RELATIONSHIP',
+            entityType: 'CALL',
+            sourceId,
+            targetId,
+            status: 'INFERRED',
+            confidence: 'HIGH',
+            evidence: evidences,
+          };
+        } else {
+          return {
+            id: nextId(),
+            name: `Call: ${rootText}()`,
+            type: 'RELATIONSHIP',
+            entityType: 'CALL',
+            sourceId,
+            targetId,
+            status: 'INFERRED',
+            confidence: 'MEDIUM',
+            evidence: evidences,
+          };
+        }
+      } else {
+        return {
+          id: nextId(),
+          name: `Call: ${rootText}()`,
+          type: 'RELATIONSHIP',
+          entityType: 'CALL',
+          sourceId,
+          status: 'INFERRED',
+          confidence: 'MEDIUM',
+          evidence: evidences,
+        };
+      }
+    }
+
+    return {
+      id: nextId(),
+      name: `Call: ${rootText}()`,
+      type: 'RELATIONSHIP',
+      entityType: 'CALL',
+      sourceId,
+      status: 'INFERRED',
+      confidence: 'LOW',
+      evidence: evidences,
+    };
+  }
+
   return null;
 }

@@ -35,14 +35,14 @@ export function extractExpressRoute(
     // Avoid false positives like app.get('env') or req.get('Range') which have only 1 arg and are getters
     if (EXPRESS_ROUTE_METHODS.has(methodName) && node.arguments.length >= 1) {
       const firstArg = node.arguments[0];
-      if (ts.isStringLiteral(firstArg)) {
+      if (ts.isStringLiteral(firstArg) || ts.isRegularExpressionLiteral(firstArg)) {
         const pathText = firstArg.text;
         // Getter calls like req.get('Range') or app.get('env') have 1 arg and non-path strings
         if (methodName === 'get' && node.arguments.length === 1 && !pathText.startsWith('/')) {
           return null;
         }
-        // Only consider it a route if there are at least 2 arguments or it starts with '/'
-        if (node.arguments.length >= 2 || pathText.startsWith('/')) {
+        // Only consider it a route if there are at least 2 arguments or it starts with '/' (or is a regex)
+        if (node.arguments.length >= 2 || pathText.startsWith('/') || ts.isRegularExpressionLiteral(firstArg)) {
           return {
             id: nextId(),
             name: `Express Route: ${methodName.toUpperCase()} ${pathText}`,
@@ -81,9 +81,9 @@ export function extractExpressRouteMiddleware(
     
     if (EXPRESS_ROUTE_METHODS.has(methodName) && node.arguments.length >= 3) {
       const firstArg = node.arguments[0];
-      if (ts.isStringLiteral(firstArg)) {
+      if (ts.isStringLiteral(firstArg) || ts.isRegularExpressionLiteral(firstArg)) {
         const pathText = firstArg.text;
-        if (methodName === 'get' && !pathText.startsWith('/')) {
+        if (methodName === 'get' && !pathText.startsWith('/') && !ts.isRegularExpressionLiteral(firstArg)) {
            return null;
         }
 
@@ -139,7 +139,7 @@ function parseExpressUseTarget(node: ts.CallExpression, sourceFile: ts.SourceFil
   let pathPrefix = 'Root';
   let targetNode = firstArg;
   
-  if (ts.isStringLiteral(firstArg) && node.arguments.length >= 2) {
+  if ((ts.isStringLiteral(firstArg) || ts.isRegularExpressionLiteral(firstArg)) && node.arguments.length >= 2) {
     pathPrefix = firstArg.text;
     targetNode = node.arguments[1];
   }
@@ -369,21 +369,41 @@ export function extractExpressResponseConnector(
         evidence: getEvidence(node),
       };
     } else if (methodName === 'render' && node.arguments.length >= 1) {
-      return {
-        id: nextId(),
-        name: `Express View Render`,
-        type: 'OPEN_CONNECTOR',
-        entityType: 'VIEW_RENDER',
-        evidence: getEvidence(node),
-      };
+      let isExpressRes = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        if (['res', 'app'].includes(rootName)) {
+          isExpressRes = true;
+        }
+      }
+
+      if (isExpressRes) {
+        return {
+          id: nextId(),
+          name: `Express View Render`,
+          type: 'OPEN_CONNECTOR',
+          entityType: 'VIEW_RENDER',
+          evidence: getEvidence(node),
+        };
+      }
     } else if (methodName === 'redirect' && node.arguments.length >= 1) {
-      return {
-        id: nextId(),
-        name: `Express Redirect`,
-        type: 'OPEN_CONNECTOR',
-        entityType: 'REDIRECT',
-        evidence: getEvidence(node),
-      };
+      let isExpressRes = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        if (['res'].includes(rootName)) {
+          isExpressRes = true;
+        }
+      }
+
+      if (isExpressRes) {
+        return {
+          id: nextId(),
+          name: `Express Redirect`,
+          type: 'OPEN_CONNECTOR',
+          entityType: 'REDIRECT',
+          evidence: getEvidence(node),
+        };
+      }
     } else if (methodName === 'send' || methodName === 'json' || methodName === 'jsonp' || methodName === 'sendStatus') {
       let isExpressRes = false;
       if (ts.isIdentifier(node.expression.expression)) {

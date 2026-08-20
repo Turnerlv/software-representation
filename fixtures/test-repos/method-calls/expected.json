@@ -1,0 +1,45 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/method-calls/userController.ts",
+      "entityType": "FILE"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/method-calls/userService.ts",
+      "entityType": "FILE"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Exported Function: handleRequest",
+      "entityType": "EXPORTED_FUNCTION"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Import: ./userService",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Import: ./otherService",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Call: userService.createUser()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: otherService.someMethod()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: globalService.unknownMethod()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: console.log()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": []
+}

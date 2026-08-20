@@ -26,6 +26,14 @@ app.get('/protected', requireAuth, (req, res) => {
   res.send('Secret data');
 });
 
+app.get(/^\/user\/[0-9]+$/, (req, res) => {
+  res.send('Regex route');
+});
+
+app.use(/^\/api.*/, function(req, res, next) {
+  next();
+});
+
 app.post('/login', (req, res) => {
   res.format({
     'application/json': () => res.json({ token: 'abc123' }),
