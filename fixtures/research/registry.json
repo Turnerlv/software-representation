@@ -900,6 +900,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "relationship.function-call"
+        },
+        {
+          "session_id": "2026-08-20-082510-nodebb",
+          "branch": "fix/relationship.function-call-2026-08-20-082510",
+          "date": "2026-08-20T00:25:10.136Z",
+          "extractor_version": "0.2.9",
+          "report_path": "fixtures/research/sessions/v0.2.9-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 23427,
+              "OPEN_CONNECTOR": 281
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "fix",
+          "target": "relationship.function-call"
         }
       ]
     }
