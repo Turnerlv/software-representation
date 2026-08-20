@@ -992,15 +992,15 @@
               "OPEN_CONNECTOR": 281
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 2052,
+              "CONTRACT": 896,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
             }
           },
           "gaps_logged": 0,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS",
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
           "type": "fix",
           "target": "open-connector.plugin-hook-fire"
         }
