@@ -874,6 +874,32 @@
           "gaps_resolved": 0,
           "status": "COMPLETE",
           "type": "inventory"
+        },
+        {
+          "session_id": "2026-08-20-082323-nodebb",
+          "branch": "research/compare/nodebb-relationship.function-call-2026-08-20-082323",
+          "date": "2026-08-20T00:23:23.561Z",
+          "extractor_version": "0.2.9",
+          "report_path": "fixtures/research/sessions/v0.2.9-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 23427,
+              "OPEN_CONNECTOR": 281
+            },
+            "after": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 895,
+              "RELATIONSHIP": 23427,
+              "OPEN_CONNECTOR": 281
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "comparison",
+          "target": "relationship.function-call"
         }
       ]
     }
