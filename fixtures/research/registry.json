@@ -1003,6 +1003,31 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "open-connector.plugin-hook-fire"
+        },
+        {
+          "session_id": "2026-08-21-182832-nodebb",
+          "branch": "research/inventory/nodebb-2026-08-21-182832",
+          "date": "2026-08-21T10:28:32.293Z",
+          "extractor_version": "0.2.11",
+          "report_path": "fixtures/research/sessions/v0.2.11-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 896,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            },
+            "after": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 896,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
         }
       ]
     }
