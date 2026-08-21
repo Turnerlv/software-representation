@@ -916,15 +916,15 @@
               "OPEN_CONNECTOR": 24
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 211,
+              "OPEN_CONNECTOR": 24
             }
           },
           "gaps_logged": 0,
           "gaps_resolved": 0,
-          "status": "IN_PROGRESS",
+          "status": "COMPLETE",
           "type": "comparison",
           "target": "src/main.ts"
         }
