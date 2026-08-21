@@ -876,6 +876,31 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "src/app/routes/article/article.controller.ts"
+        },
+        {
+          "session_id": "2026-08-21-204335-realworld",
+          "branch": "research/inventory/realworld-2026-08-21-204335",
+          "date": "2026-08-21T12:43:35.915Z",
+          "extractor_version": "0.2.15",
+          "report_path": "fixtures/research/sessions/v0.2.15-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 211,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 211,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "COMPLETE",
+          "type": "inventory"
         }
       ]
     },
