@@ -34,6 +34,7 @@ Read the output table:
 - **Occurrences > 0, Status = unhandled** → target for comparison session
 - **Occurrences = 0** → repo doesn't exercise this shape (skip for now)
 - **No sweepable patterns** → seed a pattern first: `chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>`
+- **0 unhandled patterns found (100% known coverage)** → The session is NOT over. You must proactively select 1-3 untested architectural files (e.g., a database model, a router, a controller, or middleware) and flag them for an Exploratory Comparison Session to discover brand-new unknown patterns.
 
 ```bash
 # 3. Close and merge the inventory session
@@ -45,7 +46,7 @@ TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
 
 ## Stage 2: Comparison Session (AI-assisted, rubric-driven)
 
-For each unhandled pattern flagged by the inventory:
+For each unhandled pattern flagged by the inventory (or for each file selected for Exploratory Sampling):
 
 ```bash
 # 1. Start comparison session targeting a specific file
