@@ -1054,6 +1054,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "src/controllers/authentication.js"
+        },
+        {
+          "session_id": "2026-08-21-184511-nodebb",
+          "branch": "fix/contract.cjs-module-exports-alias-2026-08-21-184511",
+          "date": "2026-08-21T10:45:11.202Z",
+          "extractor_version": "0.2.11",
+          "report_path": "fixtures/research/sessions/v0.2.11-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 896,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            },
+            "after": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 3633,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "contract.cjs-module-exports-alias"
         }
       ]
     }
