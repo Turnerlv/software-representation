@@ -22,7 +22,8 @@ test('initDatabase defaults to :memory: and creates tables', () => {
 
   const tableNames = tables.map((t) => t.name);
   assert.ok(tableNames.includes('repositories'));
-  assert.ok(tableNames.includes('structural_entities'));
+  assert.ok(tableNames.includes('nodes'));
+  assert.ok(tableNames.includes('edges'));
   assert.ok(tableNames.includes('evidence_records'));
   assert.ok(tableNames.includes('extractor_coverage_ledger'));
   db.close();
@@ -40,7 +41,7 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
   const graph: RepresentationGraph = {
     extractorVersion: '1.0.0',
     analyzedAt: '2026-08-09T10:00:00Z',
-    boundaries: [
+    nodes: [
       {
         id: 'b1',
         name: 'AuthService',
@@ -53,8 +54,6 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
           snippet: 'class AuthService {}',
         },
       },
-    ],
-    contracts: [
       {
         id: 'c1',
         name: 'POST /api/login',
@@ -67,22 +66,6 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
           snippet: "router.post('/login', handler)",
         },
       },
-    ],
-    relationships: [
-      {
-        id: 'r1',
-        name: 'AuthService -> Database',
-        type: 'RELATIONSHIP',
-        entityType: 'IMPORT',
-        scope: 'USER',
-        evidence: {
-          filePath: 'src/auth/service.ts',
-          lineNumber: 8,
-          snippet: 'import { db } from "../db";',
-        },
-      },
-    ],
-    openConnectors: [
       {
         id: 'oc1',
         name: 'StripePaymentGateway',
@@ -92,6 +75,21 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
         evidence: {
           filePath: 'src/payment/stripe.ts',
           lineNumber: 3,
+        },
+      },
+    ],
+    edges: [
+      {
+        id: 'r1',
+        name: 'AuthService -> Database',
+        type: 'RELATIONSHIP',
+        entityType: 'IMPORT',
+        scope: 'USER',
+        sourceId: 'b1',
+        evidence: {
+          filePath: 'src/auth/service.ts',
+          lineNumber: 8,
+          snippet: 'import { db } from "../db";',
         },
       },
     ],
@@ -110,7 +108,7 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
   const updatedGraph: RepresentationGraph = {
     ...graph,
     analyzedAt: '2026-08-09T11:00:00Z',
-    boundaries: [],
+    nodes: [],
   };
 
   saveRepresentationGraph(db, repo, updatedGraph);

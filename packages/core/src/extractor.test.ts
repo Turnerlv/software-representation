@@ -30,15 +30,15 @@ test('analyzeTarget extracts boundaries, contracts, relationships, and open conn
   const sampleDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'sample-app');
   const graph = analyzeTarget(sampleDir);
 
-  assert.ok(graph.boundaries.some((b) => b.name === 'Class: UserService' && b.entityType === 'CLASS'));
-  assert.ok(graph.contracts.some((c) => c.name === 'Interface: User' && c.entityType === 'EXPORTED_TYPE'));
-  assert.ok(graph.contracts.some((c) => c.name === 'Type: UserCredentials' && c.entityType === 'EXPORTED_TYPE'));
-  assert.ok(graph.relationships.some((r) => r.name === 'Import: ./types' && r.entityType === 'IMPORT'));
+  assert.ok(graph.nodes.some((b) => b.name === 'Class: UserService' && b.entityType === 'CLASS'));
+  assert.ok(graph.nodes.some((c) => c.name === 'Interface: User' && c.entityType === 'EXPORTED_TYPE'));
+  assert.ok(graph.nodes.some((c) => c.name === 'Type: UserCredentials' && c.entityType === 'EXPORTED_TYPE'));
+  assert.ok(graph.edges.some((r) => r.name === 'Import: ./types' && r.entityType === 'IMPORT'));
 
   // Open connectors use 'HTTP Call:' prefix for allowlisted HTTP clients
-  assert.ok(graph.openConnectors.some((oc) => oc.name.startsWith('HTTP Call:') && oc.name.includes('fetch') && oc.entityType === 'HTTP_FETCH'));
+  assert.ok(graph.nodes.some((oc) => oc.type === 'OPEN_CONNECTOR' && oc.name.startsWith('HTTP Call:') && oc.name.includes('fetch') && oc.entityType === 'HTTP_FETCH'));
 
-  const classBoundary = graph.boundaries.find(b => b.name === 'Class: UserService');
+  const classBoundary = graph.nodes.find(b => b.name === 'Class: UserService');
   assert.ok(classBoundary);
   const evidence = Array.isArray(classBoundary.evidence) ? classBoundary.evidence[0] : classBoundary.evidence;
   assert.ok(evidence.filePath);
@@ -64,11 +64,13 @@ test('analyzeTarget does NOT emit false-positive OPEN_CONNECTORs for non-allowli
 
   const graph = analyzeTarget(tmpFile);
 
+  const openConnectors = graph.nodes.filter(n => n.type === 'OPEN_CONNECTOR');
+
   assert.strictEqual(
-    graph.openConnectors.length,
+    openConnectors.length,
     0,
-    `Expected 0 open connectors but got ${graph.openConnectors.length}: ` +
-    JSON.stringify(graph.openConnectors.map((oc) => oc.name))
+    `Expected 0 open connectors but got ${openConnectors.length}: ` +
+    JSON.stringify(openConnectors.map((oc) => oc.name))
   );
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
@@ -79,35 +81,35 @@ test('analyzeTarget extracts Express Route Definition as CONTRACT', () => {
   const graph = analyzeTarget(fixtureDir);
 
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Route: GET /' && c.entityType === 'HTTP_ENDPOINT'),
+    graph.nodes.some((c) => c.name === 'Express Route: GET /' && c.entityType === 'HTTP_ENDPOINT'),
     'Expected to extract Express GET / route as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Route: POST /login' && c.entityType === 'HTTP_ENDPOINT'),
+    graph.nodes.some((c) => c.name === 'Express Route: POST /login' && c.entityType === 'HTTP_ENDPOINT'),
     'Expected to extract Express POST /login route as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Route: GET /items' && c.entityType === 'HTTP_ENDPOINT'),
+    graph.nodes.some((c) => c.name === 'Express Route: GET /items' && c.entityType === 'HTTP_ENDPOINT'),
     'Expected to extract Express GET /items route from router as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Param: user' && c.entityType === 'HTTP_ENDPOINT'),
+    graph.nodes.some((c) => c.name === 'Express Param: user' && c.entityType === 'HTTP_ENDPOINT'),
     'Expected to extract Express Param: user as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Express Content Negotiation: application/json, default' && c.entityType === 'HTTP_ENDPOINT'),
+    graph.nodes.some((c) => c.name === 'Express Content Negotiation: application/json, default' && c.entityType === 'HTTP_ENDPOINT'),
     'Expected to extract Express Content Negotiation: application/json, default as CONTRACT'
   );
   assert.ok(
-    !graph.contracts.some((c) => c.name === 'Express Route: GET Range'),
+    !graph.nodes.some((c) => c.name === 'Express Route: GET Range'),
     'Expected NOT to extract req.get("Range") as an Express Route'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Property Getter: ip' && c.entityType === 'PROPERTY_GETTER'),
+    graph.nodes.some((c) => c.name === 'Property Getter: ip' && c.entityType === 'PROPERTY_GETTER'),
     'Expected to extract defineGetter ip as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Prototype Method: View.prototype.lookup' && c.entityType === 'PROTOTYPE_METHOD'),
+    graph.nodes.some((c) => c.name === 'Prototype Method: View.prototype.lookup' && c.entityType === 'PROTOTYPE_METHOD'),
     'Expected to extract View.prototype.lookup as CONTRACT'
   );
 });
@@ -117,27 +119,27 @@ test('analyzeTarget extracts Express Response Connectors', () => {
   const graph = analyzeTarget(fixtureDir);
 
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express File Response: download' && c.entityType === 'FILE_RESPONSE'),
+    graph.nodes.some((c) => c.name === 'Express File Response: download' && c.entityType === 'FILE_RESPONSE'),
     'Expected to extract Express File Response: download as OPEN_CONNECTOR'
   );
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express View Render' && c.entityType === 'VIEW_RENDER'),
+    graph.nodes.some((c) => c.name === 'Express View Render' && c.entityType === 'VIEW_RENDER'),
     'Expected to extract Express View Render as OPEN_CONNECTOR'
   );
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express Redirect' && c.entityType === 'REDIRECT'),
+    graph.nodes.some((c) => c.name === 'Express Redirect' && c.entityType === 'REDIRECT'),
     'Expected to extract Express Redirect as OPEN_CONNECTOR'
   );
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: send' && c.entityType === 'HTTP_RESPONSE'),
+    graph.nodes.some((c) => c.name === 'Express HTTP Response: send' && c.entityType === 'HTTP_RESPONSE'),
     'Expected to extract Express HTTP Response: send as OPEN_CONNECTOR'
   );
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: json' && c.entityType === 'HTTP_RESPONSE'),
+    graph.nodes.some((c) => c.name === 'Express HTTP Response: json' && c.entityType === 'HTTP_RESPONSE'),
     'Expected to extract Express HTTP Response: json as OPEN_CONNECTOR'
   );
   assert.ok(
-    graph.openConnectors.some((c) => c.name === 'Express HTTP Response: sendStatus' && c.entityType === 'HTTP_RESPONSE'),
+    graph.nodes.some((c) => c.name === 'Express HTTP Response: sendStatus' && c.entityType === 'HTTP_RESPONSE'),
     'Expected to extract Express HTTP Response: sendStatus as OPEN_CONNECTOR'
   );
 });
@@ -147,15 +149,15 @@ test('analyzeTarget extracts Express Router Mount as RELATIONSHIP', () => {
   const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Express Mount: /api -> apiRouter' && r.entityType === 'MOUNTS'),
+    graph.edges.some((r) => r.name === 'Express Mount: /api -> apiRouter' && r.entityType === 'MOUNTS'),
     'Expected to extract Express /api mount as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Express Mount: /users -> usersRouter' && r.entityType === 'MOUNTS'),
+    graph.edges.some((r) => r.name === 'Express Mount: /users -> usersRouter' && r.entityType === 'MOUNTS'),
     'Expected to extract Express /users mount as RELATIONSHIP'
   );
     assert.ok(
-      graph.relationships.some((r) => r.name === 'Express Mount: Root -> express.json()' && r.entityType === 'INTERCEPTS'),
+      graph.edges.some((r) => r.name === 'Express Mount: Root -> express.json()' && r.entityType === 'INTERCEPTS'),
       'Expected to extract Express Root -> express.json() mount as INTERCEPTS'
     );
 });
@@ -165,15 +167,15 @@ test('analyzeTarget extracts CommonJS require as RELATIONSHIP', () => {
   const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Require: express' && r.entityType === 'REQUIRE'),
+    graph.edges.some((r) => r.name === 'Require: express' && r.entityType === 'REQUIRE'),
     'Expected to extract require("express") as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Require: ./routes/api' && r.entityType === 'REQUIRE'),
+    graph.edges.some((r) => r.name === 'Require: ./routes/api' && r.entityType === 'REQUIRE'),
     'Expected to extract require("./routes/api") as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Require: ./routes/users' && r.entityType === 'REQUIRE'),
+    graph.edges.some((r) => r.name === 'Require: ./routes/users' && r.entityType === 'REQUIRE'),
     'Expected to extract require("./routes/users") as RELATIONSHIP'
   );
 });
@@ -183,33 +185,33 @@ test('analyzeTarget extracts CommonJS Module Export as BOUNDARY', () => {
   const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.boundaries.some((b) => b.name === 'CJS Export: default' && b.entityType === 'CJS_EXPORT'),
+    graph.nodes.some((b) => b.name === 'CJS Export: default' && b.entityType === 'CJS_EXPORT'),
     'Expected to extract module.exports as BOUNDARY'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'CJS Export: init' && c.entityType === 'EXPORTED_FUNCTION'),
+    graph.nodes.some((c) => c.name === 'CJS Export: init' && c.entityType === 'EXPORTED_FUNCTION'),
     'Expected to extract app.init as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Dynamic Export: app[method]' && c.entityType === 'CJS_METHOD'),
+    graph.nodes.some((c) => c.name === 'Dynamic Export: app[method]' && c.entityType === 'CJS_METHOD'),
     'Expected to extract dynamic method assignment as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => {
+    graph.nodes.some((c) => {
       const ev = Array.isArray(c.evidence) ? c.evidence[0] : c.evidence;
       return c.name === 'CJS Export: header' && c.entityType === 'EXPORTED_FUNCTION' && ev.snippet?.includes('req.header');
     }),
     'Expected to extract req.header assignment as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => {
+    graph.nodes.some((c) => {
       const ev = Array.isArray(c.evidence) ? c.evidence[0] : c.evidence;
       return c.name === 'CJS Export: status' && c.entityType === 'EXPORTED_FUNCTION' && ev.snippet?.includes('res.status');
     }),
     'Expected to extract res.status assignment as CONTRACT'
   );
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Property Getter: protocol' && c.entityType === 'PROPERTY_GETTER'),
+    graph.nodes.some((c) => c.name === 'Property Getter: protocol' && c.entityType === 'PROPERTY_GETTER'),
     'Expected to extract Object.defineProperty protocol getter as CONTRACT'
   );
 });
@@ -219,11 +221,11 @@ test('analyzeTarget extracts EventEmitter patterns', () => {
   const graph = analyzeTarget(fixtureDir);
 
   assert.ok(
-    graph.contracts.some((c) => c.name === 'Event Listener: event' && c.entityType === 'EVENT_LISTENER'),
+    graph.nodes.some((c) => c.name === 'Event Listener: event' && c.entityType === 'EVENT_LISTENER'),
     'Expected to extract EventEmitter.on as CONTRACT'
   );
   assert.ok(
-    graph.openConnectors.some((r) => r.name === 'Event Emit: event' && r.entityType === 'EVENT_EMIT'),
+    graph.nodes.some((r) => r.name === 'Event Emit: event' && r.entityType === 'EVENT_EMIT'),
     'Expected to extract EventEmitter.emit as OPEN_CONNECTOR'
   );
 });
@@ -233,11 +235,11 @@ test('analyzeTarget extracts Object.create as RELATIONSHIP', () => {
   const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Inherits: http.IncomingMessage.prototype' && r.entityType === 'INHERITS'),
+    graph.edges.some((r) => r.name === 'Inherits: http.IncomingMessage.prototype' && r.entityType === 'INHERITS'),
     'Expected to extract Object.create as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Mixes: EventEmitter' && r.entityType === 'MIXES'),
+    graph.edges.some((r) => r.name === 'Mixes: EventEmitter' && r.entityType === 'MIXES'),
     'Expected to extract prototype mixin as RELATIONSHIP'
   );
 });
@@ -247,21 +249,21 @@ test('analyzeTarget extracts method calls as INFERRED RELATIONSHIP with confiden
   const graph = analyzeTarget(fixtureDir);
 
   // HIGH confidence
-  const createUserRel = graph.relationships.find((r) => r.name === 'Call: userService.createUser()');
+  const createUserRel = graph.edges.find((r) => r.name === 'Call: userService.createUser()');
   assert.ok(createUserRel, 'Expected to extract userService.createUser()');
   assert.strictEqual(createUserRel.status, 'INFERRED');
   assert.strictEqual(createUserRel.confidence, 'HIGH');
   assert.ok(Array.isArray(createUserRel.evidence) && createUserRel.evidence.length === 3);
 
   // MEDIUM confidence
-  const someMethodRel = graph.relationships.find((r) => r.name === 'Call: otherService.someMethod()');
+  const someMethodRel = graph.edges.find((r) => r.name === 'Call: otherService.someMethod()');
   assert.ok(someMethodRel, 'Expected to extract otherService.someMethod()');
   assert.strictEqual(someMethodRel.status, 'INFERRED');
   assert.strictEqual(someMethodRel.confidence, 'MEDIUM');
   assert.ok(Array.isArray(someMethodRel.evidence) && someMethodRel.evidence.length === 2);
 
   // LOW confidence
-  const unknownMethodRel = graph.relationships.find((r) => r.name === 'Call: globalService.unknownMethod()');
+  const unknownMethodRel = graph.edges.find((r) => r.name === 'Call: globalService.unknownMethod()');
   assert.ok(unknownMethodRel, 'Expected to extract globalService.unknownMethod()');
   assert.strictEqual(unknownMethodRel.status, 'INFERRED');
   assert.strictEqual(unknownMethodRel.confidence, 'LOW');
@@ -273,19 +275,19 @@ test('analyzeTarget extracts dynamic require and import as RELATIONSHIP', () => 
   const graph = analyzeTarget(fixtureFile);
 
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Dynamic Require: mod' && r.entityType === 'REQUIRE'),
+    graph.edges.some((r) => r.name === 'Dynamic Require: mod' && r.entityType === 'REQUIRE'),
     'Expected to extract require(mod) as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Dynamic Require: engine' && r.entityType === 'REQUIRE'),
+    graph.edges.some((r) => r.name === 'Dynamic Require: engine' && r.entityType === 'REQUIRE'),
     'Expected to extract require(engine) as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name === 'Import: path' && r.entityType === 'IMPORT'),
+    graph.edges.some((r) => r.name === 'Import: path' && r.entityType === 'IMPORT'),
     'Expected to extract import("path") as RELATIONSHIP'
   );
   assert.ok(
-    graph.relationships.some((r) => r.name.includes('Dynamic Import:') && r.entityType === 'IMPORT'),
+    graph.edges.some((r) => r.name.includes('Dynamic Import:') && r.entityType === 'IMPORT'),
     'Expected to extract dynamic import() as RELATIONSHIP'
   );
 });

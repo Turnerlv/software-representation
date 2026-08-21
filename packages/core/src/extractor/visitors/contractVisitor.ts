@@ -4,7 +4,7 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRoute, extractExpressRouteParameter, extractExpressContentNegotiation, extractExpressDynamicMethods } from '../adapters/expressAdapter.js';
-import { extractEventEmitterContract } from './eventEmitterVisitor.js';
+import { extractEventEmitterContract, extractSocketOnAnyContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
 
@@ -19,6 +19,7 @@ import { extractDefinePropertyContract } from './definePropertyVisitor.js';
  * - Express Route Parameters   (delegated to `extractExpressRouteParameter`)
  * - Express Content Format     (delegated to `extractExpressContentNegotiation`)
  * - EventEmitter Listeners     (delegated to `extractEventEmitterContract`)
+ * - Socket.IO Wildcard Listener (delegated to `extractSocketOnAnyContract` — `.onAny(callback)` pattern)
  * - Object.defineProperty      (delegated to `extractDefinePropertyContract`)
  *
  * @param node         The AST node to inspect.
@@ -77,6 +78,9 @@ export function visitContract(
 
   const eventEmitterContract = extractEventEmitterContract(node, getEvidence, nextId);
   if (eventEmitterContract) return eventEmitterContract;
+
+  const socketOnAnyContract = extractSocketOnAnyContract(node, getEvidence, nextId);
+  if (socketOnAnyContract) return socketOnAnyContract;
 
   const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
   if (cjsExport && cjsExport.type === 'CONTRACT') return cjsExport;

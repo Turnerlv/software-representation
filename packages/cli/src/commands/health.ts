@@ -1,7 +1,7 @@
 import { existsSync, statSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { Command } from "commander";
-import { analyzeTarget, StructuralEntity } from "@chomp/core";
+import { analyzeTarget, StructuralNode, StructuralEdge } from "@chomp/core";
 
 export function registerHealthCommand(program: Command) {
   program
@@ -20,17 +20,15 @@ export function registerHealthCommand(program: Command) {
       console.log(`Analyzing repository: ${targetPath}...`);
       const graph = analyzeTarget(targetPath);
 
-      const allEntities: StructuralEntity[] = [
-        ...graph.boundaries,
-        ...graph.contracts,
-        ...graph.relationships,
-        ...graph.openConnectors,
+      const allEntities: Array<StructuralNode | StructuralEdge> = [
+        ...graph.nodes,
+        ...graph.edges,
       ];
 
       // 1. Connectivity Rate
       // relationships with targetId / (REQUIRE + IMPORT + MOUNTS + INHERITS + EMITS)
       const connectivityTargetTypes = ['REQUIRE', 'IMPORT', 'MOUNTS', 'INHERITS', 'EMITS'];
-      const relationshipsForConnectivity = graph.relationships.filter(r => 
+      const relationshipsForConnectivity = graph.edges.filter(r => 
         r.entityType && connectivityTargetTypes.includes(r.entityType)
       );
       const connectedCount = relationshipsForConnectivity.filter(r => r.targetId).length;
@@ -45,9 +43,9 @@ export function registerHealthCommand(program: Command) {
         : 100;
 
       // 3. Parent Coverage
-      // (contracts + open_connectors) with sourceId / total
-      const children = [...graph.contracts, ...graph.openConnectors];
-      const childrenWithParent = children.filter(c => c.sourceId).length;
+      // (contracts + open_connectors) with parentBoundaryId / total
+      const children = graph.nodes.filter(n => n.type === 'CONTRACT' || n.type === 'OPEN_CONNECTOR');
+      const childrenWithParent = children.filter(c => c.parentBoundaryId).length;
       const parentCoverage = children.length > 0 
         ? (childrenWithParent / children.length) * 100 
         : 100;
@@ -90,14 +88,14 @@ export function registerHealthCommand(program: Command) {
       console.table(metrics);
 
       console.log("\n--- Informational Counts ---\n");
-      const callCount = graph.relationships.filter(r => r.entityType === 'CALL').length;
+      const callCount = graph.edges.filter(r => r.entityType === 'CALL').length;
       
       const counts = [
         { Entity: "CALL Relationships (Deferred)", Count: callCount },
-        { Entity: "BOUNDARIES", Count: graph.boundaries.length },
-        { Entity: "CONTRACTS", Count: graph.contracts.length },
-        { Entity: "RELATIONSHIPS", Count: graph.relationships.length },
-        { Entity: "OPEN CONNECTORS", Count: graph.openConnectors.length },
+        { Entity: "BOUNDARIES", Count: graph.nodes.filter(n => n.type === 'BOUNDARY').length },
+        { Entity: "CONTRACTS", Count: graph.nodes.filter(n => n.type === 'CONTRACT').length },
+        { Entity: "RELATIONSHIPS", Count: graph.edges.length },
+        { Entity: "OPEN CONNECTORS", Count: graph.nodes.filter(n => n.type === 'OPEN_CONNECTOR').length },
         { Entity: "TOTAL ENTITIES", Count: allEntities.length }
       ];
 

@@ -6,7 +6,8 @@ import {
   EntityType,
   EvidenceRecord,
   RepresentationGraph,
-  StructuralEntity,
+  StructuralNode,
+  StructuralEdge,
 } from '../types/index.js';
 
 /** Minimal repo metadata required to persist a RepresentationGraph. */
@@ -52,13 +53,17 @@ export function saveRepresentationGraph(
         commit_sha = excluded.commit_sha
     `).run(repo.id, repo.name, repo.path, graph.analyzedAt, repo.extractorVersion ?? null, repo.commitSha ?? null);
 
-    db.prepare('DELETE FROM structural_entities WHERE repository_id = ?').run(
-      repo.id
-    );
+    db.prepare('DELETE FROM nodes WHERE repository_id = ?').run(repo.id);
+    db.prepare('DELETE FROM edges WHERE repository_id = ?').run(repo.id);
 
-    const insertEntity = db.prepare(`
-      INSERT OR IGNORE INTO structural_entities (id, repository_id, name, type, entity_type, scope, source_id, target_id, parent_boundary_id, status, confidence, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    const insertNode = db.prepare(`
+      INSERT OR IGNORE INTO nodes (id, repository_id, name, type, entity_type, scope, parent_boundary_id, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    const insertEdge = db.prepare(`
+      INSERT OR IGNORE INTO edges (id, repository_id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
@@ -66,27 +71,43 @@ export function saveRepresentationGraph(
       VALUES (?, ?, ?, ?, ?, ?)
     `);
 
-    const allEntities: StructuralEntity[] = [
-      ...graph.boundaries,
-      ...graph.contracts,
-      ...graph.relationships,
-      ...graph.openConnectors,
-    ];
-
-    for (const entity of allEntities) {
-      const globalEntityId = `${repo.id}:${entity.id}`;
-      const metadataStr = entity.metadata ? JSON.stringify(entity.metadata) : null;
-      insertEntity.run(globalEntityId, repo.id, entity.name, entity.type, entity.entityType, entity.scope ?? 'USER', entity.sourceId ?? null, entity.targetId ?? null, entity.parentBoundaryId ?? null, entity.status ?? null, entity.confidence ?? null, metadataStr);
+    for (const node of graph.nodes) {
+      const globalNodeId = `${repo.id}:${node.id}`;
+      const metadataStr = node.metadata ? JSON.stringify(node.metadata) : null;
+      insertNode.run(globalNodeId, repo.id, node.name, node.type, node.entityType, node.scope ?? 'USER', node.parentBoundaryId ?? null, metadataStr);
       
-      const evidences = Array.isArray(entity.evidence) ? entity.evidence : [entity.evidence];
+      const evidences = Array.isArray(node.evidence) ? node.evidence : [node.evidence];
       for (const ev of evidences) {
         if (ev) {
-          const evidenceHashInput = `${globalEntityId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
+          const evidenceHashInput = `${globalNodeId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
           const evidenceHash = createHash('sha256').update(evidenceHashInput).digest('hex').slice(0, 16);
           const evidenceId = `ev_${evidenceHash}`;
           insertEvidence.run(
             evidenceId,
-            globalEntityId,
+            globalNodeId,
+            ev.filePath,
+            ev.lineNumber ?? null,
+            ev.snippet ?? null,
+            ev.evidenceRole ?? null
+          );
+        }
+      }
+    }
+
+    for (const edge of graph.edges) {
+      const globalEdgeId = `${repo.id}:${edge.id}`;
+      const metadataStr = edge.metadata ? JSON.stringify(edge.metadata) : null;
+      insertEdge.run(globalEdgeId, repo.id, edge.name, edge.type, edge.entityType, edge.scope ?? 'USER', edge.sourceId, edge.targetId ?? null, edge.status ?? null, edge.confidence ?? null, metadataStr);
+      
+      const evidences = Array.isArray(edge.evidence) ? edge.evidence : [edge.evidence];
+      for (const ev of evidences) {
+        if (ev) {
+          const evidenceHashInput = `${globalEdgeId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
+          const evidenceHash = createHash('sha256').update(evidenceHashInput).digest('hex').slice(0, 16);
+          const evidenceId = `ev_${evidenceHash}`;
+          insertEvidence.run(
+            evidenceId,
+            globalEdgeId,
             ev.filePath,
             ev.lineNumber ?? null,
             ev.snippet ?? null,
@@ -125,22 +146,27 @@ export function getRepresentationGraph(
   }
 
   const scopesStr = options.scopes?.length ? options.scopes.map(s => `'${s}'`).join(',') : "'USER'";
-  const entityRows = db
+  const nodeRows = db
     .prepare(
-      `SELECT id, name, type, entity_type, scope, source_id, target_id, parent_boundary_id, status, confidence, metadata FROM structural_entities WHERE repository_id = ? AND scope IN (${scopesStr})`
+      `SELECT id, name, type, entity_type, scope, parent_boundary_id, metadata FROM nodes WHERE repository_id = ? AND scope IN (${scopesStr})`
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string | null; target_id: string | null; parent_boundary_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; parent_boundary_id: string | null; metadata: string | null }>;
+
+  const edgeRows = db
+    .prepare(
+      `SELECT id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata FROM edges WHERE repository_id = ? AND scope IN (${scopesStr})`
+    )
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
 
   const evidenceRows = db
     .prepare(
       `
       SELECT er.entity_id, er.file_path, er.line_number, er.snippet, er.evidence_role
       FROM evidence_records er
-      JOIN structural_entities se ON er.entity_id = se.id
-      WHERE se.repository_id = ?
+      WHERE er.entity_id LIKE ?
     `
     )
-    .all(repoId) as Array<{
+    .all(`${repoId}:%`) as Array<{
     entity_id: string;
     file_path: string;
     line_number: number | null;
@@ -173,62 +199,65 @@ export function getRepresentationGraph(
     evidenceMap.get(cleanEntityId)!.push(record);
   }
 
-  const boundaries: StructuralEntity[] = [];
-  const contracts: StructuralEntity[] = [];
-  const relationships: StructuralEntity[] = [];
-  const openConnectors: StructuralEntity[] = [];
+  const nodes: StructuralNode[] = [];
+  const edges: StructuralEdge[] = [];
 
-  for (const row of entityRows) {
+  for (const row of nodeRows) {
     const cleanId = row.id.startsWith(prefix)
       ? row.id.slice(prefix.length)
       : row.id;
     const evidenceArray = evidenceMap.get(cleanId) ?? [];
     const evidence = evidenceArray.length === 1 ? evidenceArray[0] : (evidenceArray.length > 1 ? evidenceArray : { filePath: '' });
-    const entity: StructuralEntity = {
+    const node: StructuralNode = {
       id: cleanId,
       name: row.name,
-      type: row.type,
+      type: row.type as 'BOUNDARY' | 'CONTRACT' | 'OPEN_CONNECTOR',
       entityType: row.entity_type,
       scope: row.scope,
       evidence,
     };
     
-    if (row.source_id) entity.sourceId = row.source_id;
-    if (row.target_id) entity.targetId = row.target_id;
-    if (row.parent_boundary_id) entity.parentBoundaryId = row.parent_boundary_id;
-    if (row.status) entity.status = row.status;
-    if (row.confidence) entity.confidence = row.confidence;
+    if (row.parent_boundary_id) node.parentBoundaryId = row.parent_boundary_id;
     if (row.metadata) {
       try {
-        entity.metadata = JSON.parse(row.metadata);
-      } catch (e) {
-        // Fallback for corrupted JSON, though shouldn't happen
-      }
+        node.metadata = JSON.parse(row.metadata);
+      } catch (e) {}
     }
+    nodes.push(node);
+  }
 
-    switch (row.type) {
-      case 'BOUNDARY':
-        boundaries.push(entity);
-        break;
-      case 'CONTRACT':
-        contracts.push(entity);
-        break;
-      case 'RELATIONSHIP':
-        relationships.push(entity);
-        break;
-      case 'OPEN_CONNECTOR':
-        openConnectors.push(entity);
-        break;
+  for (const row of edgeRows) {
+    const cleanId = row.id.startsWith(prefix)
+      ? row.id.slice(prefix.length)
+      : row.id;
+    const evidenceArray = evidenceMap.get(cleanId) ?? [];
+    const evidence = evidenceArray.length === 1 ? evidenceArray[0] : (evidenceArray.length > 1 ? evidenceArray : { filePath: '' });
+    const edge: StructuralEdge = {
+      id: cleanId,
+      name: row.name,
+      type: row.type as 'RELATIONSHIP',
+      entityType: row.entity_type,
+      scope: row.scope,
+      evidence,
+      sourceId: row.source_id,
+    };
+    
+    if (row.target_id) edge.targetId = row.target_id;
+    if (row.status) edge.status = row.status as any;
+    if (row.confidence) edge.confidence = row.confidence as any;
+    if (row.metadata) {
+      try {
+        edge.metadata = JSON.parse(row.metadata);
+      } catch (e) {}
     }
+    edges.push(edge);
   }
 
   const result: RepresentationGraph = {
     extractorVersion: repoRow.extractor_version ?? '1.0.0',
     analyzedAt: repoRow.analyzed_at,
-    boundaries,
-    contracts,
-    relationships,
-    openConnectors,
+    nodes,
+    edges,
   };
 
   if (repoRow.commit_sha) {

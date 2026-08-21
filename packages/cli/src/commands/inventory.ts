@@ -44,6 +44,7 @@ function runRipgrepCount(pattern: string, targetDir: string): number {
     // rg not found — fall back to grep
     const grep = spawnSync("grep", [
       "-r",
+      "-E",
       "--include=*.ts",
       "--include=*.js",
       "-c",

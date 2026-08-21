@@ -65,10 +65,10 @@ function runAnalyzeProgrammatically(repoName: string, workspaceRoot: string): En
   db.close();
 
   return {
-    BOUNDARY: savedGraph.boundaries.length,
-    CONTRACT: savedGraph.contracts.length,
-    RELATIONSHIP: savedGraph.relationships.length,
-    OPEN_CONNECTOR: savedGraph.openConnectors.length,
+    BOUNDARY: savedGraph.nodes.filter((n: any) => n.type === 'BOUNDARY').length,
+    CONTRACT: savedGraph.nodes.filter((n: any) => n.type === 'CONTRACT').length,
+    RELATIONSHIP: savedGraph.edges.length,
+    OPEN_CONNECTOR: savedGraph.nodes.filter((n: any) => n.type === 'OPEN_CONNECTOR').length,
   };
 }
 
@@ -84,10 +84,10 @@ function getDbEntityCounts(repoName: string, workspaceRoot: string): EntityCount
   }
 
   return {
-    BOUNDARY: graph.boundaries.length,
-    CONTRACT: graph.contracts.length,
-    RELATIONSHIP: graph.relationships.length,
-    OPEN_CONNECTOR: graph.openConnectors.length,
+    BOUNDARY: graph.nodes.filter((n: any) => n.type === 'BOUNDARY').length,
+    CONTRACT: graph.nodes.filter((n: any) => n.type === 'CONTRACT').length,
+    RELATIONSHIP: graph.edges.length,
+    OPEN_CONNECTOR: graph.nodes.filter((n: any) => n.type === 'OPEN_CONNECTOR').length,
   };
 }
 

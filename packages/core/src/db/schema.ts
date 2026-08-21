@@ -40,16 +40,28 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       commit_sha TEXT
     );
 
-    CREATE TABLE IF NOT EXISTS structural_entities (
+    CREATE TABLE IF NOT EXISTS nodes (
       id TEXT PRIMARY KEY,
       repository_id TEXT NOT NULL,
       name TEXT NOT NULL,
       type TEXT NOT NULL,
       entity_type TEXT NOT NULL DEFAULT 'UNKNOWN',
       scope TEXT NOT NULL DEFAULT 'USER',
-      source_id TEXT,
-      target_id TEXT,
       parent_boundary_id TEXT,
+      metadata TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS edges (
+      id TEXT PRIMARY KEY,
+      repository_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      type TEXT NOT NULL,
+      entity_type TEXT NOT NULL DEFAULT 'UNKNOWN',
+      scope TEXT NOT NULL DEFAULT 'USER',
+      source_id TEXT NOT NULL,
+      target_id TEXT,
       status TEXT,
       confidence TEXT,
       metadata TEXT,
@@ -64,7 +76,6 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       line_number INTEGER,
       snippet TEXT,
       evidence_role TEXT,
-      FOREIGN KEY (entity_id) REFERENCES structural_entities(id) ON DELETE CASCADE,
       UNIQUE(entity_id, file_path, line_number, evidence_role)
     );
 
@@ -89,14 +100,17 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
     );
   `);
 
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN source_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN target_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN parent_boundary_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN status TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN confidence TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE structural_entities ADD COLUMN metadata TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
+  try { db.exec("ALTER TABLE nodes ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
+  try { db.exec("ALTER TABLE nodes ADD COLUMN parent_boundary_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE nodes ADD COLUMN metadata TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN source_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN target_id TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN status TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN confidence TEXT;"); } catch (e) {}
+  try { db.exec("ALTER TABLE edges ADD COLUMN metadata TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) {}

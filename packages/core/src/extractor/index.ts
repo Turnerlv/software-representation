@@ -8,7 +8,8 @@ import ts from 'typescript';
 import {
   EvidenceRecord,
   RepresentationGraph,
-  StructuralEntity,
+  StructuralNode,
+  StructuralEdge,
 } from '../types/index.js';
 import { visitBoundary } from './visitors/boundaryVisitor.js';
 import { visitContract } from './visitors/contractVisitor.js';
@@ -112,10 +113,8 @@ export function analyzeTarget(
 ): RepresentationGraph {
   const files = collectFiles(targetPath);
 
-  const boundaries: StructuralEntity[] = [];
-  const contracts: StructuralEntity[] = [];
-  const relationships: StructuralEntity[] = [];
-  const openConnectors: StructuralEntity[] = [];
+  const nodes: StructuralNode[] = [];
+  const edges: StructuralEdge[] = [];
   
   const repoRoot = path.resolve(targetPath);
   const isTargetFile = fs.statSync(repoRoot).isFile();
@@ -149,7 +148,7 @@ export function analyzeTarget(
     }
 
     const fileId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
-    boundaries.push({
+    nodes.push({
       id: fileId,
       name: `File: ${relativePath}`,
       type: 'BOUNDARY',
@@ -184,20 +183,18 @@ export function analyzeTarget(
       const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
       for (const boundaryEntity of boundaryEntities) {
         boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
-        if (!boundaryEntity.sourceId) boundaryEntity.sourceId = fileId;
-        // parentBoundaryId explicitly models the lexical containment hierarchy (File → Export/Class)
-        if (!boundaryEntity.parentBoundaryId) boundaryEntity.parentBoundaryId = fileId;
+        boundaryEntity.parentBoundaryId = fileId;
         boundaryEntity.scope = scope;
-        boundaries.push(boundaryEntity);
+        nodes.push(boundaryEntity as StructuralNode);
       }
 
       const contractResult = visitContract(node, getEvidence, () => '');
       const contractEntities = Array.isArray(contractResult) ? contractResult : (contractResult ? [contractResult] : []);
       for (const contractEntity of contractEntities) {
         contractEntity.id = stableEntityId(relativePath, contractEntity.type, contractEntity.name);
-        if (!contractEntity.sourceId) contractEntity.sourceId = fileId;
+        contractEntity.parentBoundaryId = fileId;
         contractEntity.scope = scope;
-        contracts.push(contractEntity);
+        nodes.push(contractEntity as StructuralNode);
       }
 
       const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
@@ -205,16 +202,30 @@ export function analyzeTarget(
       for (const relationshipEntity of relationshipEntities) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
         relationshipEntity.scope = scope;
-        relationships.push(relationshipEntity);
+        if (!(relationshipEntity as any).sourceId) (relationshipEntity as any).sourceId = fileId;
+        edges.push(relationshipEntity as StructuralEdge);
       }
 
       const openConnectorResult = visitOpenConnector(node, sourceFile, getEvidence, () => '');
       const openConnectorEntities = Array.isArray(openConnectorResult) ? openConnectorResult : (openConnectorResult ? [openConnectorResult] : []);
       for (const openConnectorEntity of openConnectorEntities) {
         openConnectorEntity.id = stableEntityId(relativePath, openConnectorEntity.type, openConnectorEntity.name);
-        if (!openConnectorEntity.sourceId) openConnectorEntity.sourceId = fileId;
+        openConnectorEntity.parentBoundaryId = fileId;
         openConnectorEntity.scope = scope;
-        openConnectors.push(openConnectorEntity);
+        nodes.push(openConnectorEntity as StructuralNode);
+
+        edges.push({
+          id: stableEntityId(relativePath, 'RELATIONSHIP', `Call to ${openConnectorEntity.id}`),
+          name: `Call: ${openConnectorEntity.name}`,
+          type: 'RELATIONSHIP',
+          entityType: 'CALL',
+          sourceId: fileId,
+          targetId: openConnectorEntity.id,
+          status: 'DETERMINISTIC',
+          confidence: 'HIGH',
+          evidence: openConnectorEntity.evidence,
+          scope: scope
+        });
       }
 
       ts.forEachChild(node, visit);
@@ -227,9 +238,7 @@ export function analyzeTarget(
     extractorVersion,
     analyzedAt: new Date().toISOString(),
     commitSha,
-    boundaries,
-    contracts,
-    relationships,
-    openConnectors,
+    nodes,
+    edges,
   };
 }

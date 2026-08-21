@@ -580,5 +580,30 @@ export function visitRelationship(
     };
   }
 
+  // Inferred Invocation of a Returned Function (e.g. passport.authenticate(...)() or require('...')())
+  if (ts.isCallExpression(node) && ts.isCallExpression(node.expression)) {
+    const innerCall = node.expression;
+    let innerName = 'Function';
+    if (ts.isIdentifier(innerCall.expression)) {
+      innerName = innerCall.expression.text;
+    } else if (ts.isPropertyAccessExpression(innerCall.expression)) {
+      innerName = innerCall.expression.name.text;
+    }
+
+    const callEvidence = { ...getEvidence(node), evidenceRole: 'syntax-call' as const };
+    const evidences: EvidenceRecord[] = [callEvidence];
+
+    return {
+      id: nextId(),
+      name: `Call: ${innerName}()()`,
+      type: 'RELATIONSHIP',
+      entityType: 'CALL',
+      sourceId,
+      status: 'INFERRED',
+      confidence: 'LOW',
+      evidence: evidences,
+    };
+  }
+
   return null;
 }

@@ -1,7 +1,7 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressResponseConnector, extractExpressAppListen, extractExpressResponseCookie } from '../adapters/expressAdapter.js';
-import { extractEventEmitterEmit } from './eventEmitterVisitor.js';
+import { extractEventEmitterEmit, extractPluginHookFire } from './eventEmitterVisitor.js';
 /**
  * Known HTTP / network client root identifiers.
  * Matched against the root object of a call expression (e.g. `axios` in `axios.get(...)`).
@@ -107,6 +107,11 @@ export function visitOpenConnector(
     return eventEmitterEmit;
   }
 
+  const pluginHookFire = extractPluginHookFire(node, getEvidence, nextId);
+  if (pluginHookFire) {
+    return pluginHookFire;
+  }
+
   const rootId = getRootIdentifier(node.expression);
   if (!rootId) {
     return null;
@@ -114,26 +119,29 @@ export function visitOpenConnector(
 
   if (HTTP_CLIENT_IDENTIFIERS.has(rootId)) {
     const callText = node.expression.getText(sourceFile);
+    const args = node.arguments.map(arg => arg.getText(sourceFile)).join(', ');
     return {
       id: nextId(),
       name: `HTTP Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
       entityType: 'HTTP_FETCH',
       evidence: getEvidence(node),
+      metadata: { payload: args }
     };
   }
 
   if (DB_CLIENT_IDENTIFIERS.has(rootId)) {
     const callText = node.expression.getText(sourceFile);
+    const args = node.arguments.map(arg => arg.getText(sourceFile)).join(', ');
     return {
       id: nextId(),
       name: `DB Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
       entityType: 'DB_QUERY',
       evidence: getEvidence(node),
+      metadata: { payload: args }
     };
   }
 
   return null;
 }
-

@@ -52,6 +52,17 @@ export function extractCommonjsExport(
           entityType: isFunction ? 'PROTOTYPE_METHOD' : 'CJS_EXPORT',
           evidence: getEvidence(node),
         };
+      } else if (ts.isIdentifier(left.expression) && !['this'].includes(left.expression.text)) {
+        const isFunction = ts.isFunctionExpression(node.right) || ts.isArrowFunction(node.right);
+        if (isFunction) {
+          return {
+            id: nextId(),
+            name: `CJS Export Alias: ${left.expression.text}.${left.name.text}`,
+            type: 'CONTRACT',
+            entityType: 'EXPORTED_FUNCTION',
+            evidence: getEvidence(node),
+          };
+        }
       }
     } else if (ts.isIdentifier(left) && left.text === 'exports') {
       isCjsExport = true;
