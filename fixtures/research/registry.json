@@ -1004,6 +1004,32 @@
           "status": "COMPLETE",
           "type": "comparison",
           "target": "src/app/routes/article/article.controller.ts"
+        },
+        {
+          "session_id": "2026-08-21-220353-realworld",
+          "branch": "fix/boundary.es6-export-default-2026-08-21-220353",
+          "date": "2026-08-21T14:03:53.908Z",
+          "extractor_version": "0.2.16",
+          "report_path": "fixtures/research/sessions/v0.2.16-realworld.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 66,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 211,
+              "OPEN_CONNECTOR": 24
+            },
+            "after": {
+              "BOUNDARY": 81,
+              "CONTRACT": 33,
+              "RELATIONSHIP": 211,
+              "OPEN_CONNECTOR": 24
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "boundary.es6-export-default"
         }
       ]
     },
