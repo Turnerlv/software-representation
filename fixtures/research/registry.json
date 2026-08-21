@@ -1,6 +1,39 @@
 {
   "schema_version": "v4",
   "repos": {
+    "chomp": {
+      "url": "local",
+      "framework": "typescript",
+      "status": "active",
+      "sessions": [
+        {
+          "session_id": "2026-08-21-193650-chomp",
+          "branch": "fix/data-model-upgrade-2026-08-21-193650",
+          "date": "2026-08-21T11:36:50.587Z",
+          "extractor_version": "0.2.14",
+          "report_path": "fixtures/research/sessions/v0.2.14-chomp.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2623,
+              "CONTRACT": 4473,
+              "RELATIONSHIP": 32520,
+              "OPEN_CONNECTOR": 717
+            },
+            "after": {
+              "BOUNDARY": 2626,
+              "CONTRACT": 4474,
+              "RELATIONSHIP": 33257,
+              "OPEN_CONNECTOR": 717
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
+          "type": "fix",
+          "target": "data-model-upgrade"
+        }
+      ]
+    },
     "express": {
       "url": "https://github.com/expressjs/express.git",
       "pinned_commit": "a3714473feb3d2908add734d340e7755fd85e0a3",
