@@ -1028,6 +1028,32 @@
           "gaps_resolved": 0,
           "status": "COMPLETE",
           "type": "inventory"
+        },
+        {
+          "session_id": "2026-08-21-183905-nodebb",
+          "branch": "research/compare/nodebb-src/controllers/authentication.js-2026-08-21-183905",
+          "date": "2026-08-21T10:39:05.807Z",
+          "extractor_version": "0.2.11",
+          "report_path": "fixtures/research/sessions/v0.2.11-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 896,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "comparison",
+          "target": "src/controllers/authentication.js"
         }
       ]
     }
