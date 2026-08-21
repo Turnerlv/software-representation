@@ -20,15 +20,15 @@
               "OPEN_CONNECTOR": 717
             },
             "after": {
-              "BOUNDARY": 0,
-              "CONTRACT": 0,
-              "RELATIONSHIP": 0,
-              "OPEN_CONNECTOR": 0
+              "BOUNDARY": 2626,
+              "CONTRACT": 4474,
+              "RELATIONSHIP": 33257,
+              "OPEN_CONNECTOR": 717
             }
           },
           "gaps_logged": 0,
-          "gaps_resolved": 0,
-          "status": "IN_PROGRESS",
+          "gaps_resolved": 1,
+          "status": "COMPLETE",
           "type": "fix",
           "target": "data-model-upgrade"
         }
