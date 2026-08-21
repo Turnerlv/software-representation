@@ -1,16 +1,16 @@
 {
   "boundaries": [
     {
+      "name": "Class: MyEmitter",
+      "entityType": "CLASS"
+    },
+    {
       "name": "File: ../../fixtures/test-repos/node-events/index.js",
       "entityType": "FILE"
     },
     {
       "name": "Package: events",
       "entityType": "EXTERNAL_PACKAGE"
-    },
-    {
-      "name": "Class: MyEmitter",
-      "entityType": "CLASS"
     }
   ],
   "contracts": [
@@ -21,20 +21,24 @@
   ],
   "relationships": [
     {
-      "name": "Require: events",
-      "entityType": "REQUIRE"
+      "name": "Call: console.log()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Event Emit: event",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: myEmitter.emit()",
+      "entityType": "CALL"
     },
     {
       "name": "Call: myEmitter.on()",
       "entityType": "CALL"
     },
     {
-      "name": "Call: console.log()",
-      "entityType": "CALL"
-    },
-    {
-      "name": "Call: myEmitter.emit()",
-      "entityType": "CALL"
+      "name": "Require: events",
+      "entityType": "REQUIRE"
     }
   ],
   "openConnectors": [

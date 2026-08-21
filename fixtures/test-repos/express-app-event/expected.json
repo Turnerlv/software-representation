@@ -8,6 +8,10 @@
   "contracts": [],
   "relationships": [
     {
+      "name": "Call: Event Emit: mount",
+      "entityType": "CALL"
+    },
+    {
       "name": "Call: fn.emit()",
       "entityType": "CALL"
     }

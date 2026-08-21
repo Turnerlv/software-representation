@@ -8,19 +8,19 @@
   "contracts": [],
   "relationships": [
     {
-      "name": "Dynamic Require: mod",
-      "entityType": "REQUIRE"
+      "name": "Dynamic Import: './custom-' + engine + '.js'",
+      "entityType": "IMPORT"
     },
     {
       "name": "Dynamic Require: engine",
       "entityType": "REQUIRE"
     },
     {
-      "name": "Import: path",
-      "entityType": "IMPORT"
+      "name": "Dynamic Require: mod",
+      "entityType": "REQUIRE"
     },
     {
-      "name": "Dynamic Import: './custom-' + engine + '.js'",
+      "name": "Import: path",
       "entityType": "IMPORT"
     }
   ],

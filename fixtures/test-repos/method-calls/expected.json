@@ -17,19 +17,7 @@
   ],
   "relationships": [
     {
-      "name": "Import: ./userService",
-      "entityType": "IMPORT"
-    },
-    {
-      "name": "Import: ./otherService",
-      "entityType": "IMPORT"
-    },
-    {
-      "name": "Call: userService.createUser()",
-      "entityType": "CALL"
-    },
-    {
-      "name": "Call: otherService.someMethod()",
+      "name": "Call: console.log()",
       "entityType": "CALL"
     },
     {
@@ -37,8 +25,20 @@
       "entityType": "CALL"
     },
     {
-      "name": "Call: console.log()",
+      "name": "Call: otherService.someMethod()",
       "entityType": "CALL"
+    },
+    {
+      "name": "Call: userService.createUser()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Import: ./otherService",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Import: ./userService",
+      "entityType": "IMPORT"
     }
   ],
   "openConnectors": []

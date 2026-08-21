@@ -1,28 +1,28 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/layered-app/controller.ts",
-      "entityType": "FILE"
+      "name": "Class: Database",
+      "entityType": "CLASS"
     },
     {
-      "name": "Package: express",
-      "entityType": "EXTERNAL_PACKAGE"
+      "name": "Class: UserService",
+      "entityType": "CLASS"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/layered-app/controller.ts",
+      "entityType": "FILE"
     },
     {
       "name": "File: ../../fixtures/test-repos/layered-app/db.ts",
       "entityType": "FILE"
     },
     {
-      "name": "Class: Database",
-      "entityType": "CLASS"
-    },
-    {
       "name": "File: ../../fixtures/test-repos/layered-app/service.ts",
       "entityType": "FILE"
     },
     {
-      "name": "Class: UserService",
-      "entityType": "CLASS"
+      "name": "Package: express",
+      "entityType": "EXTERNAL_PACKAGE"
     }
   ],
   "contracts": [
@@ -33,23 +33,19 @@
   ],
   "relationships": [
     {
-      "name": "Import: ./service.js",
-      "entityType": "IMPORT"
+      "name": "Call: app.get()",
+      "entityType": "CALL"
     },
     {
-      "name": "Import: express",
-      "entityType": "IMPORT"
+      "name": "Call: Express HTTP Response: json",
+      "entityType": "CALL"
     },
     {
       "name": "Call: express()",
       "entityType": "CALL"
     },
     {
-      "name": "Call: app.get()",
-      "entityType": "CALL"
-    },
-    {
-      "name": "Call: userService.getUser()",
+      "name": "Call: HTTP Call: fetch",
       "entityType": "CALL"
     },
     {
@@ -57,7 +53,19 @@
       "entityType": "CALL"
     },
     {
+      "name": "Call: userService.getUser()",
+      "entityType": "CALL"
+    },
+    {
       "name": "Import: ./db.js",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Import: ./service.js",
+      "entityType": "IMPORT"
+    },
+    {
+      "name": "Import: express",
       "entityType": "IMPORT"
     }
   ],

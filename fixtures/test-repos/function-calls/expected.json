@@ -17,16 +17,16 @@
   ],
   "relationships": [
     {
-      "name": "Import: ./utils",
-      "entityType": "IMPORT"
-    },
-    {
       "name": "Call: calculateSum()",
       "entityType": "CALL"
     },
     {
       "name": "Call: console.log()",
       "entityType": "CALL"
+    },
+    {
+      "name": "Import: ./utils",
+      "entityType": "IMPORT"
     }
   ],
   "openConnectors": []

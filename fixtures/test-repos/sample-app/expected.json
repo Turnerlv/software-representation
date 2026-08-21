@@ -1,16 +1,16 @@
 {
   "boundaries": [
     {
+      "name": "Class: UserService",
+      "entityType": "CLASS"
+    },
+    {
       "name": "File: ../../fixtures/test-repos/sample-app/types.ts",
       "entityType": "FILE"
     },
     {
       "name": "File: ../../fixtures/test-repos/sample-app/userService.ts",
       "entityType": "FILE"
-    },
-    {
-      "name": "Class: UserService",
-      "entityType": "CLASS"
     }
   ],
   "contracts": [
@@ -25,16 +25,24 @@
   ],
   "relationships": [
     {
-      "name": "Import: ./types",
-      "entityType": "IMPORT"
+      "name": "Call: dbResponse.json()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: HTTP Call: fetch",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: HTTP Call: fetch",
+      "entityType": "CALL"
     },
     {
       "name": "Call: JSON.stringify()",
       "entityType": "CALL"
     },
     {
-      "name": "Call: dbResponse.json()",
-      "entityType": "CALL"
+      "name": "Import: ./types",
+      "entityType": "IMPORT"
     }
   ],
   "openConnectors": [
