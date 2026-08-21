@@ -1080,6 +1080,32 @@
           "status": "COMPLETE",
           "type": "fix",
           "target": "contract.cjs-module-exports-alias"
+        },
+        {
+          "session_id": "2026-08-21-184959-nodebb",
+          "branch": "fix/relationship.invoke-returned-function-2026-08-21-184959",
+          "date": "2026-08-21T10:49:59.387Z",
+          "extractor_version": "0.2.12",
+          "report_path": "fixtures/research/sessions/v0.2.12-nodebb.md",
+          "entity_counts": {
+            "before": {
+              "BOUNDARY": 2052,
+              "CONTRACT": 3633,
+              "RELATIONSHIP": 26402,
+              "OPEN_CONNECTOR": 660
+            },
+            "after": {
+              "BOUNDARY": 0,
+              "CONTRACT": 0,
+              "RELATIONSHIP": 0,
+              "OPEN_CONNECTOR": 0
+            }
+          },
+          "gaps_logged": 0,
+          "gaps_resolved": 0,
+          "status": "IN_PROGRESS",
+          "type": "fix",
+          "target": "relationship.invoke-returned-function"
         }
       ]
     }
