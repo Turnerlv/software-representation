@@ -77,7 +77,6 @@ apps/*/package-lock.json
 /fixtures/cloned-repos/*/
 /fixtures/cloned-repos/*.db
 /fixtures/cloned-repos/*.db-journal
-/fixtures/test-repos/
 
 # project context and instructions
 .context/
