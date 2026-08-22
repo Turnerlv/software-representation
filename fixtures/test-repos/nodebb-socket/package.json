@@ -1,0 +1,5 @@
+{
+  "name": "nodebb-socket-fixture",
+  "version": "0.0.0",
+  "description": "Fixture exercising Socket.IO and NodeBB-specific patterns: socket.onAny() wildcard listener (contract.socket-onany-listener) and plugins.hooks.fire() plugin hook dispatch (open-connector.plugin-hook-fire)."
+}

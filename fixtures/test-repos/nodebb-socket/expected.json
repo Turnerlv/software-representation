@@ -1,0 +1,54 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/nodebb-socket/index.js",
+      "entityType": "FILE"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Event Listener: [wildcard]",
+      "entityType": "EVENT_LISTENER"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Call: dispatchToHandler()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Plugin Hook: action:sockets.disconnect",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Plugin Hook: filter:sockets.sessionId",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: plugins.fire()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: plugins.fire()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: socket.onAny()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Require: ../plugins",
+      "entityType": "REQUIRE"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Plugin Hook: action:sockets.disconnect",
+      "entityType": "PLUGIN_HOOK"
+    },
+    {
+      "name": "Plugin Hook: filter:sockets.sessionId",
+      "entityType": "PLUGIN_HOOK"
+    }
+  ]
+}

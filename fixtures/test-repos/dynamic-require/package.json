@@ -1,0 +1,5 @@
+{
+  "name": "dynamic-require",
+  "version": "1.0.0",
+  "description": "Test fixture for dynamic require and import parsing"
+}

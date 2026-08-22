@@ -74,7 +74,7 @@ apps/*/package-lock.json
 
 # Cloned Target Repositories for Local Parser Tests
 # Track the README but ignore the actual cloned repos and their generated DBs
-/fixtures/cloned-repos/*/
+/fixtures/cloned-repos/
 /fixtures/cloned-repos/*.db
 /fixtures/cloned-repos/*.db-journal
 

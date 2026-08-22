@@ -1,0 +1,6 @@
+{
+  "name": "express-app-fixture",
+  "version": "1.0.0",
+  "description": "Minimal Express.js fixture for chomp extractor tests. Exercises: CommonJS require (RELATIONSHIP), Express route definitions (CONTRACT), Express router mounts (RELATIONSHIP).",
+  "main": "app.js"
+}

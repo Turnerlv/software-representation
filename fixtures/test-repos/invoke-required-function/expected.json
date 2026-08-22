@@ -1,0 +1,20 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/invoke-required-function/index.js",
+      "entityType": "FILE"
+    }
+  ],
+  "contracts": [],
+  "relationships": [
+    {
+      "name": "Call: require()()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Require: ./my-module",
+      "entityType": "REQUIRE"
+    }
+  ],
+  "openConnectors": []
+}

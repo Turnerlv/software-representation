@@ -1,0 +1,20 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/invoke-returned-function/index.js",
+      "entityType": "FILE"
+    }
+  ],
+  "contracts": [],
+  "relationships": [
+    {
+      "name": "Call: getMiddleware()",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: getMiddleware()()",
+      "entityType": "CALL"
+    }
+  ],
+  "openConnectors": []
+}
