@@ -160,6 +160,7 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 6. **Clean Code & Testing:** Write unit tests for AST extraction rules in `packages/core` before shipping extractor changes. Tests must reference committed fixture files in `fixtures/test-repos/<framework>/` — never use inline `fs.writeFileSync` or temp directories.
 7. **Controlled Fixtures:** Visitor logic is proven against `fixtures/test-repos/<framework>/expected.json` ground truths, never directly against live cloned repos.
 8. **Do NOT commit:** Cloned repos, `.db` files, or `fixtures/research/handoffs/` directories.
+9. **Git Submodule Workflow:** `fixtures/research` is a Git Submodule containing proprietary research. You MUST commit and push research state changes from *inside* `fixtures/research/` before staging the submodule hash update in the root monorepo.
 
 ---
 

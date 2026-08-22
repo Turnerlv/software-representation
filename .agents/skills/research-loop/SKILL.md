@@ -22,12 +22,14 @@ This skill orchestrates a research session using the **v4 methodology**: a deter
 
 ## Stage 1: Inventory Session (deterministic, no LLM)
 
+> **⚠️ Submodule Note:** All research state (`pattern_ledger.db`, `bug_tracker.db`, `sessions/*.md`) is stored in the `fixtures/research` Git Submodule. Any session commands that mutate this data must be committed and pushed from *inside* `fixtures/research/` before committing the main monorepo!
+
 ```bash
 # 1. Start the session — creates branch research/inventory/<repo>-<date>
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type inventory
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type inventory
 
 # 2. Run the deterministic pattern sweep (health-gated internally)
-TSX_DISABLE_IPC=1 pnpm chomp inventory --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research inventory --repo <name>
 ```
 
 Read the output table:
@@ -38,8 +40,8 @@ Read the output table:
 
 ```bash
 # 3. Close and merge the inventory session
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 ```
 
 ---
@@ -50,7 +52,7 @@ For each unhandled pattern flagged by the inventory (or for each file selected f
 
 ```bash
 # 1. Start comparison session targeting a specific file
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type comparison --target <file-slug>
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type comparison --target <file-slug>
 ```
 
 Rubric = every pattern class Phase 1 found present in the target file + the standing checklist in `.context/chomp_extraction_ideal.md`.
@@ -65,7 +67,7 @@ Log findings **immediately via CLI** — not as a chat narrative first:
 
 ```bash
 # New pattern class discovered
-TSX_DISABLE_IPC=1 pnpm chomp ledger pattern log \
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger pattern log \
   --id route.regexp-literal \
   --ontology CONTRACT \
   --desc "Express route defined with a RegExp literal instead of a string path" \
@@ -73,7 +75,7 @@ TSX_DISABLE_IPC=1 pnpm chomp ledger pattern log \
   --repo <name> --session <session-id>
 
 # Correctness bug discovered
-TSX_DISABLE_IPC=1 pnpm chomp ledger bug log \
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger bug log \
   --id dup-evidence-<repo>-<slug> \
   --desc "Duplicate VIEW_RENDER evidence record for same call site" \
   --repo <name> --file <path> --line <n> --session <session-id>
@@ -81,8 +83,8 @@ TSX_DISABLE_IPC=1 pnpm chomp ledger bug log \
 
 ```bash
 # 2. Close the comparison session
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 ```
 
 ---
@@ -91,7 +93,7 @@ TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
 
 ```bash
 # 1. Start fix session — creates branch fix/<pattern-id>-<date>
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type fix --target <pattern-id>
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type fix --target <pattern-id>
 ```
 
 Implement the visitor in `packages/core/src/extractor/visitors/` or `adapters/`.
@@ -102,11 +104,11 @@ Add a fixture in `fixtures/test-repos/<framework>/` with ground-truth `expected.
 pnpm test --filter @chomp/core
 
 # 3. Close and merge — health + pnpm test enforced automatically
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 1
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 1
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 
 # 4. Mark the pattern resolved (NOTE: do not use non-existent flags like --pr)
-TSX_DISABLE_IPC=1 pnpm chomp ledger pattern resolve \
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger pattern resolve \
   --id <pattern-id> --session <session-id>
 ```
 

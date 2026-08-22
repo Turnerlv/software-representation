@@ -73,41 +73,38 @@ collectFiles()
 ```
 
 ### `@chomp/cli`
-The local CLI for running extraction and research session orchestration:
+The public local CLI for running extraction and interacting with the core engine:
 
 ```bash
-# Extraction
-chomp analyze --repo <name> [--format json]      # Extracts AST and outputs ontology metrics
-chomp health --repo <path>                        # Compute structural health metrics
+# Extraction & Diagnostics
+chomp analyze <path> [--format json]      # Extracts AST and outputs ontology metrics
+chomp health --repo <path>                # Compute structural health metrics
 
-# Coverage Ledger (legacy — existing gap tracking)
-chomp ledger [--db <path>]                        # Display gap analysis ledger
-chomp ledger log --repo <name> --file <path> ...  # Log an extraction gap
+# Upcoming Features (Phase 3/4)
+chomp mcp start                           # Start the MCP server for agent interaction
+chomp push                                # Sync local SQLite graph to cloud
+chomp auth login                          # Authenticate with chomp.app
+```
 
-# Pattern Ledger (v4 — coverage gaps by pattern class)
-chomp ledger patterns                             # List all pattern classes
-chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> [--sig <regex>]
-chomp ledger pattern resolve --id <slug> --session <id> [--commit <sha>]
-chomp ledger pattern status --id <slug> --status <unhandled|partial|handled>
+### `chomp-research` (Internal)
+The internal CLI used exclusively for the v4 research loop. (Requires `pnpm` workspace context).
 
-# Bug Tracker (v4 — correctness defects)
-chomp ledger bugs                                 # List all bugs
-chomp ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
-chomp ledger bug fix --id <slug> --session <id> [--commit <sha>]
+```bash
+# Session Management (v4 typed sessions)
+pnpm chomp-research session open --repo <name> --type <inventory|comparison|fix> [--target <slug>]
+pnpm chomp-research session close --repo <name> --resolved <n>
+pnpm chomp-research session merge --repo <name>
 
 # Inventory Sweep (v4 — Phase 1, deterministic, no LLM)
-chomp inventory --repo <name>                    # Ripgrep sweep of all sweepable patterns
+pnpm chomp-research inventory --repo <name>
 
-# Session Management (v4 typed sessions)
-chomp session start --repo <name> --type <inventory|comparison|fix> [--target <slug>]
-chomp session log-gaps --repo <name> --count <n>
-chomp session close --repo <name> --resolved <n>
-chomp session merge --repo <name>                # fix-type: health + tests enforced before merge
+# Pattern Ledger (v4 — coverage gaps by pattern class)
+pnpm chomp-research ledger pattern log --id <slug> --ontology <cat> --desc <text> [--sig <regex>]
+pnpm chomp-research ledger pattern resolve --id <slug> --session <id>
 
-# System Audits
-chomp audit start --topic <name>
-chomp audit close --topic <name> --change <items..>
-chomp audit merge --topic <name>
+# Bug Tracker (v4 — correctness defects)
+pnpm chomp-research ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
+pnpm chomp-research ledger bug fix --id <slug> --session <id>
 ```
 
 ---
@@ -120,7 +117,11 @@ chomp audit merge --topic <name>
 
 ### Install
 
+Because this repository uses a Git Submodule for research data, clone it recursively:
+
 ```bash
+git clone --recursive https://github.com/Turnerlv/software-representation.git chomp
+cd chomp
 pnpm install
 ```
 
@@ -169,14 +170,14 @@ git clone <repo-url> fixtures/cloned-repos/<repo-name>
 
 ```bash
 # Start the session
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type inventory
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type inventory
 
 # Run the sweep (health-gated, no LLM, updates pattern_ledger.db occurrence counts)
-TSX_DISABLE_IPC=1 pnpm chomp inventory --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research inventory --repo <name>
 
 # Close the session
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 ```
 
 ### Step 2: Comparison Session (Phase 2 — AI-assisted, rubric-driven)
@@ -185,33 +186,33 @@ For each unhandled pattern flagged by the inventory sweep:
 
 ```bash
 # Start comparison session targeting a specific file
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type comparison --target <file-slug>
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type comparison --target <file-slug>
 
 # AI compares target file against the pattern rubric.
 # Log each confirmed finding directly:
-TSX_DISABLE_IPC=1 pnpm chomp ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>
-TSX_DISABLE_IPC=1 pnpm chomp ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger pattern log --id <slug> --ontology <cat> --desc <text> --sig <regex>
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger bug log --id <slug> --desc <text> --repo <r> --file <f> --session <id>
 
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 0
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 0
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 ```
 
 ### Step 3: Fix Session (visitor implementation)
 
 ```bash
 # Start fix session targeting a specific pattern
-TSX_DISABLE_IPC=1 pnpm chomp session start --repo <name> --type fix --target <pattern-id>
+TSX_DISABLE_IPC=1 pnpm chomp-research session start --repo <name> --type fix --target <pattern-id>
 
 # Implement the visitor fix in packages/core/src/extractor/visitors/
 # Run tests
 pnpm test --filter @chomp/core
 
 # Close and merge — health + tests are enforced automatically before merge
-TSX_DISABLE_IPC=1 pnpm chomp session close --repo <name> --resolved 1
-TSX_DISABLE_IPC=1 pnpm chomp session merge --repo <name>   # ← refuses if health or tests fail
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 1
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>   # ← refuses if health or tests fail
 
 # Mark pattern resolved
-TSX_DISABLE_IPC=1 pnpm chomp ledger pattern resolve --id <pattern-id> --session <session-id>
+TSX_DISABLE_IPC=1 pnpm chomp-research ledger pattern resolve --id <pattern-id> --session <session-id>
 ```
 
 ### Two Data Stores — Strictly Separated
