@@ -411,6 +411,15 @@ export function extractExpressResponseConnector(
         if (['res'].includes(rootName)) {
           isExpressRes = true;
         }
+      } else if (ts.isCallExpression(node.expression.expression)) {
+        if (ts.isPropertyAccessExpression(node.expression.expression.expression)) {
+          if (ts.isIdentifier(node.expression.expression.expression.expression)) {
+            const rootName = node.expression.expression.expression.expression.text;
+            if (['res'].includes(rootName)) {
+              isExpressRes = true;
+            }
+          }
+        }
       }
       
       if (isExpressRes) {

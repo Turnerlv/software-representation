@@ -3,11 +3,9 @@ import { basename, dirname, resolve } from "node:path";
 import { Command } from "commander";
 import {
   analyzeTarget,
-  initDatabase,
-  saveRepresentationGraph,
-  getRepresentationGraph,
   StructuralEntity,
 } from "@chomp/core";
+import { createSQLiteStorage } from "@chomp/db";
 import { resolveDbPath } from "../utils/db.js";
 
 export function registerAnalyzeCommand(program: Command) {
@@ -15,13 +13,19 @@ export function registerAnalyzeCommand(program: Command) {
     .command("analyze <path>")
     .description("Analyze a TypeScript/JavaScript source file or directory")
     .option("--db <path>", "Path to SQLite database file (default: fixtures/cloned-repos/<repoName>.db)")
-    .action((inputPath: string, options: { db?: string }) => {
+    .action(async (inputPath: string, options: { db?: string }) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const targetPath = resolve(baseDir, inputPath);
 
-      const isFile = existsSync(targetPath) && statSync(targetPath).isFile();
-      const repoPath = isFile ? dirname(targetPath) : targetPath;
-      const repoName = basename(repoPath) || "repository";
+      if (!existsSync(targetPath)) {
+        console.error(`Error: Path does not exist: ${targetPath}`);
+        process.exit(1);
+      }
+
+      const stat = statSync(targetPath);
+      const isDir = stat.isDirectory();
+      const repoName = isDir ? basename(targetPath) : basename(dirname(targetPath));
+      const repoPath = isDir ? targetPath : dirname(targetPath);
       const repoId = repoName.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
 
       console.log(`Analyzing structural entities in: ${targetPath}...`);
@@ -30,7 +34,7 @@ export function registerAnalyzeCommand(program: Command) {
       const dbPath = options.db 
         ? resolve(baseDir, options.db)
         : resolve(baseDir, `fixtures/cloned-repos/${repoName}.db`);
-      const db = initDatabase(dbPath);
+      const storage = createSQLiteStorage(dbPath);
 
       const repoInfo = {
         id: repoId,
@@ -38,16 +42,14 @@ export function registerAnalyzeCommand(program: Command) {
         path: repoPath,
       };
 
-      saveRepresentationGraph(db, repoInfo, graph);
+      await storage.saveRepresentationGraph(repoInfo, graph);
 
-      const savedGraph = getRepresentationGraph(db, repoId) ?? graph;
-      db.close();
+      const savedGraph = await storage.getRepresentationGraph(repoId) ?? graph;
+      await storage.close();
 
-      const allEntities: StructuralEntity[] = [
-        ...savedGraph.boundaries,
-        ...savedGraph.contracts,
-        ...savedGraph.relationships,
-        ...savedGraph.openConnectors,
+      const allEntities = [
+        ...savedGraph.nodes,
+        ...savedGraph.edges,
       ];
 
       console.log(`\nSuccessfully saved structural representation to: ${dbPath}\n`);

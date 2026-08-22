@@ -261,6 +261,14 @@
       "entityType": "CALL"
     },
     {
+      "name": "Call: Express HTTP Response: json",
+      "entityType": "CALL"
+    },
+    {
+      "name": "Call: Express HTTP Response: send",
+      "entityType": "CALL"
+    },
+    {
       "name": "Call: Express HTTP Response: send",
       "entityType": "CALL"
     },
@@ -548,6 +556,14 @@
     },
     {
       "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: json",
+      "entityType": "HTTP_RESPONSE"
+    },
+    {
+      "name": "Express HTTP Response: send",
       "entityType": "HTTP_RESPONSE"
     },
     {

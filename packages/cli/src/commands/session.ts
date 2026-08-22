@@ -20,7 +20,11 @@ function buildBranchName(type: SessionType, repoName: string, targetSlug: string
 }
 import { createBranch, commitChanges, checkoutBranch, mergeBranch, pushBranch } from "../utils/git.js";
 import { findWorkspaceRoot } from "../utils/db.js";
-import { analyzeTarget, initDatabase, saveRepresentationGraph, getRepresentationGraph, initPatternLedger, getPattern, initBugTracker, getBug } from "@chomp/core";
+import { analyzeTarget } from "@chomp/core";
+import { createSQLiteStorage } from "@chomp/db";
+import { initLegacyDatabase } from "../db/legacy/schema.js";
+import { initPatternLedger, getPattern } from "../db/legacy/patternLedgerRepository.js";
+import { initBugTracker, getBug } from "../db/legacy/bugTrackerRepository.js";
 
 function getExtractorVersion(workspaceRoot: string): string {
   const pkgPath = resolve(workspaceRoot, "packages/core/package.json");
@@ -36,7 +40,7 @@ function formatDateId(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
 }
 
-function runAnalyzeProgrammatically(repoName: string, workspaceRoot: string): EntityCounts {
+async function runAnalyzeProgrammatically(repoName: string, workspaceRoot: string): Promise<EntityCounts> {
   const targetPath = resolve(workspaceRoot, `fixtures/cloned-repos/${repoName}`);
   const dbPath = resolve(workspaceRoot, `fixtures/cloned-repos/${repoName}.db`);
   const repoId = repoName.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
@@ -53,16 +57,15 @@ function runAnalyzeProgrammatically(repoName: string, workspaceRoot: string): En
   console.log(`Analyzing structural entities in: ${targetPath}...`);
   const graph = analyzeTarget(targetPath);
 
-  const db = initDatabase(dbPath);
+  const storage = createSQLiteStorage(dbPath);
   const repoInfo = {
     id: repoId,
     name: repoName,
     path: targetPath,
   };
-
-  saveRepresentationGraph(db, repoInfo, graph);
-  const savedGraph = getRepresentationGraph(db, repoId) ?? graph;
-  db.close();
+  await storage.saveRepresentationGraph(repoInfo, graph);
+  const savedGraph = await storage.getRepresentationGraph(repoId) ?? graph;
+  await storage.close();
 
   return {
     BOUNDARY: savedGraph.nodes.filter((n: any) => n.type === 'BOUNDARY').length,
@@ -72,12 +75,12 @@ function runAnalyzeProgrammatically(repoName: string, workspaceRoot: string): En
   };
 }
 
-function getDbEntityCounts(repoName: string, workspaceRoot: string): EntityCounts {
+async function getDbEntityCounts(repoName: string, workspaceRoot: string): Promise<EntityCounts> {
   const dbPath = resolve(workspaceRoot, `fixtures/cloned-repos/${repoName}.db`);
   const repoId = repoName.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
-  const db = initDatabase(dbPath);
-  const graph = getRepresentationGraph(db, repoId);
-  db.close();
+  const storage = createSQLiteStorage(dbPath);
+  const graph = await storage.getRepresentationGraph(repoId);
+  await storage.close();
   
   if (!graph) {
     throw new Error(`Graph not found in DB for repo: ${repoId}`);
@@ -101,7 +104,7 @@ export function registerSessionCommand(program: Command) {
     .option("--type <type>", "Session type: inventory | comparison | fix (default: comparison)", "comparison")
     .option("--target <slug>", "For comparison: file slug being compared. For fix: pattern/bug ID being fixed.")
     .option("--force", "Force start a new session even if a completed session with same extractor version exists")
-    .action((options) => {
+    .action(async (options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const workspaceRoot = findWorkspaceRoot(baseDir);
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
@@ -166,9 +169,9 @@ export function registerSessionCommand(program: Command) {
 
       if (fresh) {
         console.log(`✅ DB is up-to-date (extractor v${currentVersion}). Reusing existing extraction results.`);
-        counts = getDbEntityCounts(repoName, workspaceRoot);
+        counts = await getDbEntityCounts(repoName, workspaceRoot);
       } else {
-        counts = runAnalyzeProgrammatically(repoName, workspaceRoot);
+        counts = await runAnalyzeProgrammatically(repoName, workspaceRoot);
       }
 
       const now = new Date();
@@ -276,7 +279,7 @@ ${targetContext}
     .description("Log discovered gaps in a session")
     .requiredOption("--repo <name>", "Repository name")
     .requiredOption("--count <number>", "Number of gaps logged")
-    .action((options) => {
+    .action(async (options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const workspaceRoot = findWorkspaceRoot(baseDir);
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
@@ -300,7 +303,7 @@ ${targetContext}
     .description("Close a research session and record final results")
     .requiredOption("--repo <name>", "Repository name")
     .requiredOption("--resolved <number>", "Number of gaps resolved")
-    .action((options) => {
+    .action(async (options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const workspaceRoot = findWorkspaceRoot(baseDir);
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");
@@ -328,7 +331,7 @@ ${targetContext}
     .command("merge")
     .description("Merge a completed research session back to main and bump version")
     .requiredOption("--repo <name>", "Repository name")
-    .action((options) => {
+    .action(async (options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const workspaceRoot = findWorkspaceRoot(baseDir);
       const registryPath = resolve(workspaceRoot, "fixtures/research/registry.json");

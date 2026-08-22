@@ -63,3 +63,19 @@ export interface RepresentationGraph {
   nodes: StructuralNode[];
   edges: StructuralEdge[];
 }
+
+export interface StructuralEntity {
+  id: string;
+  name: string;
+  type: EntityType;
+  entityType: string;
+  scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK';
+  evidence: EvidenceRecord | EvidenceRecord[];
+  parentBoundaryId?: string;
+  sourceId?: string;
+  targetId?: string;
+  status?: 'DETERMINISTIC' | 'INFERRED';
+  confidence?: 'HIGH' | 'MEDIUM' | 'LOW';
+  metadata?: Record<string, any>;
+}
+

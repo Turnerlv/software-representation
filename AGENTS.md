@@ -47,7 +47,7 @@ The structural model uses **3 structural primitives + Open Connector as a distin
 | **Relationships** | Known structural connections between entities | AST Imports, Function Calls, Dependencies, Composition |
 | **Open Connectors** | Known points extending beyond available evidence | External APIs, Unlinked Databases, Message Brokers |
 
-`packages/core/src/db/schema.ts` is the single source of truth. All documentation describes it — never the reverse.
+`packages/db/src/adapters/sqlite/schema.ts` is the single source of truth. All documentation describes it — never the reverse.
 
 ---
 
@@ -74,10 +74,11 @@ The structural model uses **3 structural primitives + Open Connector as a distin
 ```
 chomp/
 ├── packages/
-│   ├── core/            # AST parsers (TS compiler API), ontology schemas, extraction engine
+│   ├── core/            # AST parsers, ontology, extraction engine (NO DB IMPORTS)
+│   ├── db/              # ChompStorage async interface and SQLite adapter
 │   └── cli/             # Local CLI ('chomp analyze', 'chomp inventory', 'chomp session')
 ├── apps/
-│   ├── backend/         # Node.js / Express REST API, JWT auth, SQLite graph persistence
+│   ├── mcp/             # MCP server app (planned)
 │   └── web/             # Next.js Explorer UI (Interactive graph view & evidence traceability)
 ├── fixtures/
 │   ├── test-repos/      # Committed minimal fixtures for unit tests
@@ -163,8 +164,9 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 
 ## 9. Architecture & Boundary Rules
 
-1. **Ontology Isolation:** Core Ontology (`packages/core/src/types/ontology.ts`) must never import from Ledger, CLI tools, or external system modules.
-2. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
-3. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
-4. **Separate Stores:** Pattern Ledger and Bug Tracker are separate SQLite files. No finding lives in both.
-5. **Fix Session Gate:** Fix sessions are the only session type that may change `packages/core` code. Their merge is blocked by `chomp session merge` unless `chomp health` and `pnpm test --filter @chomp/core` both pass.
+1. **DB Isolation:** `@chomp/core` must have ZERO database imports. Persistence is abstracted by the async `ChompStorage` interface in `@chomp/db`.
+2. **Ontology Isolation:** Core Ontology (`packages/core/src/types/ontology.ts`) must never import from Ledger, CLI tools, or external system modules.
+3. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
+4. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
+5. **Separate Stores:** Pattern Ledger and Bug Tracker are separate SQLite files. No finding lives in both.
+6. **Fix Session Gate:** Fix sessions are the only session type that may change `packages/core` code. Their merge is blocked by `chomp session merge` unless `chomp health` and `pnpm test --filter @chomp/core` both pass.

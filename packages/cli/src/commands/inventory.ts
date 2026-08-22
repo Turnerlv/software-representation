@@ -24,7 +24,7 @@ import {
   updatePatternOccurrence,
   getPatternSummary,
   PatternEntry,
-} from "@chomp/core";
+} from "../db/legacy/patternLedgerRepository.js";
 
 function resolvePatternLedgerPath(workspaceRoot: string): string {
   return resolve(workspaceRoot, "fixtures/research/pattern_ledger.db");

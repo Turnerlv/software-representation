@@ -2,7 +2,8 @@ import { existsSync, readFileSync, appendFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { Command } from "commander";
-import { initDatabase, getLedgerSummary, getAllLedgerEntries, logExtractionGap } from "@chomp/core";
+import { initLegacyDatabase } from "../db/legacy/schema.js";
+import { getLedgerSummary, getAllLedgerEntries, logExtractionGap } from "../db/legacy/ledgerRepository.js";
 import { readRegistry } from "../utils/registry.js";
 import {
   initPatternLedger,
@@ -13,7 +14,7 @@ import {
   updatePatternStatus,
   OntologyCategory,
   PatternStatus,
-} from "@chomp/core";
+} from "../db/legacy/patternLedgerRepository.js";
 import {
   initBugTracker,
   logBug,
@@ -22,7 +23,7 @@ import {
   getOpenBugs,
   getBugSummary,
   BugStatus,
-} from "@chomp/core";
+} from "../db/legacy/bugTrackerRepository.js";
 import { resolveDbPath, findWorkspaceRoot } from "../utils/db.js";
 
 function resolvePatternLedgerPath(workspaceRoot: string): string {
@@ -68,7 +69,7 @@ export function registerLedgerCommand(program: Command) {
         return;
       }
 
-      const db = initDatabase(dbPath);
+      const db = initLegacyDatabase(dbPath);
       const summary = getLedgerSummary(db);
       const entries = getAllLedgerEntries(db);
       db.close();
@@ -140,7 +141,7 @@ export function registerLedgerCommand(program: Command) {
         process.exit(1);
       }
       
-      const db = initDatabase(dbPath);
+      const db = initLegacyDatabase(dbPath);
       let importedCount = 0;
       
       for (const item of data) {
@@ -192,7 +193,7 @@ export function registerLedgerCommand(program: Command) {
     .action((options) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const dbPath = resolveDbPath(baseDir, options.db);
-      const db = initDatabase(dbPath);
+      const db = initLegacyDatabase(dbPath);
       
       const hash = createHash("sha256")
         .update(`${options.file}:${options.line}:${options.pattern}`)

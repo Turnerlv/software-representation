@@ -11,7 +11,6 @@ import path from 'path';
  *                              Cascade-deleted when the parent repository is removed.
  * - `evidence_records`         One row per entity linking back to its exact source file + line.
  *                              Cascade-deleted when the parent entity is removed.
- * - `extractor_coverage_ledger` Research ledger — logs unhandled AST patterns discovered during repo evaluation.
  *
  * All CREATE TABLE statements use IF NOT EXISTS, making this function safe to call on
  * every startup without migration logic.
@@ -79,25 +78,6 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       UNIQUE(entity_id, file_path, line_number, evidence_role)
     );
 
-    CREATE TABLE IF NOT EXISTS extractor_coverage_ledger (
-      id TEXT PRIMARY KEY,
-      pattern_name TEXT NOT NULL,
-      framework TEXT DEFAULT 'TypeScript',
-      status TEXT CHECK(status IN ('DISCOVERED', 'IN_PROGRESS', 'RESOLVED', 'OUT_OF_SCOPE')) DEFAULT 'DISCOVERED',
-      impact_level TEXT CHECK(impact_level IN ('HIGH', 'MEDIUM', 'LOW')) DEFAULT 'MEDIUM',
-      evidence_repo TEXT NOT NULL,
-      evidence_file TEXT NOT NULL,
-      evidence_line INTEGER,
-      evidence_snippet TEXT,
-      discovery_type TEXT,
-      suggested_evolution TEXT,
-      rationale TEXT,
-      fix_location TEXT,
-      fix_pattern_summary TEXT,
-      test_fixture_path TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
   `);
 
   try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
@@ -114,9 +94,6 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) {}
   try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN discovery_type TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN suggested_evolution TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE extractor_coverage_ledger ADD COLUMN rationale TEXT;"); } catch (e) {}
   try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) {}
 
   return db;

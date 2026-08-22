@@ -51,7 +51,7 @@ export function registerHealthCommand(program: Command) {
         : 100;
 
       // 4. Scope Purity
-      const productionEntities = allEntities.filter(e => e.scope === 'USER' || e.scope === 'PRODUCTION' || !e.scope).length;
+      const productionEntities = allEntities.filter(e => e.scope === 'USER' || !e.scope).length;
       const scopePurity = allEntities.length > 0 
         ? (productionEntities / allEntities.length) * 100 
         : 100;

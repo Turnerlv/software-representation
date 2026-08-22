@@ -8,20 +8,9 @@ import {
   RepresentationGraph,
   StructuralNode,
   StructuralEdge,
-} from '../types/index.js';
+} from '@chomp/core';
 
-/** Minimal repo metadata required to persist a RepresentationGraph. */
-export interface RepositoryInfo {
-  /** Stable kebab-case identifier derived from the repo directory name. */
-  id: string;
-  name: string;
-  /** Absolute path to the repo root on disk. */
-  path: string;
-  /** Version of @chomp/core that extracted this representation. */
-  extractorVersion?: string;
-  /** Git commit SHA of the repository state at extraction time. */
-  commitSha?: string;
-}
+import { RepositoryInfo, ScopeOptions } from '../../interface.js';
 
 import { createHash } from 'crypto';
 
@@ -133,7 +122,7 @@ export function saveRepresentationGraph(
 export function getRepresentationGraph(
   db: Database.Database,
   repoId: string,
-  options: { scopes?: Array<'USER' | 'TEST' | 'MOCK' | 'CONFIG'> } = { scopes: ['USER'] }
+  options: ScopeOptions = { scopes: ['USER'] }
 ): RepresentationGraph | null {
   const repoRow = db
     .prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories WHERE id = ?')

@@ -50,6 +50,15 @@ export function visitBoundary(
       evidence: getEvidence(node),
     };
   }
+  if (ts.isExportAssignment(node)) {
+    return {
+      id: nextId(),
+      name: `Module Export (Default)`,
+      type: 'BOUNDARY',
+      entityType: 'MODULE',
+      evidence: getEvidence(node),
+    };
+  }
   const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
   if (cjsExport && cjsExport.type === 'BOUNDARY') return cjsExport;
 

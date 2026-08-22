@@ -12,7 +12,7 @@ import {
   ImpactLevel,
   LedgerSummary,
   LogExtractionGapInput,
-} from '../types/index.js';
+} from '@chomp/core';
 
 /** Maps a raw SQLite row (snake_case columns) to a typed ExtractorCoverageEntry (camelCase). */
 function mapRowToCoverageEntry(row: any): ExtractorCoverageEntry {
