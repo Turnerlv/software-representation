@@ -76,13 +76,14 @@ chomp/
 ├── packages/
 │   ├── core/            # AST parsers, ontology, extraction engine (NO DB IMPORTS)
 │   ├── db/              # ChompStorage async interface and SQLite adapter
-│   └── cli/             # Local CLI ('chomp analyze', 'chomp inventory', 'chomp session')
+│   └── cli/             # Local CLI ('chomp analyze', 'chomp health')
 ├── apps/
 │   ├── mcp/             # MCP server app (planned)
 │   └── web/             # Next.js Explorer UI (Interactive graph view & evidence traceability)
 ├── fixtures/
 │   ├── test-repos/      # Committed minimal fixtures for unit tests
 │   ├── cloned-repos/    # Git-ignored real-world repos cloned for research (not committed)
+│   ├── research-cli/    # Internal CLI for research loop ('chomp-research')
 │   └── research/
 │       ├── registry.json       # Session ledger (schema_version: v4)
 │       ├── pattern_ledger.db   # Coverage gaps — one row per pattern class (git-ignored)
@@ -136,7 +137,7 @@ The v4 research loop replaces all previous ad-hoc methodologies. Three formal se
 
 **Pattern Ledger** (`fixtures/research/pattern_ledger.db`):
 - One row per **pattern class** (a syntactic shape the extractor doesn't know yet)
-- `chomp inventory` sweeps these using `detection_signature` (ripgrep patterns)
+- `chomp-research inventory` sweeps these using `detection_signature` (ripgrep patterns)
 
 **Bug Tracker** (`fixtures/research/bug_tracker.db`):
 - One row per **correctness defect** in an already-handled pattern
@@ -151,8 +152,8 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 
 ## 8. Rules for AI Agents Working on `chomp`
 
-1. **Health Before AI:** Never invoke AI analysis on a repository that fails `chomp health`. The inventory sweep (`chomp inventory`) calls the health gate automatically — do not bypass it.
-2. **Log Immediately:** When a comparison session finds a pattern gap or bug, log it immediately via `chomp ledger pattern log` or `chomp ledger bug log`. Do not write a narrative summary and transcribe later — the compression step loses detail.
+1. **Health Before AI:** Never invoke AI analysis on a repository that fails `chomp health`. The inventory sweep (`chomp-research inventory`) calls the health gate automatically — do not bypass it.
+2. **Log Immediately:** When a comparison session finds a pattern gap or bug, log it immediately via `chomp-research ledger pattern log` or `chomp-research ledger bug log`. Do not write a narrative summary and transcribe later — the compression step loses detail.
 3. **Preserve Documentation Integrity:** Maintain explicit references to line numbers and evidence sources.
 4. **Scope Boundaries:** Keep new features strictly focused on TypeScript/Node repository parsing and representation.
 5. **Schema Compliance:** All extracted structures must adhere to the 3 structural primitives (plus Open Connectors). `schema.ts` is the authority.
@@ -169,4 +170,4 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 3. **Visitor Isolation:** Extractor visitors must be kept isolated in `packages/core/src/extractor/visitors/` or `adapters/`.
 4. **Modular Syntax Expansion:** Every new AST syntax rule must be implemented in a dedicated visitor/adapter file, not in the main orchestrator (`packages/core/src/extractor/index.ts`).
 5. **Separate Stores:** Pattern Ledger and Bug Tracker are separate SQLite files. No finding lives in both.
-6. **Fix Session Gate:** Fix sessions are the only session type that may change `packages/core` code. Their merge is blocked by `chomp session merge` unless `chomp health` and `pnpm test --filter @chomp/core` both pass.
+6. **Fix Session Gate:** Fix sessions are the only session type that may change `packages/core` code. Their merge is blocked by `chomp-research session merge` unless `chomp health` and `pnpm test --filter @chomp/core` both pass.

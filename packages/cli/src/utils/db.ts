@@ -1,12 +1,8 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import os from "node:os";
+import fs from "node:fs";
 
-/**
- * Walks up the directory tree from startDir until it finds a directory containing
- * pnpm-workspace.yaml. Returns that directory as the monorepo root.
- *
- * Falls back to startDir if no workspace root is found (e.g. running outside the monorepo).
- */
 export function findWorkspaceRoot(startDir: string): string {
   let current = startDir;
   while (current !== dirname(current)) {
@@ -18,16 +14,13 @@ export function findWorkspaceRoot(startDir: string): string {
   return startDir;
 }
 
-/**
- * Resolves the SQLite database path.
- *
- * If optionDb is passed explicitly, it is resolved relative to the baseDir.
- * Otherwise, defaults to the canonical workspace database at apps/backend/data/chomp.db.
- */
 export function resolveDbPath(baseDir: string, optionDb?: string): string {
   if (optionDb) {
     return resolve(baseDir, optionDb);
   }
-  const workspaceRoot = findWorkspaceRoot(baseDir);
-  return resolve(workspaceRoot, "apps/backend/data/chomp.db");
+  const defaultDir = join(os.homedir(), ".chomp");
+  if (!fs.existsSync(defaultDir)) {
+    fs.mkdirSync(defaultDir, { recursive: true });
+  }
+  return join(defaultDir, "chomp.db");
 }

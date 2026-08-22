@@ -2,6 +2,7 @@
   "name": "chomp-monorepo",
   "private": true,
   "scripts": {
+    "chomp-research": "pnpm --filter chomp-research chomp-research",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "test": "turbo run test",

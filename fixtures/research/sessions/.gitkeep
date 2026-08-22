@@ -1,3 +1,0 @@
-# This file ensures the sessions/ directory is tracked by git.
-# Session report files (e.g., express-2026-08-10.md) are committed here
-# alongside the visitor code changes they document.
