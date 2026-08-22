@@ -87,3 +87,5 @@ apps/*/package-lock.json
 # Research SQLite stores
 /fixtures/research/*.db
 /fixtures/research/*.db-journal
+
+.chomp/
