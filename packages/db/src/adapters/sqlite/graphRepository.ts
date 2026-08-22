@@ -61,19 +61,18 @@ export function saveRepresentationGraph(
     `);
 
     for (const node of graph.nodes) {
-      const globalNodeId = `${repo.id}:${node.id}`;
       const metadataStr = node.metadata ? JSON.stringify(node.metadata) : null;
-      insertNode.run(globalNodeId, repo.id, node.name, node.type, node.entityType, node.scope ?? 'USER', node.parentBoundaryId ?? null, metadataStr);
+      insertNode.run(node.id, repo.id, node.name, node.type, node.entityType, node.scope ?? 'USER', node.parentBoundaryId ?? null, metadataStr);
       
       const evidences = Array.isArray(node.evidence) ? node.evidence : [node.evidence];
       for (const ev of evidences) {
         if (ev) {
-          const evidenceHashInput = `${globalNodeId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
+          const evidenceHashInput = `${node.id}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
           const evidenceHash = createHash('sha256').update(evidenceHashInput).digest('hex').slice(0, 16);
           const evidenceId = `ev_${evidenceHash}`;
           insertEvidence.run(
             evidenceId,
-            globalNodeId,
+            node.id,
             ev.filePath,
             ev.lineNumber ?? null,
             ev.snippet ?? null,
@@ -84,19 +83,18 @@ export function saveRepresentationGraph(
     }
 
     for (const edge of graph.edges) {
-      const globalEdgeId = `${repo.id}:${edge.id}`;
       const metadataStr = edge.metadata ? JSON.stringify(edge.metadata) : null;
-      insertEdge.run(globalEdgeId, repo.id, edge.name, edge.type, edge.entityType, edge.scope ?? 'USER', edge.sourceId, edge.targetId ?? null, edge.status ?? null, edge.confidence ?? null, metadataStr);
+      insertEdge.run(edge.id, repo.id, edge.name, edge.type, edge.entityType, edge.scope ?? 'USER', edge.sourceId, edge.targetId ?? null, edge.status ?? null, edge.confidence ?? null, metadataStr);
       
       const evidences = Array.isArray(edge.evidence) ? edge.evidence : [edge.evidence];
       for (const ev of evidences) {
         if (ev) {
-          const evidenceHashInput = `${globalEdgeId}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
+          const evidenceHashInput = `${edge.id}:${ev.filePath}:${ev.lineNumber ?? ''}:${ev.evidenceRole ?? ''}`;
           const evidenceHash = createHash('sha256').update(evidenceHashInput).digest('hex').slice(0, 16);
           const evidenceId = `ev_${evidenceHash}`;
           insertEvidence.run(
             evidenceId,
-            globalEdgeId,
+            edge.id,
             ev.filePath,
             ev.lineNumber ?? null,
             ev.snippet ?? null,
@@ -152,10 +150,14 @@ export function getRepresentationGraph(
       `
       SELECT er.entity_id, er.file_path, er.line_number, er.snippet, er.evidence_role
       FROM evidence_records er
-      WHERE er.entity_id LIKE ?
+      JOIN nodes n ON er.entity_id = n.id WHERE n.repository_id = ?
+      UNION
+      SELECT er.entity_id, er.file_path, er.line_number, er.snippet, er.evidence_role
+      FROM evidence_records er
+      JOIN edges e ON er.entity_id = e.id WHERE e.repository_id = ?
     `
     )
-    .all(`${repoId}:%`) as Array<{
+    .all(repoId, repoId) as Array<{
     entity_id: string;
     file_path: string;
     line_number: number | null;
@@ -163,7 +165,6 @@ export function getRepresentationGraph(
     evidence_role: 'syntax-call' | 'import-match' | 'target-signature' | null;
   }>;
 
-  const prefix = `${repoId}:`;
   const evidenceMap = new Map<string, EvidenceRecord[]>();
   for (const row of evidenceRows) {
     const record: EvidenceRecord = {
@@ -178,9 +179,7 @@ export function getRepresentationGraph(
     if (row.evidence_role !== null && row.evidence_role !== undefined) {
       record.evidenceRole = row.evidence_role;
     }
-    const cleanEntityId = row.entity_id.startsWith(prefix)
-      ? row.entity_id.slice(prefix.length)
-      : row.entity_id;
+    const cleanEntityId = row.entity_id;
       
     if (!evidenceMap.has(cleanEntityId)) {
       evidenceMap.set(cleanEntityId, []);
@@ -192,9 +191,7 @@ export function getRepresentationGraph(
   const edges: StructuralEdge[] = [];
 
   for (const row of nodeRows) {
-    const cleanId = row.id.startsWith(prefix)
-      ? row.id.slice(prefix.length)
-      : row.id;
+    const cleanId = row.id;
     const evidenceArray = evidenceMap.get(cleanId) ?? [];
     const evidence = evidenceArray.length === 1 ? evidenceArray[0] : (evidenceArray.length > 1 ? evidenceArray : { filePath: '' });
     const node: StructuralNode = {
@@ -216,9 +213,7 @@ export function getRepresentationGraph(
   }
 
   for (const row of edgeRows) {
-    const cleanId = row.id.startsWith(prefix)
-      ? row.id.slice(prefix.length)
-      : row.id;
+    const cleanId = row.id;
     const evidenceArray = evidenceMap.get(cleanId) ?? [];
     const evidence = evidenceArray.length === 1 ? evidenceArray[0] : (evidenceArray.length > 1 ? evidenceArray : { filePath: '' });
     const edge: StructuralEdge = {

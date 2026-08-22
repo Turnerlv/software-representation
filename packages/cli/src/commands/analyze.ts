@@ -1,4 +1,4 @@
-import { existsSync, statSync } from "node:fs";
+import { existsSync, statSync, mkdirSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { Command } from "commander";
 import {
@@ -31,9 +31,13 @@ export function registerAnalyzeCommand(program: Command) {
       console.log(`Analyzing structural entities in: ${targetPath}...`);
       const graph = analyzeTarget(targetPath);
 
+      const defaultDbDir = resolve(repoPath, ".chomp");
+      if (!existsSync(defaultDbDir)) {
+        mkdirSync(defaultDbDir, { recursive: true });
+      }
       const dbPath = options.db 
         ? resolve(baseDir, options.db)
-        : resolve(baseDir, `fixtures/cloned-repos/${repoName}.db`);
+        : resolve(defaultDbDir, "graph.db");
       const storage = createSQLiteStorage(dbPath);
 
       const repoInfo = {
