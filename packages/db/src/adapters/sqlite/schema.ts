@@ -27,6 +27,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   }
 
   const db = new Database(dbPath);
+  db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
   db.exec(`
@@ -80,21 +81,21 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
 
   `);
 
-  try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
-  try { db.exec("ALTER TABLE nodes ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
-  try { db.exec("ALTER TABLE nodes ADD COLUMN parent_boundary_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE nodes ADD COLUMN metadata TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN source_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN target_id TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN status TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN confidence TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE edges ADD COLUMN metadata TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) {}
-  try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) {}
-  try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) {}
+  try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
+  try { db.exec("ALTER TABLE nodes ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) { }
+  try { db.exec("ALTER TABLE nodes ADD COLUMN parent_boundary_id TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE nodes ADD COLUMN metadata TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN source_id TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN target_id TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN status TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN confidence TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN metadata TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) { }
+  try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) { }
 
   return db;
 }
