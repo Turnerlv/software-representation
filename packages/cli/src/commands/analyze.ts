@@ -6,13 +6,12 @@ import {
   StructuralEntity,
 } from "@chomp/core";
 import { createSQLiteStorage } from "@chomp/db";
-import { resolveDbPath } from "../utils/db.js";
 
 export function registerAnalyzeCommand(program: Command) {
   program
     .command("analyze <path>")
     .description("Analyze a TypeScript/JavaScript source file or directory")
-    .option("--db <path>", "Path to SQLite database file (default: fixtures/cloned-repos/<repoName>.db)")
+    .option("--db <path>", "Path to SQLite database file (default: <path>/.chomp/graph.db)")
     .action(async (inputPath: string, options: { db?: string }) => {
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       const targetPath = resolve(baseDir, inputPath);

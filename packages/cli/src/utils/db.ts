@@ -14,13 +14,3 @@ export function findWorkspaceRoot(startDir: string): string {
   return startDir;
 }
 
-export function resolveDbPath(baseDir: string, optionDb?: string): string {
-  if (optionDb) {
-    return resolve(baseDir, optionDb);
-  }
-  const defaultDir = join(os.homedir(), ".chomp");
-  if (!fs.existsSync(defaultDir)) {
-    fs.mkdirSync(defaultDir, { recursive: true });
-  }
-  return join(defaultDir, "chomp.db");
-}
