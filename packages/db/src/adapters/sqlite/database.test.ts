@@ -115,7 +115,7 @@ test('saveRepresentationGraph and getRepresentationGraph with repository info', 
 
 test('createSQLiteStorage creates directory for file-backed database', async () => {
   const testDbDir = path.join(process.cwd(), 'temp_test_data_spec');
-  const testDbPath = path.join(testDbDir, 'chomp.db');
+  const testDbPath = path.join(testDbDir, 'graph.db');
 
   if (fs.existsSync(testDbDir)) {
     fs.rmSync(testDbDir, { recursive: true, force: true });
