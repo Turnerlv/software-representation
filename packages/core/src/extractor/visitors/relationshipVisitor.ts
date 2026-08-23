@@ -264,11 +264,14 @@ export function visitRelationship(
 
   // Inferred Method Calls (e.g. userController.createUser())
   if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
-    let rootIdentifier: ts.Identifier | null = null;
+    let rootText: string | null = null;
     let currentExpr: ts.Expression = node.expression.expression;
     while (currentExpr) {
       if (ts.isIdentifier(currentExpr)) {
-        rootIdentifier = currentExpr;
+        rootText = currentExpr.text;
+        break;
+      } else if (currentExpr.kind === ts.SyntaxKind.ThisKeyword) {
+        rootText = 'this';
         break;
       } else if (ts.isPropertyAccessExpression(currentExpr)) {
         currentExpr = currentExpr.expression;
@@ -279,8 +282,7 @@ export function visitRelationship(
       }
     }
 
-    if (rootIdentifier) {
-      const rootText = rootIdentifier.text;
+    if (rootText) {
       
       // Skip known open connectors (HTTP and DB clients)
       if (HTTP_CLIENT_IDENTIFIERS.has(rootText) || DB_CLIENT_IDENTIFIERS.has(rootText)) {

@@ -65,6 +65,11 @@
       "patternId": "relationship.invoke-returned-function"
     },
     {
+      "name": "Call: this.query()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
       "name": "Call: userService.getUser()",
       "entityType": "CALL",
       "patternId": "relationship.invoke-returned-function"
