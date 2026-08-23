@@ -23,8 +23,9 @@
   "dependencies": {
     "@chomp/core": "workspace:*",
     "@chomp/db": "workspace:*",
-    "better-sqlite3": "^11.0.0",
     "@google/generative-ai": "^0.24.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "better-sqlite3": "^11.0.0",
     "commander": "^12.1.0",
     "dotenv": "^16.4.5",
     "typescript": "^5.3.0"
