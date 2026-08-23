@@ -49,7 +49,7 @@ export function extractCommonjsExport(
           id: nextId(),
           name: `Prototype Method: ${className}.prototype.${methodName}`,
           type: isFunction ? 'CONTRACT' : 'BOUNDARY',
-          entityType: isFunction ? 'PROTOTYPE_METHOD' : 'CJS_EXPORT',
+          entityType: isFunction ? 'PROTOTYPE_METHOD' : 'CJS_EXPORT', patternId: isFunction ? 'contract.commonjs-export' : 'boundary.commonjs-export',
           evidence: getEvidence(node),
         };
       } else if (ts.isIdentifier(left.expression) && !['this'].includes(left.expression.text)) {
@@ -59,7 +59,7 @@ export function extractCommonjsExport(
             id: nextId(),
             name: `CJS Export Alias: ${left.expression.text}.${left.name.text}`,
             type: 'CONTRACT',
-            entityType: 'EXPORTED_FUNCTION',
+            entityType: 'EXPORTED_FUNCTION', patternId: 'contract.cjs-module-exports-alias',
             evidence: getEvidence(node),
           };
         }
@@ -76,7 +76,7 @@ export function extractCommonjsExport(
             id: nextId(),
             name: `Dynamic Export: ${leftExpr.text}[method]`,
             type: 'CONTRACT',
-            entityType: 'CJS_METHOD',
+            entityType: 'CJS_METHOD', patternId: 'contract.commonjs-export',
             evidence: getEvidence(node),
           };
         }
@@ -90,7 +90,7 @@ export function extractCommonjsExport(
         id: nextId(),
         name: `CJS Export: ${exportName}`,
         type: isFunction ? 'CONTRACT' : 'BOUNDARY',
-        entityType: isFunction ? 'EXPORTED_FUNCTION' : 'CJS_EXPORT',
+        entityType: isFunction ? 'EXPORTED_FUNCTION' : 'CJS_EXPORT', patternId: isFunction ? 'contract.commonjs-export' : 'boundary.commonjs-export',
         evidence: getEvidence(node),
       };
     }

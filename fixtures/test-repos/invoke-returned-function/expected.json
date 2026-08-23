@@ -2,18 +2,21 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/invoke-returned-function/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [],
   "relationships": [
     {
       "name": "Call: getMiddleware()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: getMiddleware()()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-required-function"
     }
   ],
   "openConnectors": []

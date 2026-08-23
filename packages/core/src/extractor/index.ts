@@ -152,7 +152,7 @@ export function analyzeTarget(
       id: fileId,
       name: `File: ${relativePath}`,
       type: 'BOUNDARY',
-      entityType: 'FILE',
+      entityType: 'FILE', patternId: 'generic.boundary',
       scope,
       evidence: { filePath: relativePath },
     });
@@ -218,7 +218,7 @@ export function analyzeTarget(
           id: stableEntityId(relativePath, 'RELATIONSHIP', `Call to ${openConnectorEntity.id}`),
           name: `Call: ${openConnectorEntity.name}`,
           type: 'RELATIONSHIP',
-          entityType: 'CALL',
+          entityType: 'CALL', patternId: 'generic.relationship',
           sourceId: fileId,
           targetId: openConnectorEntity.id,
           status: 'DETERMINISTIC',

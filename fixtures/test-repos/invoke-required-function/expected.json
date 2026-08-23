@@ -2,18 +2,21 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/invoke-required-function/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [],
   "relationships": [
     {
       "name": "Call: require()()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-required-function"
     },
     {
       "name": "Require: ./my-module",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     }
   ],
   "openConnectors": []

@@ -2,11 +2,13 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/es6-export-default/src/index.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "Module Export (Default)",
-      "entityType": "MODULE"
+      "entityType": "MODULE",
+      "patternId": "boundary.es6-export-default"
     }
   ],
   "contracts": [],

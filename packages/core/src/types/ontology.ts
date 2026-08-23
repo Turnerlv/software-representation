@@ -36,6 +36,7 @@ export interface StructuralNode {
   name: string;
   type: 'BOUNDARY' | 'CONTRACT' | 'OPEN_CONNECTOR';
   entityType: string;
+  patternId: string;
   scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK';
   evidence: EvidenceRecord | EvidenceRecord[];
   parentBoundaryId?: string; // Lexical containment (e.g., File -> Contract)
@@ -47,6 +48,7 @@ export interface StructuralEdge {
   name: string;
   type: 'RELATIONSHIP';
   entityType: string;
+  patternId: string;
   scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK';
   evidence: EvidenceRecord | EvidenceRecord[];
   sourceId: string; // Where the call originates
@@ -69,6 +71,7 @@ export interface StructuralEntity {
   name: string;
   type: EntityType;
   entityType: string;
+  patternId: string;
   scope?: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK';
   evidence: EvidenceRecord | EvidenceRecord[];
   parentBoundaryId?: string;

@@ -2,13 +2,15 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/cjs-export-alias/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [
     {
       "name": "CJS Export Alias: myAlias.myFunction",
-      "entityType": "EXPORTED_FUNCTION"
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.cjs-module-exports-alias"
     }
   ],
   "relationships": [],

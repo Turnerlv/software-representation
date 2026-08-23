@@ -2,57 +2,69 @@
   "boundaries": [
     {
       "name": "Class: UserService",
-      "entityType": "CLASS"
+      "entityType": "CLASS",
+      "patternId": "boundary.class-declaration"
     },
     {
       "name": "File: ../../fixtures/test-repos/sample-app/types.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/sample-app/userService.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [
     {
       "name": "Interface: User",
-      "entityType": "EXPORTED_TYPE"
+      "entityType": "EXPORTED_TYPE",
+      "patternId": "contract.interface-declaration"
     },
     {
       "name": "Type: UserCredentials",
-      "entityType": "EXPORTED_TYPE"
+      "entityType": "EXPORTED_TYPE",
+      "patternId": "contract.type-alias-declaration"
     }
   ],
   "relationships": [
     {
       "name": "Call: dbResponse.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: HTTP Call: fetch",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: HTTP Call: fetch",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: JSON.stringify()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Import: ./types",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     }
   ],
   "openConnectors": [
     {
       "name": "HTTP Call: fetch",
-      "entityType": "HTTP_FETCH"
+      "entityType": "HTTP_FETCH",
+      "patternId": "open-connector.http-call"
     },
     {
       "name": "HTTP Call: fetch",
-      "entityType": "HTTP_FETCH"
+      "entityType": "HTTP_FETCH",
+      "patternId": "open-connector.http-call"
     }
   ]
 }

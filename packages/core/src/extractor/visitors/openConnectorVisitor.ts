@@ -124,7 +124,7 @@ export function visitOpenConnector(
       id: nextId(),
       name: `HTTP Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
-      entityType: 'HTTP_FETCH',
+      entityType: 'HTTP_FETCH', patternId: 'open-connector.http-call',
       evidence: getEvidence(node),
       metadata: { payload: args }
     };
@@ -137,7 +137,7 @@ export function visitOpenConnector(
       id: nextId(),
       name: `DB Call: ${callText}`,
       type: 'OPEN_CONNECTOR',
-      entityType: 'DB_QUERY',
+      entityType: 'DB_QUERY', patternId: 'open-connector.db-call',
       evidence: getEvidence(node),
       metadata: { payload: args }
     };

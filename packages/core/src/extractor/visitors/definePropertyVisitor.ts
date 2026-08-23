@@ -33,7 +33,7 @@ export function extractDefinePropertyContract(
               id: nextId(),
               name: `Property Getter: ${propName}`,
               type: 'CONTRACT',
-              entityType: 'PROPERTY_GETTER',
+              entityType: 'PROPERTY_GETTER', patternId: 'contract.define-property',
               evidence: getEvidence(node),
             };
           }
@@ -48,7 +48,7 @@ export function extractDefinePropertyContract(
             id: nextId(),
             name: `Property Getter: ${propName}`,
             type: 'CONTRACT',
-            entityType: 'PROPERTY_GETTER',
+            entityType: 'PROPERTY_GETTER', patternId: 'contract.define-property',
             evidence: getEvidence(node),
           };
         }

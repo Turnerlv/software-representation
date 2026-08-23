@@ -37,7 +37,7 @@ export function visitContract(
       id: nextId(),
       name: `Interface: ${node.name.text}`,
       type: 'CONTRACT',
-      entityType: 'EXPORTED_TYPE',
+      entityType: 'EXPORTED_TYPE', patternId: 'contract.interface-declaration',
       evidence: getEvidence(node),
     };
   }
@@ -46,7 +46,7 @@ export function visitContract(
       id: nextId(),
       name: `Type: ${node.name.text}`,
       type: 'CONTRACT',
-      entityType: 'EXPORTED_TYPE',
+      entityType: 'EXPORTED_TYPE', patternId: 'contract.type-alias-declaration',
       evidence: getEvidence(node),
     };
   }
@@ -59,7 +59,7 @@ export function visitContract(
       id: nextId(),
       name: `Exported Function: ${node.name.text}`,
       type: 'CONTRACT',
-      entityType: 'EXPORTED_FUNCTION',
+      entityType: 'EXPORTED_FUNCTION', patternId: 'contract.exported-function',
       evidence: getEvidence(node),
     };
   }

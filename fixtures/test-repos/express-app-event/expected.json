@@ -2,24 +2,28 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/express-app-event/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [],
   "relationships": [
     {
       "name": "Call: Event Emit: mount",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: fn.emit()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     }
   ],
   "openConnectors": [
     {
       "name": "Event Emit: mount",
-      "entityType": "EVENT_EMIT"
+      "entityType": "EVENT_EMIT",
+      "patternId": "open-connector.event-emitter-emit"
     }
   ]
 }

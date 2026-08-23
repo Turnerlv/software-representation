@@ -2,26 +2,31 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/dynamic-require/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [],
   "relationships": [
     {
       "name": "Dynamic Import: './custom-' + engine + '.js'",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.dynamic-import"
     },
     {
       "name": "Dynamic Require: engine",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Dynamic Require: mod",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Import: path",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.dynamic-import"
     }
   ],
   "openConnectors": []

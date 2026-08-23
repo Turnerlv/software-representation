@@ -2,53 +2,64 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/nodebb-socket/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [
     {
       "name": "Event Listener: [wildcard]",
-      "entityType": "EVENT_LISTENER"
+      "entityType": "EVENT_LISTENER",
+      "patternId": "contract.socket-onany-listener"
     }
   ],
   "relationships": [
     {
       "name": "Call: dispatchToHandler()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Plugin Hook: action:sockets.disconnect",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Plugin Hook: filter:sockets.sessionId",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: plugins.fire()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: plugins.fire()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: socket.onAny()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Require: ../plugins",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     }
   ],
   "openConnectors": [
     {
       "name": "Plugin Hook: action:sockets.disconnect",
-      "entityType": "PLUGIN_HOOK"
+      "entityType": "PLUGIN_HOOK",
+      "patternId": "open-connector.plugin-hook-fire"
     },
     {
       "name": "Plugin Hook: filter:sockets.sessionId",
-      "entityType": "PLUGIN_HOOK"
+      "entityType": "PLUGIN_HOOK",
+      "patternId": "open-connector.plugin-hook-fire"
     }
   ]
 }

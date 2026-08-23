@@ -2,81 +2,99 @@
   "boundaries": [
     {
       "name": "Class: Database",
-      "entityType": "CLASS"
+      "entityType": "CLASS",
+      "patternId": "boundary.class-declaration"
     },
     {
       "name": "Class: UserService",
-      "entityType": "CLASS"
+      "entityType": "CLASS",
+      "patternId": "boundary.class-declaration"
     },
     {
       "name": "File: ../../fixtures/test-repos/layered-app/controller.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/layered-app/db.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/layered-app/service.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "Package: express",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
     }
   ],
   "contracts": [
     {
       "name": "Express Route: GET /users/:id",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     }
   ],
   "relationships": [
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: express()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
     },
     {
       "name": "Call: HTTP Call: fetch",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: userService.getUser()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Import: ./db.js",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     },
     {
       "name": "Import: ./service.js",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     },
     {
       "name": "Import: express",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     }
   ],
   "openConnectors": [
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "HTTP Call: fetch",
-      "entityType": "HTTP_FETCH"
+      "entityType": "HTTP_FETCH",
+      "patternId": "open-connector.http-call"
     }
   ]
 }
