@@ -380,6 +380,21 @@
       "patternId": "generic.relationship"
     },
     {
+      "name": "Call: Express Response Header: Link",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: Express Response Header: X-Baz",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: Express Response Header: X-Foo",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
       "name": "Call: Express View Render",
       "entityType": "CALL",
       "patternId": "generic.relationship"
@@ -460,6 +475,11 @@
       "patternId": "relationship.invoke-returned-function"
     },
     {
+      "name": "Call: res.header()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
       "name": "Call: res.json()",
       "entityType": "CALL",
       "patternId": "relationship.invoke-returned-function"
@@ -531,6 +551,16 @@
     },
     {
       "name": "Call: res.sendStatus()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: res.set()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: res.setHeader()",
       "entityType": "CALL",
       "patternId": "relationship.invoke-returned-function"
     },
@@ -750,6 +780,21 @@
       "name": "Express Response Cookie: remember",
       "entityType": "HTTP_RESPONSE",
       "patternId": "open-connector.express-response-cookie"
+    },
+    {
+      "name": "Express Response Header: Link",
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response-header"
+    },
+    {
+      "name": "Express Response Header: X-Baz",
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response-header"
+    },
+    {
+      "name": "Express Response Header: X-Foo",
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response-header"
     },
     {
       "name": "Express View Render",
