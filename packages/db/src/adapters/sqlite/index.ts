@@ -1,7 +1,7 @@
 import Database from 'better-sqlite3';
 import { ChompStorage, RepositoryInfo, ScopeOptions } from '../../interface.js';
 import { initDatabase } from './schema.js';
-import { saveRepresentationGraph, getRepresentationGraph } from './graphRepository.js';
+import { saveRepresentationGraph, getRepresentationGraph, listRepositories } from './graphRepository.js';
 import type { RepresentationGraph } from '@chomp/core';
 
 export class SQLiteStorage implements ChompStorage {
@@ -20,14 +20,7 @@ export class SQLiteStorage implements ChompStorage {
   }
 
   async listRepositories(): Promise<RepositoryInfo[]> {
-    const rows = this.db.prepare('SELECT id, name, path, extractor_version, commit_sha FROM repositories').all() as any[];
-    return rows.map(row => ({
-      id: row.id,
-      name: row.name,
-      path: row.path,
-      extractorVersion: row.extractor_version ?? undefined,
-      commitSha: row.commit_sha ?? undefined
-    }));
+    return listRepositories(this.db);
   }
 
   async deleteRepository(repoId: string): Promise<void> {
@@ -44,3 +37,4 @@ export function createSQLiteStorage(dbPath: string): ChompStorage {
 }
 
 export * from './schema.js';
+export * from './graphRepository.js';

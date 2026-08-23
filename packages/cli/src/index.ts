@@ -5,7 +5,7 @@
 import { Command } from "commander";
 import { registerAnalyzeCommand } from "./commands/analyze.js";
 import { registerHealthCommand } from "./commands/health.js";
-import { registerMcpCommand } from "./commands/mcp.js";
+import { registerMcpCommand } from './commands/mcp.js';
 import { registerPushCommand } from "./commands/push.js";
 import { registerAuthCommand } from "./commands/auth.js";
 

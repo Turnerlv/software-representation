@@ -252,3 +252,18 @@ export function getRepresentationGraph(
 
   return result;
 }
+
+export function listRepositories(db: Database.Database): Promise<RepositoryInfo[]> {
+  const rows = db.prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories').all();
+  // Map the snake_case DB columns back to the camelCase RepositoryInfo interface
+  const repos = rows.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    path: row.path,
+    analyzedAt: row.analyzed_at,
+    extractorVersion: row.extractor_version,
+    commitSha: row.commit_sha
+  }));
+  return Promise.resolve(repos);
+}
+
