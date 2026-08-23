@@ -2,43 +2,52 @@
   "boundaries": [
     {
       "name": "File: ../../fixtures/test-repos/method-calls/userController.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/method-calls/userService.ts",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     }
   ],
   "contracts": [
     {
       "name": "Exported Function: handleRequest",
-      "entityType": "EXPORTED_FUNCTION"
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
     }
   ],
   "relationships": [
     {
       "name": "Call: console.log()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: globalService.unknownMethod()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: otherService.someMethod()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
     },
     {
       "name": "Call: userService.createUser()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.function-call"
     },
     {
       "name": "Import: ./otherService",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     },
     {
       "name": "Import: ./userService",
-      "entityType": "IMPORT"
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
     }
   ],
   "openConnectors": []

@@ -37,7 +37,7 @@ export function visitBoundary(
       id: nextId(),
       name: `Class: ${node.name.text}`,
       type: 'BOUNDARY',
-      entityType: 'CLASS',
+      entityType: 'CLASS', patternId: 'boundary.class-declaration',
       evidence: getEvidence(node),
     };
   }
@@ -46,7 +46,7 @@ export function visitBoundary(
       id: nextId(),
       name: `Module: ${node.name.text}`,
       type: 'BOUNDARY',
-      entityType: 'MODULE',
+      entityType: 'MODULE', patternId: 'boundary.module-declaration',
       evidence: getEvidence(node),
     };
   }
@@ -55,7 +55,7 @@ export function visitBoundary(
       id: nextId(),
       name: `Module Export (Default)`,
       type: 'BOUNDARY',
-      entityType: 'MODULE',
+      entityType: 'MODULE', patternId: 'boundary.es6-export-default',
       evidence: getEvidence(node),
     };
   }
@@ -71,7 +71,7 @@ export function visitBoundary(
         id: nextId(),
         name: `Package: ${importLiteral}`,
         type: 'BOUNDARY',
-        entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE',
+        entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE', patternId: 'boundary.external-import',
         evidence: getEvidence(node),
       };
     }
@@ -88,7 +88,7 @@ export function visitBoundary(
           id: nextId(),
           name: `Package: ${importLiteral}`,
           type: 'BOUNDARY',
-          entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE',
+          entityType: importLiteral.startsWith('node:') ? 'NODE_BUILTIN' : 'EXTERNAL_PACKAGE', patternId: 'boundary.external-require',
           evidence: getEvidence(node),
         };
       }

@@ -47,7 +47,7 @@ export function extractExpressRoute(
             id: nextId(),
             name: `Express Route: ${methodName.toUpperCase()} ${pathText}`,
             type: 'CONTRACT',
-            entityType: 'HTTP_ENDPOINT',
+            entityType: 'HTTP_ENDPOINT', patternId: 'contract.express-route', 
             evidence: getEvidence(node),
           };
         }
@@ -118,7 +118,7 @@ export function extractExpressRouteMiddleware(
             id: nextId(),
             name: `Express Mount: ${pathText} -> ${target}`,
             type: 'RELATIONSHIP',
-            entityType: 'INTERCEPTS',
+            entityType: 'INTERCEPTS', patternId: 'relationship.express-route-middleware', 
             targetId: stableEntityId(`middleware:${target}`, 'BOUNDARY', `Middleware: ${target}`),
             evidence: getEvidence(node),
           });
@@ -202,7 +202,7 @@ export function extractExpressRouterMount(
         id: nextId(),
         name: `Express Mount: ${pathPrefix} -> ${target}`,
         type: 'RELATIONSHIP',
-        entityType: isMiddleware ? 'INTERCEPTS' : 'MOUNTS',
+        entityType: isMiddleware ? 'INTERCEPTS' : 'MOUNTS', patternId: isMiddleware ? 'relationship.express-route-middleware' : 'relationship.express-router-mount', 
         targetId: stableEntityId(`middleware:${target}`, 'BOUNDARY', `Middleware: ${target}`),
         evidence: getEvidence(node),
       };
@@ -235,7 +235,7 @@ export function extractExpressMiddlewareBoundary(
           id: nextId(),
           name: `Middleware: ${target}`,
           type: 'BOUNDARY',
-          entityType: 'MIDDLEWARE',
+          entityType: 'MIDDLEWARE', patternId: 'boundary.express-middleware', 
           evidence: getEvidence(node),
         };
       }
@@ -280,7 +280,7 @@ export function extractExpressRouteParameter(
         id: nextId(),
         name: `Express Param: ${paramName}`,
         type: 'CONTRACT',
-        entityType: 'HTTP_ENDPOINT',
+        entityType: 'HTTP_ENDPOINT', patternId: 'contract.express-route-parameter', 
         evidence: getEvidence(node),
       };
     }
@@ -328,7 +328,7 @@ export function extractExpressContentNegotiation(
           id: nextId(),
           name: `Express Content Negotiation: ${types.join(', ')}`,
           type: 'CONTRACT',
-          entityType: 'HTTP_ENDPOINT',
+          entityType: 'HTTP_ENDPOINT', patternId: 'contract.express-content-negotiation', 
           evidence: getEvidence(node),
         };
       }
@@ -365,7 +365,7 @@ export function extractExpressResponseConnector(
         id: nextId(),
         name: `Express File Response: ${methodName}`,
         type: 'OPEN_CONNECTOR',
-        entityType: 'FILE_RESPONSE',
+        entityType: 'FILE_RESPONSE', patternId: 'open-connector.express-response', 
         evidence: getEvidence(node),
       };
     } else if (methodName === 'render' && node.arguments.length >= 1) {
@@ -382,7 +382,7 @@ export function extractExpressResponseConnector(
           id: nextId(),
           name: `Express View Render`,
           type: 'OPEN_CONNECTOR',
-          entityType: 'VIEW_RENDER',
+          entityType: 'VIEW_RENDER', patternId: 'open-connector.express-response', 
           evidence: getEvidence(node),
         };
       }
@@ -400,7 +400,7 @@ export function extractExpressResponseConnector(
           id: nextId(),
           name: `Express Redirect`,
           type: 'OPEN_CONNECTOR',
-          entityType: 'REDIRECT',
+          entityType: 'REDIRECT', patternId: 'open-connector.express-response-redirect', 
           evidence: getEvidence(node),
         };
       }
@@ -427,7 +427,7 @@ export function extractExpressResponseConnector(
           id: nextId(),
           name: `Express HTTP Response: ${methodName}`,
           type: 'OPEN_CONNECTOR',
-          entityType: 'HTTP_RESPONSE',
+          entityType: 'HTTP_RESPONSE', patternId: 'open-connector.express-response', 
           evidence: getEvidence(node),
         };
       }
@@ -471,7 +471,7 @@ export function extractExpressAppListen(
           id: nextId(),
           name: `Express App Listen`,
           type: 'OPEN_CONNECTOR',
-          entityType: 'NETWORK_LISTEN',
+          entityType: 'NETWORK_LISTEN', patternId: 'open-connector.express-app-listen', 
           evidence: getEvidence(node),
         };
       }
@@ -520,7 +520,7 @@ export function extractExpressResponseCookie(
           id: nextId(),
           name: `Express Response Cookie: ${cookieName}`,
           type: 'OPEN_CONNECTOR',
-          entityType: 'HTTP_RESPONSE',
+          entityType: 'HTTP_RESPONSE', patternId: 'open-connector.express-response-cookie', 
           evidence: getEvidence(node),
         };
       }
@@ -557,7 +557,7 @@ export function extractExpressDynamicMethods(
         id: nextId(),
         name: `Express Route: ${method.toUpperCase()} (Dynamic)`,
         type: 'CONTRACT',
-        entityType: 'HTTP_ENDPOINT',
+        entityType: 'HTTP_ENDPOINT', patternId: 'contract.express-dynamic-methods', 
         evidence: getEvidence(node),
       });
     }

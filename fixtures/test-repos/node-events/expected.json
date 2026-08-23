@@ -2,49 +2,59 @@
   "boundaries": [
     {
       "name": "Class: MyEmitter",
-      "entityType": "CLASS"
+      "entityType": "CLASS",
+      "patternId": "boundary.class-declaration"
     },
     {
       "name": "File: ../../fixtures/test-repos/node-events/index.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "Package: events",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     }
   ],
   "contracts": [
     {
       "name": "Event Listener: event",
-      "entityType": "EVENT_LISTENER"
+      "entityType": "EVENT_LISTENER",
+      "patternId": "contract.event-emitter-listener"
     }
   ],
   "relationships": [
     {
       "name": "Call: console.log()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Event Emit: event",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: myEmitter.emit()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: myEmitter.on()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Require: events",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     }
   ],
   "openConnectors": [
     {
       "name": "Event Emit: event",
-      "entityType": "EVENT_EMIT"
+      "entityType": "EVENT_EMIT",
+      "patternId": "open-connector.event-emitter-emit"
     }
   ]
 }

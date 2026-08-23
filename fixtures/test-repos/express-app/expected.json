@@ -2,609 +2,759 @@
   "boundaries": [
     {
       "name": "CJS Export: default",
-      "entityType": "CJS_EXPORT"
+      "entityType": "CJS_EXPORT",
+      "patternId": "boundary.commonjs-export"
     },
     {
       "name": "CJS Export: default",
-      "entityType": "CJS_EXPORT"
+      "entityType": "CJS_EXPORT",
+      "patternId": "boundary.commonjs-export"
     },
     {
       "name": "CJS Export: default",
-      "entityType": "CJS_EXPORT"
+      "entityType": "CJS_EXPORT",
+      "patternId": "boundary.commonjs-export"
     },
     {
       "name": "CJS Export: request",
-      "entityType": "CJS_EXPORT"
+      "entityType": "CJS_EXPORT",
+      "patternId": "boundary.commonjs-export"
     },
     {
       "name": "CJS Export: response",
-      "entityType": "CJS_EXPORT"
+      "entityType": "CJS_EXPORT",
+      "patternId": "boundary.commonjs-export"
     },
     {
       "name": "File: ../../fixtures/test-repos/express-app/app.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/express-app/inheritance.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/express-app/routes/api.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "File: ../../fixtures/test-repos/express-app/routes/users.js",
-      "entityType": "FILE"
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
     },
     {
       "name": "Middleware: express.json()",
-      "entityType": "MIDDLEWARE"
+      "entityType": "MIDDLEWARE",
+      "patternId": "boundary.express-middleware"
     },
     {
       "name": "Middleware: express.urlencoded()",
-      "entityType": "MIDDLEWARE"
+      "entityType": "MIDDLEWARE",
+      "patternId": "boundary.express-middleware"
     },
     {
       "name": "Middleware: Inline Middleware",
-      "entityType": "MIDDLEWARE"
+      "entityType": "MIDDLEWARE",
+      "patternId": "boundary.express-middleware"
     },
     {
       "name": "Package: events",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     },
     {
       "name": "Package: express",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     },
     {
       "name": "Package: express",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     },
     {
       "name": "Package: express",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     },
     {
       "name": "Package: http",
-      "entityType": "EXTERNAL_PACKAGE"
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-require"
     }
   ],
   "contracts": [
     {
       "name": "CJS Export: header",
-      "entityType": "EXPORTED_FUNCTION"
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.commonjs-export"
     },
     {
       "name": "CJS Export: init",
-      "entityType": "EXPORTED_FUNCTION"
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.commonjs-export"
     },
     {
       "name": "CJS Export: status",
-      "entityType": "EXPORTED_FUNCTION"
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.commonjs-export"
     },
     {
       "name": "Dynamic Export: app[method]",
-      "entityType": "CJS_METHOD"
+      "entityType": "CJS_METHOD",
+      "patternId": "contract.commonjs-export"
     },
     {
       "name": "Express Content Negotiation: application/json, default",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-content-negotiation"
     },
     {
       "name": "Express Param: user",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route-parameter"
     },
     {
       "name": "Express Route: DELETE /items/:id",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /:id",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /^\\/user\\/[0-9]+$/",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /cookie",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /download",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /items",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /protected",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /redirect",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: GET /view",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: POST /items",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: POST /login",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: PUT /:id",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Express Route: ROUTE /settings",
-      "entityType": "HTTP_ENDPOINT"
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.express-route"
     },
     {
       "name": "Property Getter: ip",
-      "entityType": "PROPERTY_GETTER"
+      "entityType": "PROPERTY_GETTER",
+      "patternId": "contract.define-property"
     },
     {
       "name": "Property Getter: name",
-      "entityType": "PROPERTY_GETTER"
+      "entityType": "PROPERTY_GETTER",
+      "patternId": "contract.define-property"
     },
     {
       "name": "Property Getter: protocol",
-      "entityType": "PROPERTY_GETTER"
+      "entityType": "PROPERTY_GETTER",
+      "patternId": "contract.define-property"
     },
     {
       "name": "Prototype Method: View.prototype.lookup",
-      "entityType": "PROTOTYPE_METHOD"
+      "entityType": "PROTOTYPE_METHOD",
+      "patternId": "contract.commonjs-export"
     }
   ],
   "relationships": [
     {
       "name": "Call: app.emit()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.listen()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.param()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.post()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.post()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: app.route()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: defineGetter()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Event Emit: mount",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express App Listen",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express File Response: download",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: json",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: send",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express HTTP Response: sendStatus",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express Redirect",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express Response Cookie: remember",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express Response Cookie: remember",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: Express View Render",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
     },
     {
       "name": "Call: express.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: express.Router()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: express.Router()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: express.urlencoded()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: express()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: next()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: next()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: next()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Object.defineProperty()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: Object.defineProperty()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: req.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.clearCookie()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.cookie()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.download()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.format()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.json()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.redirect()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.render()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.send()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.sendStatus()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.status()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: res.status()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.delete()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.get()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.post()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Call: router.put()",
-      "entityType": "CALL"
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
     },
     {
       "name": "Express Mount: /^\\/api.*/ -> Inline Middleware",
-      "entityType": "INTERCEPTS"
+      "entityType": "INTERCEPTS",
+      "patternId": "relationship.express-route-middleware"
     },
     {
       "name": "Express Mount: /api -> apiRouter",
-      "entityType": "MOUNTS"
+      "entityType": "MOUNTS",
+      "patternId": "relationship.express-router-mount"
     },
     {
       "name": "Express Mount: /protected -> requireAuth",
-      "entityType": "INTERCEPTS"
+      "entityType": "INTERCEPTS",
+      "patternId": "relationship.express-route-middleware"
     },
     {
       "name": "Express Mount: /users -> usersRouter",
-      "entityType": "MOUNTS"
+      "entityType": "MOUNTS",
+      "patternId": "relationship.express-router-mount"
     },
     {
       "name": "Express Mount: Root -> express.json()",
-      "entityType": "INTERCEPTS"
+      "entityType": "INTERCEPTS",
+      "patternId": "relationship.express-route-middleware"
     },
     {
       "name": "Express Mount: Root -> express.urlencoded()",
-      "entityType": "INTERCEPTS"
+      "entityType": "INTERCEPTS",
+      "patternId": "relationship.express-route-middleware"
     },
     {
       "name": "Inherits: http.IncomingMessage.prototype",
-      "entityType": "INHERITS"
+      "entityType": "INHERITS",
+      "patternId": "relationship.object-create"
     },
     {
       "name": "Inherits: http.IncomingMessage.prototype",
-      "entityType": "INHERITS"
+      "entityType": "INHERITS",
+      "patternId": "relationship.object-setprototypeof"
     },
     {
       "name": "Mixes: EventEmitter",
-      "entityType": "MIXES"
+      "entityType": "MIXES",
+      "patternId": "relationship.prototype-mixin"
     },
     {
       "name": "Require: ./routes/api",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: ./routes/users",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: events",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: express",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: express",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: express",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     },
     {
       "name": "Require: http",
-      "entityType": "REQUIRE"
+      "entityType": "REQUIRE",
+      "patternId": "relationship.require-call"
     }
   ],
   "openConnectors": [
     {
       "name": "Event Emit: mount",
-      "entityType": "EVENT_EMIT"
+      "entityType": "EVENT_EMIT",
+      "patternId": "open-connector.event-emitter-emit"
     },
     {
       "name": "Express App Listen",
-      "entityType": "NETWORK_LISTEN"
+      "entityType": "NETWORK_LISTEN",
+      "patternId": "open-connector.express-app-listen"
     },
     {
       "name": "Express File Response: download",
-      "entityType": "FILE_RESPONSE"
+      "entityType": "FILE_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: json",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: send",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express HTTP Response: sendStatus",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response"
     },
     {
       "name": "Express Redirect",
-      "entityType": "REDIRECT"
+      "entityType": "REDIRECT",
+      "patternId": "open-connector.express-response-redirect"
     },
     {
       "name": "Express Response Cookie: remember",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response-cookie"
     },
     {
       "name": "Express Response Cookie: remember",
-      "entityType": "HTTP_RESPONSE"
+      "entityType": "HTTP_RESPONSE",
+      "patternId": "open-connector.express-response-cookie"
     },
     {
       "name": "Express View Render",
-      "entityType": "VIEW_RENDER"
+      "entityType": "VIEW_RENDER",
+      "patternId": "open-connector.express-response"
     }
   ]
 }

@@ -30,7 +30,7 @@ export function extractEventEmitterContract(
             id: nextId(),
             name: `Event Listener: ${firstArg.text}`,
             type: 'CONTRACT',
-            entityType: 'EVENT_LISTENER',
+            entityType: 'EVENT_LISTENER', patternId: 'contract.event-emitter-listener',
             evidence: getEvidence(node),
           };
         }
@@ -71,7 +71,7 @@ export function extractSocketOnAnyContract(
         id: nextId(),
         name: 'Event Listener: [wildcard]',
         type: 'CONTRACT',
-        entityType: 'EVENT_LISTENER',
+        entityType: 'EVENT_LISTENER', patternId: 'contract.socket-onany-listener',
         evidence: getEvidence(node),
       };
     }
@@ -130,7 +130,7 @@ export function extractPluginHookFire(
     id: nextId(),
     name: `Plugin Hook: ${firstArg.text}`,
     type: 'OPEN_CONNECTOR',
-    entityType: 'PLUGIN_HOOK',
+    entityType: 'PLUGIN_HOOK', patternId: 'open-connector.plugin-hook-fire',
     evidence: getEvidence(node),
   };
 }
@@ -160,7 +160,7 @@ export function extractEventEmitterEmit(
             id: nextId(),
             name: `Event Emit: ${firstArg.text}`,
             type: 'OPEN_CONNECTOR',
-            entityType: 'EVENT_EMIT',
+            entityType: 'EVENT_EMIT', patternId: 'open-connector.event-emitter-emit',
             evidence: getEvidence(node),
           };
         }

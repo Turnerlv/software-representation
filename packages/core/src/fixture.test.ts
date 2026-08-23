@@ -19,10 +19,10 @@ test('analyzeTarget exactly matches expected.json for all fixtures', () => {
     const actual = analyzeTarget(fixturePath);
 
     const actualMapped = {
-      boundaries: actual.nodes.filter(n => n.type === 'BOUNDARY').map(b => ({ name: b.name, entityType: b.entityType })),
-      contracts: actual.nodes.filter(n => n.type === 'CONTRACT').map(c => ({ name: c.name, entityType: c.entityType })),
-      relationships: actual.edges.map(r => ({ name: r.name, entityType: r.entityType })),
-      openConnectors: actual.nodes.filter(n => n.type === 'OPEN_CONNECTOR').map(oc => ({ name: oc.name, entityType: oc.entityType }))
+      boundaries: actual.nodes.filter(n => n.type === 'BOUNDARY').map(b => ({ name: b.name, entityType: b.entityType, patternId: b.patternId })),
+      contracts: actual.nodes.filter(n => n.type === 'CONTRACT').map(c => ({ name: c.name, entityType: c.entityType, patternId: c.patternId })),
+      relationships: actual.edges.map(r => ({ name: r.name, entityType: r.entityType, patternId: r.patternId })),
+      openConnectors: actual.nodes.filter(n => n.type === 'OPEN_CONNECTOR').map(oc => ({ name: oc.name, entityType: oc.entityType, patternId: oc.patternId }))
     };
 
     // Sort to ensure order independence in assertions
