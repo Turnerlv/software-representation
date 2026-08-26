@@ -9,6 +9,7 @@ import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
 import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport } from '../adapters/nextjsAdapter.js';
 import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
+import { extractFactoryExport } from './factoryExportVisitor.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -116,6 +117,9 @@ export function visitContract(
 
   const definePropertyContract = extractDefinePropertyContract(node, getEvidence, nextId);
   if (definePropertyContract) return definePropertyContract;
+
+  const factoryExport = extractFactoryExport(node, getEvidence, nextId);
+  if (factoryExport) return factoryExport;
 
   return null;
 }
