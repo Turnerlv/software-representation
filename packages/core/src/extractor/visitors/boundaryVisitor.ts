@@ -6,7 +6,7 @@ import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { resolveModulePath } from '../pathResolver.js';
 import { extractExpressMiddlewareBoundary } from '../adapters/expressAdapter.js';
-import { NextjsFileRole, extractNextjsPageBoundary } from '../adapters/nextjsAdapter.js';
+import { NextjsFileRole, extractNextjsPageBoundary, extractNextjsLayoutBoundary } from '../adapters/nextjsAdapter.js';
 
 /**
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
@@ -103,6 +103,9 @@ export function visitBoundary(
 
   const nextjsPage = extractNextjsPageBoundary(node, fileRole ?? null, filePath ?? '', getEvidence, nextId);
   if (nextjsPage) return nextjsPage;
+
+  const nextjsLayout = extractNextjsLayoutBoundary(node, fileRole ?? null, filePath ?? '', getEvidence, nextId);
+  if (nextjsLayout) return nextjsLayout;
 
   return null;
 }

@@ -36,15 +36,15 @@ export function classifyNextjsFile(filePath: string): NextjsFileRole | null {
   const normalized = filePath.replace(/\\/g, '/');
 
   // Route Handler: app/**/route.ts(x)
-  if (/(?:^|\/)app\/.+\/route\.[tj]sx?$/.test(normalized)) {
+  if (/(?:^|\/)app\/(?:.*\/)?route\.[tj]sx?$/.test(normalized)) {
     return 'ROUTE_HANDLER';
   }
   // Page: app/**/page.ts(x)
-  if (/(?:^|\/)app\/.+\/page\.[tj]sx?$/.test(normalized)) {
+  if (/(?:^|\/)app\/(?:.*\/)?page\.[tj]sx?$/.test(normalized)) {
     return 'PAGE';
   }
   // Layout: app/**/layout.ts(x)
-  if (/(?:^|\/)app\/.+\/layout\.[tj]sx?$/.test(normalized)) {
+  if (/(?:^|\/)app\/(?:.*\/)?layout\.[tj]sx?$/.test(normalized)) {
     return 'LAYOUT';
   }
   // Middleware: middleware.ts(x) at root (may have leading path segments from cwd)
@@ -248,8 +248,8 @@ function deriveRoutePath(filePath: string): string {
   const normalized = filePath.replace(/\\/g, '/');
   // Strip everything up to and including the first 'app/' segment
   const afterApp = normalized.replace(/^.*?app\//, '');
-  // Remove the trailing /page.tsx or page.tsx
-  const withoutPage = afterApp.replace(/\/?page\.[tj]sx?$/, '');
+  // Remove the trailing /page.tsx, page.tsx, /layout.tsx, or layout.tsx
+  const withoutPage = afterApp.replace(/\/?(?:page|layout)\.[tj]sx?$/, '');
   // Remove route group segments like (dashboard) or (auth)
   const withoutGroups = withoutPage.replace(/\([^)]+\)\//g, '').replace(/\([^)]+\)$/, '');
 
@@ -258,12 +258,7 @@ function deriveRoutePath(filePath: string): string {
 }
 
 /**
- * Extracts Next.js cache invalidation calls (revalidatePath, revalidateTag) as OPEN_CONNECTOR entities.
- *
- * @param node        The AST node to inspect.
- * @param getEvidence Returns an EvidenceRecord for the given node.
- * @param nextId      Placeholder ID closure.
- * @returns An OPEN_CONNECTOR entity, or null.
+ * Extracts Next.js Cache invalidation calls...
  */
 export function extractNextjsRevalidate(
   node: ts.Node,
@@ -284,4 +279,47 @@ export function extractNextjsRevalidate(
     patternId: 'open-connector.nextjs-revalidate-path',
     evidence: getEvidence(node),
   };
+}
+
+/**
+ * Extracts a Next.js Layout component as a BOUNDARY from a `layout.tsx` file.
+ *
+ * Matches: `export default function DashboardLayout(...)` or
+ *          `export default async function DashboardLayout(...)`.
+ *
+ * @param node      The AST node to inspect.
+ * @param fileRole  The classified role of the current file (only fires on LAYOUT).
+ * @param filePath  The relative file path, used to derive the route path.
+ * @param getEvidence  Returns an EvidenceRecord for the given node.
+ * @param nextId    Placeholder ID closure.
+ * @returns A BOUNDARY entity, or null.
+ */
+export function extractNextjsLayoutBoundary(
+  node: ts.Node,
+  fileRole: NextjsFileRole | null,
+  filePath: string,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (fileRole !== 'LAYOUT') return null;
+
+  if (
+    ts.isFunctionDeclaration(node) &&
+    node.name &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword) &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword)
+  ) {
+    const routePath = deriveRoutePath(filePath);
+    return {
+      id: nextId(),
+      name: `Next.js Layout: ${routePath}`,
+      type: 'BOUNDARY',
+      entityType: 'NEXTJS_LAYOUT',
+      patternId: 'boundary.nextjs-layout-component',
+      evidence: getEvidence(node),
+      metadata: { routePath, componentName: node.name.text },
+    };
+  }
+
+  return null;
 }

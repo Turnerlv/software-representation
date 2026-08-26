@@ -31,6 +31,16 @@
       "patternId": "boundary.nextjs-page-component"
     },
     {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/layout.tsx",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Next.js Layout: /",
+      "entityType": "NEXTJS_LAYOUT",
+      "patternId": "boundary.nextjs-layout-component"
+    },
+    {
       "name": "Package: next/server",
       "entityType": "EXTERNAL_PACKAGE",
       "patternId": "boundary.external-import"

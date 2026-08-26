@@ -64,10 +64,14 @@ export function visitContract(
     // those are handled more specifically by extractNextjsRouteHandlerContracts.
     const isRouteMethod = fileRole === 'ROUTE_HANDLER' &&
       new Set(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']).has(node.name.text);
-    // Skip default-exported functions in PAGE files — captured as BOUNDARY by extractNextjsPageBoundary.
-    const isPageDefault = fileRole === 'PAGE' &&
-      node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword);
-    if (!isRouteMethod && !isPageDefault) {
+    // Skip default-exported functions in PAGE and LAYOUT files — captured as BOUNDARY.
+    if (
+      (fileRole === 'PAGE' || fileRole === 'LAYOUT') &&
+      node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword)
+    ) {
+      return null;
+    }
+    if (!isRouteMethod) {
       return {
         id: nextId(),
         name: `Exported Function: ${node.name.text}`,
