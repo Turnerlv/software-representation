@@ -13,6 +13,7 @@ const FACTORY_FUNCTIONS = new Set([
   'NextAuth',
   'createInsertSchema',
   'createSelectSchema',
+  'pgTable',
 ]);
 
 /**
@@ -48,9 +49,10 @@ export function extractFactoryExport(
 
     const isNextAuth = factoryFnName === 'NextAuth';
     const isDrizzle = factoryFnName.startsWith('create') && factoryFnName.endsWith('Schema');
+    const isTable = factoryFnName === 'pgTable';
 
-    const entityType = isNextAuth ? 'AUTH_INTERFACE' : (isDrizzle ? 'VALIDATOR_SCHEMA' : 'FACTORY_EXPORT');
-    const patternId = isNextAuth ? 'contract.nextauth-factory-destructure' : (isDrizzle ? 'contract.drizzle-exported-validator' : 'contract.factory-export');
+    const entityType = isNextAuth ? 'AUTH_INTERFACE' : (isDrizzle ? 'VALIDATOR_SCHEMA' : (isTable ? 'DB_SCHEMA' : 'FACTORY_EXPORT'));
+    const patternId = isNextAuth ? 'contract.nextauth-factory-destructure' : (isDrizzle ? 'contract.drizzle-exported-validator' : (isTable ? 'contract.drizzle-table-schema' : 'contract.factory-export'));
 
     if (ts.isIdentifier(decl.name)) {
       // Direct assignment: export const schema = createInsertSchema(...)
