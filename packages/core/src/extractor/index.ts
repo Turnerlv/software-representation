@@ -15,6 +15,7 @@ import { visitBoundary } from './visitors/boundaryVisitor.js';
 import { visitContract } from './visitors/contractVisitor.js';
 import { visitRelationship } from './visitors/relationshipVisitor.js';
 import { visitOpenConnector } from './visitors/openConnectorVisitor.js';
+import { classifyNextjsFile, NextjsFileRole } from './adapters/nextjsAdapter.js';
 
 /**
  * Recursively collects all TypeScript and JavaScript source files under the given path.
@@ -157,6 +158,9 @@ export function analyzeTarget(
       evidence: { filePath: relativePath },
     });
 
+    // Classify the file's Next.js App Router role (if any) once, before the AST walk.
+    const fileRole: NextjsFileRole | null = classifyNextjsFile(relativePath);
+
     /**
      * Constructs a 1-indexed source evidence record for the given AST node.
      * Truncates snippets to 80 characters and normalizes whitespace.
@@ -179,7 +183,7 @@ export function analyzeTarget(
      * Replaces placeholder entity IDs with deterministic stableEntityId() before pushing to graph arrays.
      */
     function visit(node: ts.Node) {
-      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot);
+      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath);
       const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
       for (const boundaryEntity of boundaryEntities) {
         boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
@@ -188,7 +192,7 @@ export function analyzeTarget(
         nodes.push(boundaryEntity as StructuralNode);
       }
 
-      const contractResult = visitContract(node, getEvidence, () => '');
+      const contractResult = visitContract(node, sourceFile, getEvidence, () => '', fileRole);
       const contractEntities = Array.isArray(contractResult) ? contractResult : (contractResult ? [contractResult] : []);
       for (const contractEntity of contractEntities) {
         contractEntity.id = stableEntityId(relativePath, contractEntity.type, contractEntity.name);
