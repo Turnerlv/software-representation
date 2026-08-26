@@ -256,3 +256,32 @@ function deriveRoutePath(filePath: string): string {
   if (!withoutGroups || withoutGroups === '/') return '/';
   return '/' + withoutGroups.replace(/\/$/, '');
 }
+
+/**
+ * Extracts Next.js cache invalidation calls (revalidatePath, revalidateTag) as OPEN_CONNECTOR entities.
+ *
+ * @param node        The AST node to inspect.
+ * @param getEvidence Returns an EvidenceRecord for the given node.
+ * @param nextId      Placeholder ID closure.
+ * @returns An OPEN_CONNECTOR entity, or null.
+ */
+export function extractNextjsRevalidate(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (!ts.isCallExpression(node)) return null;
+  if (!ts.isIdentifier(node.expression)) return null;
+
+  const fnName = node.expression.text;
+  if (fnName !== 'revalidatePath' && fnName !== 'revalidateTag') return null;
+
+  return {
+    id: nextId(),
+    name: `Next.js Cache: ${fnName}()`,
+    type: 'OPEN_CONNECTOR',
+    entityType: 'CACHE_INVALIDATION',
+    patternId: 'open-connector.nextjs-revalidate-path',
+    evidence: getEvidence(node),
+  };
+}

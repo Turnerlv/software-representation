@@ -48,6 +48,11 @@
       "patternId": "contract.nextauth-factory-destructure"
     },
     {
+      "name": "DB_SCHEMA: users",
+      "entityType": "DB_SCHEMA",
+      "patternId": "contract.drizzle-table-schema"
+    },
+    {
       "name": "VALIDATOR_SCHEMA: insertUserSchema",
       "entityType": "VALIDATOR_SCHEMA",
       "patternId": "contract.drizzle-exported-validator"

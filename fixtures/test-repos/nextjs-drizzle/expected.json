@@ -1,0 +1,125 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-drizzle/lib/db.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Package: drizzle-orm",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Package: next/cache",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Exported Function: deleteUser",
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
+    },
+    {
+      "name": "Exported Function: getUser",
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Call: db.delete()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: db.from()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: db.select()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: db.where()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: db.where()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: Drizzle Query: delete()",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: Drizzle Query: select()",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: eq()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: eq()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: Next.js Cache: revalidatePath()",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: revalidatePath()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Import: ./schema",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: ./setup",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: drizzle-orm",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: next/cache",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Drizzle Query: delete()",
+      "entityType": "DB_QUERY",
+      "patternId": "open-connector.drizzle-query-chain"
+    },
+    {
+      "name": "Drizzle Query: select()",
+      "entityType": "DB_QUERY",
+      "patternId": "open-connector.drizzle-query-chain"
+    },
+    {
+      "name": "Next.js Cache: revalidatePath()",
+      "entityType": "CACHE_INVALIDATION",
+      "patternId": "open-connector.nextjs-revalidate-path"
+    }
+  ]
+}
