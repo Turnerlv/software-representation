@@ -7,6 +7,8 @@ import { extractExpressRoute, extractExpressRouteParameter, extractExpressConten
 import { extractEventEmitterContract, extractSocketOnAnyContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
+import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport } from '../adapters/nextjsAdapter.js';
+import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -29,8 +31,10 @@ import { extractDefinePropertyContract } from './definePropertyVisitor.js';
  */
 export function visitContract(
   node: ts.Node,
+  sourceFile: ts.SourceFile,
   getEvidence: (node: ts.Node) => EvidenceRecord,
-  nextId: () => string
+  nextId: () => string,
+  fileRole?: NextjsFileRole | null
 ): StructuralEntity | StructuralEntity[] | null {
   if (ts.isInterfaceDeclaration(node) && node.name) {
     return {
@@ -55,15 +59,40 @@ export function visitContract(
     node.name &&
     node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
   ) {
-    return {
-      id: nextId(),
-      name: `Exported Function: ${node.name.text}`,
-      type: 'CONTRACT',
-      entityType: 'EXPORTED_FUNCTION', patternId: 'contract.exported-function',
-      evidence: getEvidence(node),
-    };
+    // Skip functions whose names are HTTP method names in a ROUTE_HANDLER file —
+    // those are handled more specifically by extractNextjsRouteHandlerContracts.
+    const isRouteMethod = fileRole === 'ROUTE_HANDLER' &&
+      new Set(['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']).has(node.name.text);
+    // Skip default-exported functions in PAGE files — captured as BOUNDARY by extractNextjsPageBoundary.
+    const isPageDefault = fileRole === 'PAGE' &&
+      node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword);
+    if (!isRouteMethod && !isPageDefault) {
+      return {
+        id: nextId(),
+        name: `Exported Function: ${node.name.text}`,
+        type: 'CONTRACT',
+        entityType: 'EXPORTED_FUNCTION', patternId: 'contract.exported-function',
+        evidence: getEvidence(node),
+      };
+    }
   }
-  
+
+  // Next.js: directive prologues ('use server', 'use client')
+  const directive = extractDirectiveContract(node, sourceFile, getEvidence, nextId);
+  if (directive) return directive;
+
+  // Next.js: server-only import guard
+  const serverGuard = extractServerOnlyGuard(node, getEvidence, nextId);
+  if (serverGuard) return serverGuard;
+
+  // Next.js: Route Handler contracts (GET/POST/... exports in route.ts)
+  const routeHandlers = extractNextjsRouteHandlerContracts(node, fileRole ?? null, getEvidence, nextId);
+  if (routeHandlers) return routeHandlers;
+
+  // Next.js: middleware export contract
+  const middleware = extractNextjsMiddlewareExport(node, fileRole ?? null, getEvidence, nextId);
+  if (middleware) return middleware;
+
   const expressRoute = extractExpressRoute(node, getEvidence, nextId);
   if (expressRoute) return expressRoute;
 
