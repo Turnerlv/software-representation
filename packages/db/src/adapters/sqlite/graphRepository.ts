@@ -46,13 +46,13 @@ export function saveRepresentationGraph(
     db.prepare('DELETE FROM edges WHERE repository_id = ?').run(repo.id);
 
     const insertNode = db.prepare(`
-      INSERT OR IGNORE INTO nodes (id, repository_id, name, type, entity_type, scope, parent_boundary_id, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO nodes (id, repository_id, name, type, entity_type, pattern_id, scope, parent_boundary_id, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEdge = db.prepare(`
-      INSERT OR IGNORE INTO edges (id, repository_id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT OR IGNORE INTO edges (id, repository_id, name, type, entity_type, pattern_id, scope, source_id, target_id, status, confidence, metadata)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const insertEvidence = db.prepare(`
@@ -62,7 +62,7 @@ export function saveRepresentationGraph(
 
     for (const node of graph.nodes) {
       const metadataStr = node.metadata ? JSON.stringify(node.metadata) : null;
-      insertNode.run(node.id, repo.id, node.name, node.type, node.entityType, node.scope ?? 'USER', node.parentBoundaryId ?? null, metadataStr);
+      insertNode.run(node.id, repo.id, node.name, node.type, node.entityType, node.patternId, node.scope ?? 'USER', node.parentBoundaryId ?? null, metadataStr);
       
       const evidences = Array.isArray(node.evidence) ? node.evidence : [node.evidence];
       for (const ev of evidences) {
@@ -84,7 +84,7 @@ export function saveRepresentationGraph(
 
     for (const edge of graph.edges) {
       const metadataStr = edge.metadata ? JSON.stringify(edge.metadata) : null;
-      insertEdge.run(edge.id, repo.id, edge.name, edge.type, edge.entityType, edge.scope ?? 'USER', edge.sourceId, edge.targetId ?? null, edge.status ?? null, edge.confidence ?? null, metadataStr);
+      insertEdge.run(edge.id, repo.id, edge.name, edge.type, edge.entityType, edge.patternId, edge.scope ?? 'USER', edge.sourceId, edge.targetId ?? null, edge.status ?? null, edge.confidence ?? null, metadataStr);
       
       const evidences = Array.isArray(edge.evidence) ? edge.evidence : [edge.evidence];
       for (const ev of evidences) {
@@ -135,15 +135,15 @@ export function getRepresentationGraph(
   const scopesStr = options.scopes?.length ? options.scopes.map(s => `'${s}'`).join(',') : "'USER'";
   const nodeRows = db
     .prepare(
-      `SELECT id, name, type, entity_type, scope, parent_boundary_id, metadata FROM nodes WHERE repository_id = ? AND scope IN (${scopesStr})`
+      `SELECT id, name, type, entity_type, pattern_id, scope, parent_boundary_id, metadata FROM nodes WHERE repository_id = ? AND scope IN (${scopesStr})`
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; parent_boundary_id: string | null; metadata: string | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; pattern_id: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; parent_boundary_id: string | null; metadata: string | null }>;
 
   const edgeRows = db
     .prepare(
-      `SELECT id, name, type, entity_type, scope, source_id, target_id, status, confidence, metadata FROM edges WHERE repository_id = ? AND scope IN (${scopesStr})`
+      `SELECT id, name, type, entity_type, pattern_id, scope, source_id, target_id, status, confidence, metadata FROM edges WHERE repository_id = ? AND scope IN (${scopesStr})`
     )
-    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
+    .all(repoId) as Array<{ id: string; name: string; type: EntityType; entity_type: string; pattern_id: string; scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG'; source_id: string; target_id: string | null; status: 'DETERMINISTIC' | 'INFERRED' | null; confidence: 'HIGH' | 'MEDIUM' | 'LOW' | null; metadata: string | null }>;
 
   const evidenceRows = db
     .prepare(
@@ -199,6 +199,7 @@ export function getRepresentationGraph(
       name: row.name,
       type: row.type as 'BOUNDARY' | 'CONTRACT' | 'OPEN_CONNECTOR',
       entityType: row.entity_type,
+      patternId: row.pattern_id,
       scope: row.scope,
       evidence,
     };
@@ -221,6 +222,7 @@ export function getRepresentationGraph(
       name: row.name,
       type: row.type as 'RELATIONSHIP',
       entityType: row.entity_type,
+      patternId: row.pattern_id,
       scope: row.scope,
       evidence,
       sourceId: row.source_id,
@@ -250,3 +252,18 @@ export function getRepresentationGraph(
 
   return result;
 }
+
+export function listRepositories(db: Database.Database): Promise<RepositoryInfo[]> {
+  const rows = db.prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories').all();
+  // Map the snake_case DB columns back to the camelCase RepositoryInfo interface
+  const repos = rows.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    path: row.path,
+    analyzedAt: row.analyzed_at,
+    extractorVersion: row.extractor_version,
+    commitSha: row.commit_sha
+  }));
+  return Promise.resolve(repos);
+}
+

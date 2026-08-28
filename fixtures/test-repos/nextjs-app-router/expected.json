@@ -1,0 +1,119 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/api/products/route.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/dashboard/page.tsx",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/lib/actions.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/lib/config.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/middleware.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Next.js Page: /dashboard",
+      "entityType": "NEXTJS_PAGE",
+      "patternId": "boundary.nextjs-page-component"
+    },
+    {
+      "name": "Package: next/server",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Package: server-only",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Directive: 'use server'",
+      "entityType": "NEXTJS_DIRECTIVE",
+      "patternId": "contract.nextjs-use-server-directive"
+    },
+    {
+      "name": "Exported Function: deleteProduct",
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
+    },
+    {
+      "name": "Exported Function: getSecretConfig",
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
+    },
+    {
+      "name": "Next.js Middleware",
+      "entityType": "NEXTJS_MIDDLEWARE",
+      "patternId": "contract.nextjs-middleware-export"
+    },
+    {
+      "name": "Route Handler: GET",
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.nextjs-route-handler"
+    },
+    {
+      "name": "Route Handler: POST",
+      "entityType": "HTTP_ENDPOINT",
+      "patternId": "contract.nextjs-route-handler"
+    },
+    {
+      "name": "Server Guard: server-only",
+      "entityType": "SERVER_GUARD",
+      "patternId": "contract.nextjs-server-only-guard"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Call: formData.get()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: Number()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: req.json()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: Response.json()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: Response.json()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Import: next/server",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: server-only",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    }
+  ],
+  "openConnectors": []
+}

@@ -1,6 +1,8 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressResponseConnector, extractExpressAppListen, extractExpressResponseCookie } from '../adapters/expressAdapter.js';
+import { extractDrizzleQueryChain } from '../adapters/drizzleAdapter.js';
+import { extractNextjsRevalidate } from '../adapters/nextjsAdapter.js';
 import { extractEventEmitterEmit, extractPluginHookFire } from './eventEmitterVisitor.js';
 /**
  * Known HTTP / network client root identifiers.
@@ -28,7 +30,6 @@ export const DB_CLIENT_IDENTIFIERS = new Set([
   'mongoose',
   'sequelize',
   'typeorm',
-  'drizzle',
   'supabase',
   // Raw DB clients
   'pg',
@@ -86,6 +87,12 @@ export function visitOpenConnector(
   if (!ts.isCallExpression(node)) {
     return null;
   }
+
+  const drizzleQuery = extractDrizzleQueryChain(node, getEvidence, nextId);
+  if (drizzleQuery) return drizzleQuery;
+
+  const nextjsRevalidate = extractNextjsRevalidate(node, getEvidence, nextId);
+  if (nextjsRevalidate) return nextjsRevalidate;
 
   const expressResponse = extractExpressResponseConnector(node, getEvidence, nextId);
   if (expressResponse) {

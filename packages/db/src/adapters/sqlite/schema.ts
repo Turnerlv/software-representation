@@ -46,6 +46,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       name TEXT NOT NULL,
       type TEXT NOT NULL,
       entity_type TEXT NOT NULL DEFAULT 'UNKNOWN',
+      pattern_id TEXT NOT NULL DEFAULT 'UNKNOWN',
       scope TEXT NOT NULL DEFAULT 'USER',
       parent_boundary_id TEXT,
       metadata TEXT,
@@ -59,6 +60,7 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       name TEXT NOT NULL,
       type TEXT NOT NULL,
       entity_type TEXT NOT NULL DEFAULT 'UNKNOWN',
+      pattern_id TEXT NOT NULL DEFAULT 'UNKNOWN',
       scope TEXT NOT NULL DEFAULT 'USER',
       source_id TEXT NOT NULL,
       target_id TEXT,
@@ -82,11 +84,13 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   `);
 
   try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
+  try { db.exec("ALTER TABLE nodes ADD COLUMN pattern_id TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
   try { db.exec("ALTER TABLE nodes ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) { }
   try { db.exec("ALTER TABLE nodes ADD COLUMN parent_boundary_id TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE nodes ADD COLUMN metadata TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE edges ADD COLUMN source_id TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE edges ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
+  try { db.exec("ALTER TABLE edges ADD COLUMN pattern_id TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
   try { db.exec("ALTER TABLE edges ADD COLUMN scope TEXT NOT NULL DEFAULT 'USER';"); } catch (e) { }
   try { db.exec("ALTER TABLE edges ADD COLUMN target_id TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE edges ADD COLUMN status TEXT;"); } catch (e) { }

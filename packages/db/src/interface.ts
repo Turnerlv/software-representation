@@ -4,6 +4,7 @@ export interface RepositoryInfo {
   id: string;
   name: string;
   path: string;
+  analyzedAt?: string;
   extractorVersion?: string;
   commitSha?: string;
 }

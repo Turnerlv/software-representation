@@ -1,0 +1,109 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/factory-destructure/lib/auth.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "File: ../../fixtures/test-repos/factory-destructure/lib/schema.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Package: drizzle-orm/pg-core",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Package: drizzle-zod",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Package: next-auth",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "AUTH_INTERFACE: auth",
+      "entityType": "AUTH_INTERFACE",
+      "patternId": "contract.nextauth-factory-destructure"
+    },
+    {
+      "name": "AUTH_INTERFACE: handlers",
+      "entityType": "AUTH_INTERFACE",
+      "patternId": "contract.nextauth-factory-destructure"
+    },
+    {
+      "name": "AUTH_INTERFACE: signIn",
+      "entityType": "AUTH_INTERFACE",
+      "patternId": "contract.nextauth-factory-destructure"
+    },
+    {
+      "name": "AUTH_INTERFACE: signOut",
+      "entityType": "AUTH_INTERFACE",
+      "patternId": "contract.nextauth-factory-destructure"
+    },
+    {
+      "name": "DB_SCHEMA: users",
+      "entityType": "DB_SCHEMA",
+      "patternId": "contract.drizzle-table-schema"
+    },
+    {
+      "name": "VALIDATOR_SCHEMA: insertUserSchema",
+      "entityType": "VALIDATOR_SCHEMA",
+      "patternId": "contract.drizzle-exported-validator"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Call: createInsertSchema()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: NextAuth()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: pgTable()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: serial.primaryKey()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: serial()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Call: text()",
+      "entityType": "CALL",
+      "patternId": "relationship.inferred-method-call"
+    },
+    {
+      "name": "Import: drizzle-orm/pg-core",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: drizzle-zod",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: next-auth",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    }
+  ],
+  "openConnectors": []
+}
