@@ -7,7 +7,7 @@ import { extractExpressRoute, extractExpressRouteParameter, extractExpressConten
 import { extractEventEmitterContract, extractSocketOnAnyContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
-import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport } from '../adapters/nextjsAdapter.js';
+import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport, extractNextjsRouteConfig } from '../adapters/nextjsAdapter.js';
 import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
 import { extractFactoryExport } from './factoryExportVisitor.js';
 
@@ -97,6 +97,10 @@ export function visitContract(
   // Next.js: middleware export contract
   const middleware = extractNextjsMiddlewareExport(node, fileRole ?? null, getEvidence, nextId);
   if (middleware) return middleware;
+
+  // Next.js: Route segment config
+  const routeConfig = extractNextjsRouteConfig(node, getEvidence, nextId);
+  if (routeConfig) return routeConfig;
 
   const expressRoute = extractExpressRoute(node, getEvidence, nextId);
   if (expressRoute) return expressRoute;

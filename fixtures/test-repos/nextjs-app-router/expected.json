@@ -11,6 +11,11 @@
       "patternId": "generic.boundary"
     },
     {
+      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/layout.tsx",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
       "name": "File: ../../fixtures/test-repos/nextjs-app-router/lib/actions.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
@@ -26,19 +31,14 @@
       "patternId": "generic.boundary"
     },
     {
-      "name": "Next.js Page: /dashboard",
-      "entityType": "NEXTJS_PAGE",
-      "patternId": "boundary.nextjs-page-component"
-    },
-    {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/layout.tsx",
-      "entityType": "FILE",
-      "patternId": "generic.boundary"
-    },
-    {
       "name": "Next.js Layout: /",
       "entityType": "NEXTJS_LAYOUT",
       "patternId": "boundary.nextjs-layout-component"
+    },
+    {
+      "name": "Next.js Page: /dashboard",
+      "entityType": "NEXTJS_PAGE",
+      "patternId": "boundary.nextjs-page-component"
     },
     {
       "name": "Package: next/server",
@@ -66,6 +66,16 @@
       "name": "Exported Function: getSecretConfig",
       "entityType": "EXPORTED_FUNCTION",
       "patternId": "contract.exported-function"
+    },
+    {
+      "name": "Next.js Config: dynamic",
+      "entityType": "NEXTJS_ROUTE_CONFIG",
+      "patternId": "contract.nextjs-route-config"
+    },
+    {
+      "name": "Next.js Config: revalidate",
+      "entityType": "NEXTJS_ROUTE_CONFIG",
+      "patternId": "contract.nextjs-route-config"
     },
     {
       "name": "Next.js Middleware",
