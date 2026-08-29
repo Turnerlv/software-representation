@@ -58,6 +58,9 @@ app.get('/view', (req, res) => {
 });
 
 app.get('/redirect', (req, res) => {
+  res.set('Link', '<http://example.com>; rel="alternate"');
+  res.setHeader('X-Foo', 'Bar');
+  res.header('X-Baz', 'Qux');
   res.redirect('/home');
 });
 
