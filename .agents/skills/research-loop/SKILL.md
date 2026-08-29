@@ -18,7 +18,7 @@ This skill orchestrates a research session using the **v4 methodology**: a deter
 
 > **🤖 AI Agent Note:** When executing `pnpm chomp` or `pnpm test` commands via the `run_command` tool, you **must set `BypassSandbox: true`**. The standard execution sandbox restricts access to `/var/folders/` (which `tsx` requires for IPC socket creation) and `~/.npmrc` (which `pnpm` reads), leading to `EPERM: operation not permitted` errors if the sandbox is not bypassed.
 
-> **🌳 Worktree Note:** When instructed to run a research loop for a framework/repo (e.g., `express`), **ALWAYS** check if an existing epic worktree branch already exists for it (e.g., run `git worktree list` or `git branch -a` to look for a branch like `research_express_loop`). If an epic branch/worktree already exists, you **MUST** run the research inside that existing worktree/branch to build upon prior work. Do NOT branch off `main` or create a redundant new worktree for the same repo.
+> **🌳 Dedicated Research Environment:** You must ALWAYS execute this research loop inside the dedicated agent worktree: `/Users/turnervickery/code/chomp-research-agent`. Do NOT use `invoke_subagent` with `Workspace: share` and do NOT create dynamic Git worktrees. If you need to spawn a subagent, use `Workspace: inherit` or instruct it to `cd` into the dedicated directory before executing commands.
 
 ---
 
