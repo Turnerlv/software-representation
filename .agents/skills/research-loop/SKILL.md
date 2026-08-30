@@ -105,13 +105,18 @@ Add a fixture in `fixtures/test-repos/<framework>/` with ground-truth `expected.
 # 2. Run tests
 pnpm test --filter @chomp/core
 
-# 3. Close and merge — health + pnpm test enforced automatically
-TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 1
-TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
+# 3. Commit your code changes!
+git add packages/core/ fixtures/test-repos/
+git commit -m "feat(core): implement extractor for <pattern-id>"
 
 # 4. Mark the pattern resolved (NOTE: do not use non-existent flags like --pr)
+# DO THIS BEFORE MERGING so the ledger is updated and tests pass
 TSX_DISABLE_IPC=1 pnpm chomp-research ledger pattern resolve \
   --id <pattern-id> --session <session-id>
+
+# 5. Close and merge — workspace cleanliness + health + pnpm test enforced automatically
+TSX_DISABLE_IPC=1 pnpm chomp-research session close --repo <name> --resolved 1
+TSX_DISABLE_IPC=1 pnpm chomp-research session merge --repo <name>
 ```
 
 ---
