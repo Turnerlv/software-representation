@@ -78,6 +78,11 @@
       "patternId": "contract.nextjs-route-config"
     },
     {
+      "name": "Next.js Metadata",
+      "entityType": "NEXTJS_METADATA",
+      "patternId": "contract.nextjs-metadata-export"
+    },
+    {
       "name": "Next.js Middleware",
       "entityType": "NEXTJS_MIDDLEWARE",
       "patternId": "contract.nextjs-middleware-export"

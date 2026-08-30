@@ -354,3 +354,31 @@ export function extractNextjsRouteConfig(
 
   return results.length > 0 ? results : null;
 }
+
+/**
+ * Extracts Next.js metadata export as a CONTRACT.
+ * Matches: `export const metadata = { ... }` or `export const metadata: Metadata = { ... }`
+ */
+export function extractNextjsMetadataExport(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (!ts.isVariableStatement(node)) return null;
+  if (!node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) return null;
+
+  for (const decl of node.declarationList.declarations) {
+    if (ts.isIdentifier(decl.name) && decl.name.text === 'metadata') {
+      return {
+        id: nextId(),
+        name: `Next.js Metadata`,
+        type: 'CONTRACT',
+        entityType: 'NEXTJS_METADATA',
+        patternId: 'contract.nextjs-metadata-export',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  return null;
+}
