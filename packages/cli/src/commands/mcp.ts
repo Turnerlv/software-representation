@@ -118,6 +118,26 @@ export function registerMcpCommand(program: Command) {
         }
       );
 
+      // 4. Tool: chomp_get_rendered_layout
+      server.registerTool(
+        "chomp_get_rendered_layout",
+        {
+          description: "Reads the actual X/Y coordinates and bounding boxes of the currently rendered graph from the browser. Use this to detect visual spaghetti, overlapping nodes, or bad Dagre layouts."
+        },
+        async () => {
+          try {
+            const layoutPath = path.join(path.dirname(dbPath), "rendered_layout.json");
+            if (!fs.existsSync(layoutPath)) {
+              throw new Error("Rendered layout not found. Make sure the Next.js visualizer is running and has loaded the graph.");
+            }
+            const layoutData = fs.readFileSync(layoutPath, "utf-8");
+            return { content: [{ type: "text", text: layoutData }] };
+          } catch (error: any) {
+            return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
+          }
+        }
+      );
+
       const transport = new StdioServerTransport();
       await server.connect(transport);
       console.error("Chomp MCP Server running on stdio");
