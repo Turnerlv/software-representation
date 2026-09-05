@@ -6,7 +6,7 @@ import path from 'path';
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRouterMount, extractExpressRouteMiddleware } from '../adapters/expressAdapter.js';
-import { extractPayloadConfigRegistry } from '../adapters/payloadAdapter.js';
+import { extractPayloadConfigRegistry, extractPayloadHooks } from '../adapters/payloadAdapter.js';
 
 import { resolveModulePath } from '../pathResolver.js';
 import { stableEntityId } from '../index.js';
@@ -160,6 +160,9 @@ export function visitRelationship(
 
   const payloadRegistry = extractPayloadConfigRegistry(node, sourceFile, getEvidence, nextId);
   if (payloadRegistry) return payloadRegistry;
+
+  const payloadHooks = extractPayloadHooks(node, sourceFile, getEvidence, nextId);
+  if (payloadHooks) return payloadHooks;
 
   const expressMount = extractExpressRouterMount(node, sourceFile, getEvidence, nextId);
   if (expressMount) {

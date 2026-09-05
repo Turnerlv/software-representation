@@ -1,22 +1,27 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/payload-collection/index.ts",
+      "name": "File: ../../fixtures/test-repos/payload-global/index.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
-    },
-    {
-      "name": "Payload Collection: Posts",
-      "entityType": "PAYLOAD_COLLECTION",
-      "patternId": "boundary.payload-collection-config"
     },
     {
       "name": "Package: payload",
       "entityType": "EXTERNAL_PACKAGE",
       "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Payload Global: Header",
+      "entityType": "PAYLOAD_GLOBAL",
+      "patternId": "boundary.payload-global-config"
     }
   ],
   "contracts": [
+    {
+      "name": "Payload Access Control",
+      "entityType": "PAYLOAD_ACCESS",
+      "patternId": "contract.payload-collection-access"
+    },
     {
       "name": "Payload Fields Array",
       "entityType": "PAYLOAD_FIELDS",

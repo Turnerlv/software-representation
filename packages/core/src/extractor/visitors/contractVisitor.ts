@@ -10,6 +10,7 @@ import { extractDefinePropertyContract } from './definePropertyVisitor.js';
 import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport, extractNextjsRouteConfig, extractNextjsMetadataExport } from '../adapters/nextjsAdapter.js';
 import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
 import { extractFactoryExport } from './factoryExportVisitor.js';
+import { extractPayloadContracts } from '../adapters/payloadAdapter.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -77,7 +78,10 @@ export function visitContract(
       (fileRole === 'PAGE' || fileRole === 'LAYOUT') &&
       node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword)
     ) {
-      return null;
+      const payloadContracts = extractPayloadContracts(node, getEvidence, nextId);
+  if (payloadContracts) return payloadContracts;
+
+  return null;
     }
     if (!isRouteMethod) {
       return {
@@ -140,6 +144,9 @@ export function visitContract(
 
   const factoryExport = extractFactoryExport(node, getEvidence, nextId);
   if (factoryExport) return factoryExport;
+
+  const payloadContracts = extractPayloadContracts(node, getEvidence, nextId);
+  if (payloadContracts) return payloadContracts;
 
   return null;
 }

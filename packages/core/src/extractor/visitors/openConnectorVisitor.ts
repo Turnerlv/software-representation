@@ -3,6 +3,7 @@ import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressResponseConnector, extractExpressAppListen, extractExpressResponseCookie } from '../adapters/expressAdapter.js';
 import { extractDrizzleQueryChain } from '../adapters/drizzleAdapter.js';
 import { extractNextjsRevalidate } from '../adapters/nextjsAdapter.js';
+import { extractPayloadOpenConnectors } from '../adapters/payloadAdapter.js';
 import { extractEventEmitterEmit, extractPluginHookFire } from './eventEmitterVisitor.js';
 /**
  * Known HTTP / network client root identifiers.
@@ -118,6 +119,9 @@ export function visitOpenConnector(
   if (pluginHookFire) {
     return pluginHookFire;
   }
+
+  const payloadConnectors = extractPayloadOpenConnectors(node, getEvidence, nextId);
+  if (payloadConnectors) return payloadConnectors;
 
   const rootId = getRootIdentifier(node.expression);
   if (!rootId) {

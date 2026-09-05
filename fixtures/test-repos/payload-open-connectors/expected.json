@@ -1,0 +1,44 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/payload-open-connectors/index.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    }
+  ],
+  "contracts": [],
+  "relationships": [
+    {
+      "name": "Call: Model.create()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    },
+    {
+      "name": "Call: Mongoose DB Operation: create",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: Payload Local API: find",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: payload.find()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Payload Local API: find",
+      "entityType": "LOCAL_API_CALL",
+      "patternId": "open-connector.payload-local-api-call"
+    },
+    {
+      "name": "Mongoose DB Operation: create",
+      "entityType": "DB_OPERATION",
+      "patternId": "open-connector.payload-mongoose-operation"
+    }
+  ]
+}
