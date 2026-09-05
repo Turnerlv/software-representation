@@ -7,6 +7,7 @@ import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { resolveModulePath } from '../pathResolver.js';
 import { extractExpressMiddlewareBoundary } from '../adapters/expressAdapter.js';
 import { NextjsFileRole, extractNextjsPageBoundary, extractNextjsLayoutBoundary } from '../adapters/nextjsAdapter.js';
+import { extractPayloadCollectionConfig } from '../adapters/payloadAdapter.js';
 
 /**
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
@@ -18,6 +19,7 @@ import { NextjsFileRole, extractNextjsPageBoundary, extractNextjsLayoutBoundary 
  * - ImportDeclaration  (External packages)
  * - Require Calls      (External packages)
  * - Express Middleware (Express routes/middleware)
+ * - Payload Collection (Payload CMS collection config)
  *
  * @param node         The AST node to inspect.
  * @param sourceFile   TypeScript SourceFile object used for text extraction.
@@ -106,6 +108,9 @@ export function visitBoundary(
 
   const nextjsLayout = extractNextjsLayoutBoundary(node, fileRole ?? null, filePath ?? '', getEvidence, nextId);
   if (nextjsLayout) return nextjsLayout;
+
+  const payloadCollection = extractPayloadCollectionConfig(node, getEvidence, nextId);
+  if (payloadCollection) return payloadCollection;
 
   return null;
 }
