@@ -137,6 +137,18 @@ export function extractPayloadOpenConnectors(
     const objName = ts.isIdentifier(node.expression.expression) ? node.expression.expression.text : null;
     const methodName = node.expression.name.text;
     
+    const callText = node.expression.getText();
+    if (callText.includes("payload.jobs.queue")) {
+      return {
+        id: nextId(),
+        name: `Payload Job Queue: ${callText}`,
+        type: "OPEN_CONNECTOR",
+        entityType: "JOB_DISPATCH",
+        patternId: "open-connector.payload-job-dispatch",
+        evidence: getEvidence(node),
+      };
+    }
+
     if (objName === 'payload' && ['find', 'findByID', 'create', 'update', 'delete', 'count', 'findGlobal', 'updateGlobal'].includes(methodName)) {
       return {
         id: nextId(),
