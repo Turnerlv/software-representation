@@ -186,8 +186,13 @@ export function analyzeTarget(
       const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath);
       const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
       for (const boundaryEntity of boundaryEntities) {
-        boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
-        boundaryEntity.parentBoundaryId = fileId;
+        if (boundaryEntity.entityType === 'EXTERNAL_PACKAGE' || boundaryEntity.entityType === 'NODE_BUILTIN') {
+          const importLiteral = boundaryEntity.name.replace('Package: ', '');
+          boundaryEntity.id = stableEntityId(`package:${importLiteral}`, boundaryEntity.type, boundaryEntity.name);
+        } else {
+          boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
+          boundaryEntity.parentBoundaryId = fileId;
+        }
         boundaryEntity.scope = scope;
         nodes.push(boundaryEntity as StructuralNode);
       }
