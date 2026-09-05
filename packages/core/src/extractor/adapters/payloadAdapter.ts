@@ -1,5 +1,6 @@
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
+import { stableEntityId } from '../index.js';
 
 export function extractPayloadCollectionConfig(
   node: ts.Node,
@@ -25,6 +26,41 @@ export function extractPayloadCollectionConfig(
       patternId: 'boundary.payload-collection-config',
       evidence: getEvidence(node),
     };
+  }
+  return null;
+}
+
+export function extractPayloadConfigRegistry(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity[] | null {
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'buildConfig' && node.arguments.length > 0) {
+    const configArg = node.arguments[0];
+    if (ts.isObjectLiteralExpression(configArg)) {
+      const entities: StructuralEntity[] = [];
+      for (const property of configArg.properties) {
+        if (ts.isPropertyAssignment(property) && ts.isIdentifier(property.name) && (property.name.text === 'collections' || property.name.text === 'globals')) {
+          if (ts.isArrayLiteralExpression(property.initializer)) {
+            for (const element of property.initializer.elements) {
+              if (ts.isIdentifier(element)) {
+                entities.push({
+                  id: nextId(),
+                  name: `Payload Config Registry: ${element.text}`,
+                  type: 'RELATIONSHIP',
+                  entityType: 'REGISTRY_MOUNT',
+                  patternId: 'relationship.payload-config-registry',
+                  targetId: stableEntityId(`Payload Collection: ${element.text}`, 'BOUNDARY', `Payload Collection: ${element.text}`),
+                  evidence: getEvidence(node),
+                });
+              }
+            }
+          }
+        }
+      }
+      if (entities.length > 0) return entities;
+    }
   }
   return null;
 }
