@@ -37,7 +37,11 @@ export function visitContract(
   nextId: () => string,
   fileRole?: NextjsFileRole | null
 ): StructuralEntity | StructuralEntity[] | null {
-  if (ts.isInterfaceDeclaration(node) && node.name) {
+  if (
+    ts.isInterfaceDeclaration(node) &&
+    node.name &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  ) {
     return {
       id: nextId(),
       name: `Interface: ${node.name.text}`,
@@ -46,7 +50,11 @@ export function visitContract(
       evidence: getEvidence(node),
     };
   }
-  if (ts.isTypeAliasDeclaration(node) && node.name) {
+  if (
+    ts.isTypeAliasDeclaration(node) &&
+    node.name &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  ) {
     return {
       id: nextId(),
       name: `Type: ${node.name.text}`,
