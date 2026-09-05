@@ -1,0 +1,14 @@
+{
+  "boundaries": [
+    { "name": "File: ../../fixtures/test-repos/payload-jobs/index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
+    { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" }
+  ],
+  "contracts": [
+    { "name": "Payload Task: myTask", "entityType": "PAYLOAD_TASK", "patternId": "contract.payload-job-task-definition" }
+  ],
+  "relationships": [
+    { "name": "Import: payload", "entityType": "IMPORT", "patternId": "relationship.import-declaration" },
+    { "name": "Call: console.log()", "entityType": "CALL", "patternId": "relationship.invoke-returned-function" }
+  ],
+  "openConnectors": []
+}

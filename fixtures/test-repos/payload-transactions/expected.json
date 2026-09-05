@@ -1,0 +1,23 @@
+{
+  "boundaries": [
+    { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" },
+    { "name": "File: ../../fixtures/test-repos/payload-transactions/index.ts", "entityType": "FILE", "patternId": "generic.boundary" }
+  ],
+  "contracts": [
+    { "name": "Exported Function: safeCreate", "entityType": "EXPORTED_FUNCTION", "patternId": "contract.exported-function" }
+  ],
+  "relationships": [
+    { "name": "Import: payload", "entityType": "IMPORT", "patternId": "relationship.import-declaration" },
+    { "name": "Call: initTransaction()", "entityType": "CALL", "patternId": "relationship.inferred-method-call" },
+    { "name": "Call: commitTransaction()", "entityType": "CALL", "patternId": "relationship.inferred-method-call" },
+    { "name": "Call: killTransaction()", "entityType": "CALL", "patternId": "relationship.inferred-method-call" },
+    { "name": "Call: Payload Transaction: initTransaction", "entityType": "CALL", "patternId": "generic.relationship" },
+    { "name": "Call: Payload Transaction: commitTransaction", "entityType": "CALL", "patternId": "generic.relationship" },
+    { "name": "Call: Payload Transaction: killTransaction", "entityType": "CALL", "patternId": "generic.relationship" }
+  ],
+  "openConnectors": [
+    { "name": "Payload Transaction: initTransaction", "entityType": "DB_TRANSACTION", "patternId": "open-connector.payload-transaction-lifecycle" },
+    { "name": "Payload Transaction: commitTransaction", "entityType": "DB_TRANSACTION", "patternId": "open-connector.payload-transaction-lifecycle" },
+    { "name": "Payload Transaction: killTransaction", "entityType": "DB_TRANSACTION", "patternId": "open-connector.payload-transaction-lifecycle" }
+  ]
+}

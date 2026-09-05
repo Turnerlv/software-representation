@@ -42,19 +42,42 @@ export function extractPayloadConfigRegistry(
     if (ts.isObjectLiteralExpression(configArg)) {
       const entities: StructuralEntity[] = [];
       for (const property of configArg.properties) {
-        if (ts.isPropertyAssignment(property) && ts.isIdentifier(property.name) && (property.name.text === 'collections' || property.name.text === 'globals')) {
-          if (ts.isArrayLiteralExpression(property.initializer)) {
-            for (const element of property.initializer.elements) {
-              if (ts.isIdentifier(element)) {
-                entities.push({
-                  id: nextId(),
-                  name: `Payload Config Registry: ${element.text}`,
-                  type: 'RELATIONSHIP',
-                  entityType: 'REGISTRY_MOUNT',
-                  patternId: 'relationship.payload-config-registry',
-                  targetId: stableEntityId(`Payload Collection: ${element.text}`, 'BOUNDARY', `Payload Collection: ${element.text}`),
-                  evidence: getEvidence(node),
-                });
+        if (ts.isPropertyAssignment(property) && ts.isIdentifier(property.name)) {
+          if (property.name.text === 'collections' || property.name.text === 'globals') {
+            if (ts.isArrayLiteralExpression(property.initializer)) {
+              for (const element of property.initializer.elements) {
+                if (ts.isIdentifier(element)) {
+                  entities.push({
+                    id: nextId(),
+                    name: `Payload Config Registry: ${element.text}`,
+                    type: 'RELATIONSHIP',
+                    entityType: 'REGISTRY_MOUNT',
+                    patternId: 'relationship.payload-config-registry',
+                    targetId: stableEntityId(`Payload Collection: ${element.text}`, 'BOUNDARY', `Payload Collection: ${element.text}`),
+                    evidence: getEvidence(node),
+                  });
+                }
+              }
+            }
+          } else if (property.name.text === 'plugins') {
+            if (ts.isArrayLiteralExpression(property.initializer)) {
+              for (const element of property.initializer.elements) {
+                let pluginName = '';
+                if (ts.isCallExpression(element) && ts.isIdentifier(element.expression)) {
+                  pluginName = element.expression.text;
+                } else if (ts.isIdentifier(element)) {
+                  pluginName = element.text;
+                }
+                if (pluginName) {
+                  entities.push({
+                    id: nextId(),
+                    name: `Payload Plugin: ${pluginName}`,
+                    type: 'RELATIONSHIP',
+                    entityType: 'PLUGIN_REGISTRATION',
+                    patternId: 'relationship.payload-plugin-registration',
+                    evidence: getEvidence(node),
+                  });
+                }
               }
             }
           }
@@ -79,6 +102,16 @@ export function extractPayloadContracts(
         type: 'CONTRACT',
         entityType: 'PAYLOAD_FIELDS',
         patternId: 'contract.payload-field-definition',
+        evidence: getEvidence(node),
+      };
+    }
+    if (node.name.text === 'endpoints' && ts.isArrayLiteralExpression(node.initializer)) {
+      return {
+        id: nextId(),
+        name: 'Payload Endpoints Array',
+        type: 'CONTRACT',
+        entityType: 'PAYLOAD_ENDPOINTS',
+        patternId: 'contract.payload-endpoint-definition',
         evidence: getEvidence(node),
       };
     }
@@ -133,11 +166,36 @@ export function extractPayloadOpenConnectors(
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string
 ): StructuralEntity | null {
+  if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
+    const fnName = node.expression.text;
+    if (['initTransaction', 'commitTransaction', 'rollbackTransaction', 'killTransaction'].includes(fnName)) {
+      return {
+        id: nextId(),
+        name: `Payload Transaction: ${fnName}`,
+        type: 'OPEN_CONNECTOR',
+        entityType: 'DB_TRANSACTION',
+        patternId: 'open-connector.payload-transaction-lifecycle',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
   if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
     const objName = ts.isIdentifier(node.expression.expression) ? node.expression.expression.text : null;
     const methodName = node.expression.name.text;
     
     const callText = node.expression.getText();
+    if (callText.includes("payload.db.") && ['find', 'findOne', 'create', 'updateOne', 'update', 'deleteOne', 'deleteMany', 'deleteVersions', 'count', 'countVersions'].includes(methodName)) {
+      return {
+        id: nextId(),
+        name: `Payload DB Adapter: ${methodName}`,
+        type: 'OPEN_CONNECTOR',
+        entityType: 'DB_OPERATION',
+        patternId: 'open-connector.payload-db-adapter-operation',
+        evidence: getEvidence(node),
+      };
+    }
+
     if (callText.includes("payload.jobs.queue")) {
       return {
         id: nextId(),
@@ -167,6 +225,42 @@ export function extractPayloadOpenConnectors(
         type: 'OPEN_CONNECTOR',
         entityType: 'DB_OPERATION',
         patternId: 'open-connector.payload-mongoose-operation',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+  return null;
+}
+
+
+export function extractPayloadTypeRefContracts(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (
+    ts.isVariableDeclaration(node) &&
+    node.name && ts.isIdentifier(node.name) &&
+    node.type && ts.isTypeReferenceNode(node.type) && ts.isIdentifier(node.type.typeName) &&
+    node.initializer && ts.isObjectLiteralExpression(node.initializer)
+  ) {
+    if (node.type.typeName.text === 'Block') {
+      return {
+        id: nextId(),
+        name: `Payload Block: ${node.name.text}`,
+        type: 'CONTRACT',
+        entityType: 'PAYLOAD_BLOCK',
+        patternId: 'contract.payload-block-definition',
+        evidence: getEvidence(node),
+      };
+    }
+    if (node.type.typeName.text === 'TaskConfig') {
+      return {
+        id: nextId(),
+        name: `Payload Task: ${node.name.text}`,
+        type: 'CONTRACT',
+        entityType: 'PAYLOAD_TASK',
+        patternId: 'contract.payload-job-task-definition',
         evidence: getEvidence(node),
       };
     }
