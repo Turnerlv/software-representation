@@ -15,7 +15,7 @@ export default async function Home() {
 
     return (
         <main style={{ width: '100vw', height: '100vh' }}>
-            <GraphVisualizer initialNodes={data.nodes} initialEdges={data.edges} />
+            <GraphVisualizer initialNodes={data.nodes} initialEdges={data.edges} gridLayout={data.gridLayout} />
         </main>
     );
 }

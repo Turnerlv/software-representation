@@ -6,9 +6,12 @@ export async function POST(request: Request) {
     try {
         const data = await request.json();
 
-        // Save it next to the graph.db
-        const dumpPath = process.env.CHOMP_DB_PATH
-            ? path.join(path.dirname(process.env.CHOMP_DB_PATH), 'rendered_layout.json')
+        const activeKey = process.env.ACTIVE_DB || "CHOMP_DB_PATH";
+        const envPath = process.env[activeKey] || process.env.CHOMP_DB_PATH;
+
+        // Save it next to the active graph.db
+        const dumpPath = envPath
+            ? path.join(path.dirname(envPath), 'rendered_layout.json')
             : path.join(process.cwd(), '../../.chomp/rendered_layout.json');
 
         fs.writeFileSync(dumpPath, JSON.stringify(data, null, 2));

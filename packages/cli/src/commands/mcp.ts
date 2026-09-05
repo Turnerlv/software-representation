@@ -77,6 +77,7 @@ export function registerMcpCommand(program: Command) {
             if (!graph) throw new Error("Graph not found in database.");
 
             let nodes = graph.nodes;
+            nodes = nodes.filter(n => n.entityType !== 'FILE' && n.entityType !== 'MODULE' && n.entityType !== 'NODE_BUILTIN');
             if (type) nodes = nodes.filter(n => n.type === type);
             if (parent_boundary_id) nodes = nodes.filter(n => n.parentBoundaryId === parent_boundary_id);
 
@@ -118,25 +119,54 @@ export function registerMcpCommand(program: Command) {
         }
       );
 
-      // 4. Tool: chomp_get_rendered_layout
-      server.registerTool(
-        "chomp_get_rendered_layout",
+      // 4. Tool: chomp_save_grid_layout
+      const saveGridLayoutSchema = {
+        nodes: z.array(z.object({
+          id: z.string(),
+          role: z.enum(["INGRESS", "CORE", "EGRESS", "TOP_TRAY", "BOTTOM_TRAY"]),
+          depth: z.number().describe("X-axis topological depth (0 for INGRESS)"),
+          lane: z.number().describe("Y-axis row index"),
+          label_primary: z.string().describe("Semantic action, e.g., 'Authenticate User'"),
+          label_secondary: z.string().describe("Source/AST reference, e.g., 'AuthService.SignIn'")
+        })),
+        edges: z.array(z.object({
+          source: z.string(),
+          target: z.string(),
+          is_inferred: z.boolean(),
+          reason: z.string().optional()
+        }))
+      };
+
+      server.registerTool<any, typeof saveGridLayoutSchema>(
+        "chomp_save_grid_layout",
         {
-          description: "Reads the actual X/Y coordinates and bounding boxes of the currently rendered graph from the browser. Use this to detect visual spaghetti, overlapping nodes, or bad Dagre layouts."
+          description: "Saves an AI-generated grid layout schema to a local JSON file.",
+          inputSchema: saveGridLayoutSchema
         },
-        async () => {
+        async ({ nodes, edges }) => {
           try {
-            const layoutPath = path.join(path.dirname(dbPath), "rendered_layout.json");
-            if (!fs.existsSync(layoutPath)) {
-              throw new Error("Rendered layout not found. Make sure the Next.js visualizer is running and has loaded the graph.");
+            if (!fs.existsSync(dbPath)) throw new Error("Database not found. Run chomp_analyze first.");
+            const storage = createSQLiteStorage(dbPath);
+            const repoId = await getLocalRepoId(storage);
+            const graph = await storage.getRepresentationGraph(repoId);
+            if (!graph) throw new Error("Graph not found in database.");
+
+            const validIds = new Set(graph.nodes.map(n => n.id));
+            const invalidIds = nodes.map((n: any) => n.id).filter((id: string) => !validIds.has(id));
+            if (invalidIds.length > 0) {
+              throw new Error(`Invalid layout. The following node IDs do not exist in the database: [${invalidIds.join(', ')}]. You must only use exact IDs returned by chomp_get_nodes.`);
             }
-            const layoutData = fs.readFileSync(layoutPath, "utf-8");
-            return { content: [{ type: "text", text: layoutData }] };
+
+            const layoutPath = path.join(path.dirname(dbPath), "grid_layout.json");
+            fs.writeFileSync(layoutPath, JSON.stringify({ nodes, edges }, null, 2));
+            return { content: [{ type: "text", text: `Successfully saved grid layout to ${layoutPath}` }] };
           } catch (error: any) {
             return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
           }
         }
       );
+
+
 
       const transport = new StdioServerTransport();
       await server.connect(transport);
