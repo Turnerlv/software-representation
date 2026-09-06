@@ -3,6 +3,7 @@
 
 import { createHash } from 'crypto';
 import fs from 'fs';
+import ignore from 'ignore';
 import path from 'path';
 import ts from 'typescript';
 import {
@@ -38,12 +39,23 @@ export function collectFiles(targetPath: string): string[] {
     return [absolutePath];
   }
 
+  // Load .chompignore if it exists
+  const ig = (ignore as any).default ? (ignore as any).default() : (ignore as any)();
+  const ignorePath = path.join(absolutePath, '.chompignore');
+  if (fs.existsSync(ignorePath)) {
+    ig.add(fs.readFileSync(ignorePath, 'utf8'));
+  }
+
   const files: string[] = [];
 
   function walkDir(currentDir: string) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(currentDir, entry.name);
+      
+      // Calculate path relative to root target for ignore testing
+      const relativePath = path.relative(absolutePath, fullPath);
+
       if (entry.isDirectory()) {
         if (
           entry.name === 'node_modules' ||
@@ -61,15 +73,30 @@ export function collectFiles(targetPath: string): string[] {
         ) {
           continue;
         }
+
+        // Apply .chompignore for directories
+        if (fs.existsSync(ignorePath) && ig.ignores(relativePath + '/')) {
+          continue;
+        }
+
         walkDir(fullPath);
       } else if (entry.isFile()) {
+        // Apply .chompignore for files
+        if (fs.existsSync(ignorePath) && ig.ignores(relativePath)) {
+          continue;
+        }
+
         const ext = path.extname(entry.name).toLowerCase();
         if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
           const lowerName = entry.name.toLowerCase();
-          if (lowerName.includes('.test.') || lowerName.includes('.spec.')) {
-            continue;
+          if (
+            !lowerName.includes('.test.') &&
+            !lowerName.includes('.spec.') &&
+            !lowerName.includes('.mock.') &&
+            !lowerName.includes('.d.ts')
+          ) {
+            files.push(fullPath);
           }
-          files.push(fullPath);
         }
       }
     }
