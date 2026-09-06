@@ -23,6 +23,7 @@
   "dependencies": {
     "@chomp/core": "workspace:*",
     "@chomp/db": "workspace:*",
+    "@chomp/mcp": "workspace:^",
     "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "better-sqlite3": "^11.0.0",

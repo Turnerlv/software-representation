@@ -113,6 +113,9 @@ importers:
       '@chomp/db':
         specifier: workspace:*
         version: link:../db
+      '@chomp/mcp':
+        specifier: workspace:^
+        version: link:../mcp
       '@google/generative-ai':
         specifier: ^0.24.1
         version: 0.24.1
@@ -179,6 +182,22 @@ importers:
       tsx:
         specifier: ^4.19.0
         version: 4.23.5
+
+  packages/mcp:
+    dependencies:
+      '@chomp/core':
+        specifier: workspace:*
+        version: link:../core
+      '@chomp/db':
+        specifier: workspace:*
+        version: link:../db
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.5.0
+        version: 1.30.0(zod@3.25.76)
+    devDependencies:
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
 
 packages:
 
