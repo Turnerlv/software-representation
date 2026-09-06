@@ -37,7 +37,9 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       path TEXT NOT NULL,
       analyzed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       extractor_version TEXT,
-      commit_sha TEXT
+      commit_sha TEXT,
+      branch_name TEXT,
+      project_id TEXT
     );
 
     CREATE TABLE IF NOT EXISTS nodes (
@@ -99,6 +101,8 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN branch_name TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN project_id TEXT;"); } catch (e) { }
   try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) { }
 
   return db;

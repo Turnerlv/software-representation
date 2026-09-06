@@ -62,6 +62,7 @@ export interface RepresentationGraph {
   extractorVersion: string;
   analyzedAt: string;
   commitSha?: string;
+  branchName?: string;
   nodes: StructuralNode[];
   edges: StructuralEdge[];
 }

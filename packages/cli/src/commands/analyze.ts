@@ -15,6 +15,8 @@ import { Command } from "commander";
 import { analyzeTarget } from "@chomp/core";
 import { createSQLiteStorage } from "@chomp/db";
 
+import { getGitInfo } from "../utils/git.js";
+
 /**
  * Registers the `analyze` command on the Commander program instance.
  *
@@ -76,6 +78,9 @@ export function registerAnalyzeCommand(program: Command): void {
       const repoPath = isDir ? targetPath : dirname(targetPath);
       const repoId = repoName.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
 
+      // Fetch git info for commit anchoring
+      const { commitSha, branchName } = getGitInfo(repoPath);
+
       console.log(`Analyzing structural entities in: ${targetPath}...`);
       const graph = analyzeTarget(targetPath);
 
@@ -93,6 +98,8 @@ export function registerAnalyzeCommand(program: Command): void {
         id: repoId,
         name: repoName,
         path: repoPath,
+        commitSha,
+        branchName,
       };
 
       // Persist the extracted representation graph
@@ -108,6 +115,7 @@ export function registerAnalyzeCommand(program: Command): void {
 
       console.log(`\nSuccessfully saved structural representation to: ${dbPath}\n`);
       console.log(`Repository: ${repoName} (${repoId})`);
+      if (commitSha) console.log(`Git Commit: ${commitSha} (Branch: ${branchName ?? 'detached'})`);
       console.log(`Analyzed At: ${savedGraph.analyzedAt}`);
       console.log(`Total Entities Found: ${allEntities.length}\n`);
 
