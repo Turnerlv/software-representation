@@ -83,6 +83,26 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       UNIQUE(entity_id, file_path, line_number, evidence_role)
     );
 
+    CREATE TABLE IF NOT EXISTS layout_views (
+      id TEXT PRIMARY KEY,
+      repository_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS layout_nodes (
+      layout_id TEXT NOT NULL,
+      node_id TEXT NOT NULL,
+      lane TEXT,
+      role TEXT,
+      x INTEGER,
+      y INTEGER,
+      PRIMARY KEY (layout_id, node_id),
+      FOREIGN KEY (layout_id) REFERENCES layout_views(id) ON DELETE CASCADE,
+      FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE
+    );
+
   `);
 
   try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
