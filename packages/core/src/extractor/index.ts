@@ -110,7 +110,7 @@ export function stableEntityId(filePath: string, type: string, name: string): st
  */
 export function analyzeTarget(
   targetPath: string,
-  extractorVersion: string = '1.0.0',
+  extractorVersion: string = '1.1.0',
   commitSha?: string
 ): RepresentationGraph {
   const files = collectFiles(targetPath);
