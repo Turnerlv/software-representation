@@ -9,6 +9,7 @@ import { registerMcpCommand } from './commands/mcp.js';
 import { registerPushCommand } from "./commands/push.js";
 import { registerAuthCommand } from "./commands/auth.js";
 import { registerUiCommand } from "./commands/ui.js";
+import { registerDiffCommand } from "./commands/diff.js";
 
 const program = new Command();
 
@@ -22,5 +23,6 @@ registerMcpCommand(program);
 registerPushCommand(program);
 registerAuthCommand(program);
 registerUiCommand(program);
+registerDiffCommand(program);
 
 program.parse(process.argv);
