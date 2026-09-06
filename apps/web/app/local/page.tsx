@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function LocalViewPage() {
+function LocalViewContent() {
   const searchParams = useSearchParams();
   const port = searchParams.get("port") || "5555";
   
@@ -125,5 +125,13 @@ export default function LocalViewPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LocalViewPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LocalViewContent />
+    </Suspense>
   );
 }
