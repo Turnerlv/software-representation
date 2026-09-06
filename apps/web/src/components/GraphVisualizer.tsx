@@ -11,6 +11,89 @@ import '@xyflow/react/dist/style.css';
 const CELL_WIDTH = 280;
 const CELL_HEIGHT = 120;
 
+
+function GhostNode({ data }: any) {
+  const primary = data.label_primary || data.name;
+  const secondary = data.label_secondary;
+  const status = data.diffStatus; // 'ADDED' | 'REMOVED' | 'MODIFIED' | 'UNCHANGED'
+
+  let borderColor = '#30363d';
+  let bgColor = '#0d1117';
+  let borderStyle = 'solid';
+  let textColor = '#8b949e';
+
+  if (status === 'ADDED') {
+    borderColor = '#2ea043';
+    bgColor = 'rgba(46, 160, 67, 0.1)';
+    borderStyle = 'dashed';
+    textColor = '#3fb950';
+  } else if (status === 'REMOVED') {
+    borderColor = '#f85149';
+    bgColor = 'rgba(248, 81, 73, 0.1)';
+    borderStyle = 'dotted';
+    textColor = '#ff7b72';
+  } else if (status === 'MODIFIED') {
+    borderColor = '#d29922';
+    bgColor = 'rgba(210, 153, 34, 0.1)';
+    borderStyle = 'dashed';
+    textColor = '#e3b341';
+  } else if (status === 'UNCHANGED') {
+    borderColor = '#58a6ff';
+    textColor = '#e6edf3';
+  }
+
+  return (
+    <div style={{
+      width: 240,
+      height: 80,
+      border: `2px ${borderStyle} ${borderColor}`,
+      background: bgColor,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '0 10px',
+      boxSizing: 'border-box',
+      textAlign: 'center',
+      overflow: 'hidden',
+      borderRadius: '4px',
+      opacity: status === 'REMOVED' ? 0.6 : 1
+    }}>
+      <Handle type="target" position={Position.Left} style={{ background: borderColor, width: 6, height: 6, border: 'none' }} />
+
+      <div style={{
+        fontSize: '13px',
+        fontWeight: 600,
+        color: textColor,
+        textOverflow: 'ellipsis',
+        overflow: 'hidden',
+        whiteSpace: 'nowrap',
+        width: '100%',
+        textDecoration: status === 'REMOVED' ? 'line-through' : 'none'
+      }}>
+        {primary}
+      </div>
+      
+      {secondary && (
+        <div style={{
+          fontSize: '11px',
+          color: status === 'UNCHANGED' ? '#8b949e' : textColor,
+          marginTop: '4px',
+          textOverflow: 'ellipsis',
+          overflow: 'hidden',
+          whiteSpace: 'nowrap',
+          width: '100%',
+          opacity: 0.8
+        }}>
+          {secondary}
+        </div>
+      )}
+
+      <Handle type="source" position={Position.Right} style={{ background: borderColor, width: 6, height: 6, border: 'none' }} />
+    </div>
+  );
+}
+
 function WireframeNode({ data }: any) {
   const primary = data.label_primary || data.name;
   const secondary = data.label_secondary;
