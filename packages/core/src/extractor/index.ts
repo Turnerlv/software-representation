@@ -16,6 +16,7 @@ import { visitContract } from './visitors/contractVisitor.js';
 import { visitRelationship } from './visitors/relationshipVisitor.js';
 import { visitOpenConnector } from './visitors/openConnectorVisitor.js';
 import { classifyNextjsFile, NextjsFileRole } from './adapters/nextjsAdapter.js';
+import { buildWorkspaceRegistry, WorkspaceRegistry } from './workspaceResolver.js';
 
 /**
  * Recursively collects all TypeScript and JavaScript source files under the given path.
@@ -121,6 +122,24 @@ export function analyzeTarget(
   const isTargetFile = fs.statSync(repoRoot).isFile();
   const actualRepoRoot = isTargetFile ? path.dirname(repoRoot) : repoRoot;
 
+  // 1. Build Workspace Registry
+  const workspaceRegistry = buildWorkspaceRegistry(actualRepoRoot);
+
+  // 2. Emit WORKSPACE_PACKAGE boundaries
+  for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
+    const relativePkgPath = path.relative(process.cwd(), pkgPath) || pkgPath;
+    const pkgId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);
+    nodes.push({
+      id: pkgId,
+      name: `Package: ${pkgName}`,
+      type: 'BOUNDARY',
+      entityType: 'WORKSPACE_PACKAGE',
+      patternId: 'generic.boundary',
+      scope: 'USER',
+      evidence: { filePath: relativePkgPath }
+    });
+  }
+
   for (const filePath of files) {
     const sourceText = fs.readFileSync(filePath, 'utf8');
     const sourceFile = ts.createSourceFile(
@@ -148,6 +167,15 @@ export function analyzeTarget(
       scope = 'BENCHMARK';
     }
 
+    // Assign parent_boundary_id if file belongs to a workspace package
+    let parentBoundaryId: string | undefined = undefined;
+    for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
+      if (filePath.startsWith(pkgPath + path.sep) || filePath === pkgPath) {
+        parentBoundaryId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);
+        break;
+      }
+    }
+
     const fileId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
     nodes.push({
       id: fileId,
@@ -155,6 +183,7 @@ export function analyzeTarget(
       type: 'BOUNDARY',
       entityType: 'FILE', patternId: 'generic.boundary',
       scope,
+      parentBoundaryId,
       evidence: { filePath: relativePath },
     });
 
@@ -183,7 +212,7 @@ export function analyzeTarget(
      * Replaces placeholder entity IDs with deterministic stableEntityId() before pushing to graph arrays.
      */
     function visit(node: ts.Node) {
-      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath);
+      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath, workspaceRegistry);
       const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
       for (const boundaryEntity of boundaryEntities) {
         if (boundaryEntity.entityType === 'EXTERNAL_PACKAGE' || boundaryEntity.entityType === 'NODE_BUILTIN') {
@@ -206,7 +235,7 @@ export function analyzeTarget(
         nodes.push(contractEntity as StructuralNode);
       }
 
-      const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
+      const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId, workspaceRegistry);
       const relationshipEntities = Array.isArray(relationshipResult) ? relationshipResult : (relationshipResult ? [relationshipResult] : []);
       for (const relationshipEntity of relationshipEntities) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);
