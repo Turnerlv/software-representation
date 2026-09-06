@@ -12,6 +12,9 @@ export default function LocalViewPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [layout, setLayout] = useState<any>(null);
+  const [generating, setGenerating] = useState(false);
+
   useEffect(() => {
     async function fetchLocalData() {
       try {
@@ -49,27 +52,69 @@ export default function LocalViewPage() {
     );
   }
 
+  const generateLayout = async () => {
+    if (!data?.nodes) return;
+    try {
+      setGenerating(true);
+      const res = await fetch("/api/cartographer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nodes: data.nodes, edges: data.edges })
+      });
+      const result = await res.json();
+      if (res.ok) {
+        setLayout(result.assignments);
+      } else {
+        alert(result.error || "Failed to generate layout");
+      }
+    } catch (err) {
+      alert("Error generating layout.");
+    } finally {
+      setGenerating(false);
+    }
+  };
+
   return (
     <div className="p-8 text-white">
-      <header className="mb-8 border-b border-gray-800 pb-4">
-        <h1 className="text-2xl font-bold flex items-center gap-3">
-          <span className="w-3 h-3 rounded-full bg-green-500 inline-block animate-pulse"></span>
-          Local Preview: {status?.repoName}
-        </h1>
-        <p className="text-gray-400 mt-2">
-          Connected to localhost:{port} | ID: {status?.repoId}
-        </p>
+      <header className="mb-8 border-b border-gray-800 pb-4 flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-3">
+            <span className="w-3 h-3 rounded-full bg-green-500 inline-block animate-pulse"></span>
+            Local Preview: {status?.repoName}
+          </h1>
+          <p className="text-gray-400 mt-2">
+            Connected to localhost:{port} | ID: {status?.repoId}
+          </p>
+        </div>
+        <button 
+          onClick={generateLayout}
+          disabled={generating}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded disabled:opacity-50"
+        >
+          {generating ? "Generating..." : "Generate AI Layout"}
+        </button>
       </header>
 
       <div className="grid grid-cols-2 gap-8">
-        <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
-          <h2 className="text-xl font-semibold mb-4">Graph Statistics</h2>
-          <ul className="space-y-2 text-gray-300">
-            <li>Nodes: {data?.nodes?.length || 0}</li>
-            <li>Edges: {data?.edges?.length || 0}</li>
-            <li>Analyzed At: {new Date(data?.analyzedAt).toLocaleString()}</li>
-            <li>Commit: <code className="text-sm bg-gray-800 px-1 rounded">{data?.commitSha?.substring(0, 7) || 'None'}</code></li>
-          </ul>
+        <div className="bg-gray-900 p-4 rounded-lg border border-gray-800 flex flex-col gap-4">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Graph Statistics</h2>
+            <ul className="space-y-2 text-gray-300">
+              <li>Nodes: {data?.nodes?.length || 0}</li>
+              <li>Edges: {data?.edges?.length || 0}</li>
+              <li>Analyzed At: {new Date(data?.analyzedAt).toLocaleString()}</li>
+              <li>Commit: <code className="text-sm bg-gray-800 px-1 rounded">{data?.commitSha?.substring(0, 7) || 'None'}</code></li>
+            </ul>
+          </div>
+          
+          {layout && (
+            <div className="mt-4 pt-4 border-t border-gray-800 overflow-auto max-h-[300px]">
+              <h2 className="text-xl font-semibold text-green-400 mb-2">Cartographer Layout Output</h2>
+              <pre className="text-xs text-gray-300">
+                {JSON.stringify(layout, null, 2)}
+              </pre>
+            </div>
+          )}
         </div>
         
         <div className="bg-gray-900 p-4 rounded-lg border border-gray-800 overflow-auto h-[600px]">
