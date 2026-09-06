@@ -1,6 +1,6 @@
 import { RepresentationGraph, StructuralNode, StructuralEdge, EvidenceRecord } from "../types/ontology.js";
 
-export type DiffStatus = 'ADDED' | 'REMOVED' | 'MODIFIED' | 'UNCHANGED';
+export type DiffStatus = 'ADDED' | 'REMOVED' | 'MODIFIED' | 'UNCHANGED' | 'LEXICAL_SHIFT';
 
 export interface DiffNode extends StructuralNode {
   diffStatus: DiffStatus;
@@ -37,26 +37,28 @@ function normalizeEvidence(evidence: EvidenceRecord | EvidenceRecord[]): Evidenc
  * the user might want to know if the actual structure changed.
  * For now, strict deep equality is safest to detect any AST location change.
  */
-function isEvidenceEqual(a: EvidenceRecord[], b: EvidenceRecord[]): boolean {
-  if (a.length !== b.length) return false;
+function getEvidenceStatus(a: EvidenceRecord[], b: EvidenceRecord[]): 'UNCHANGED' | 'MODIFIED' | 'LEXICAL_SHIFT' {
+  if (a.length !== b.length) return 'MODIFIED';
   
-  // Sort them just in case (though extractor yields deterministically)
   const sortedA = [...a].sort((x, y) => (x.filePath + x.lineNumber).localeCompare(y.filePath + y.lineNumber));
   const sortedB = [...b].sort((x, y) => (x.filePath + x.lineNumber).localeCompare(y.filePath + y.lineNumber));
 
+  let hasLexicalShift = false;
   for (let i = 0; i < sortedA.length; i++) {
     const ea = sortedA[i];
     const eb = sortedB[i];
-    if (
-      ea.filePath !== eb.filePath ||
-      ea.lineNumber !== eb.lineNumber ||
-      ea.snippet !== eb.snippet ||
-      ea.evidenceRole !== eb.evidenceRole
-    ) {
-      return false;
+    
+    // If the actual file or structural snippet changed, it's structurally modified
+    if (ea.filePath !== eb.filePath || ea.snippet !== eb.snippet || ea.evidenceRole !== eb.evidenceRole) {
+      return 'MODIFIED';
+    }
+    
+    // If only the line number drifted, it's a lexical shift
+    if (ea.lineNumber !== eb.lineNumber) {
+      hasLexicalShift = true;
     }
   }
-  return true;
+  return hasLexicalShift ? 'LEXICAL_SHIFT' : 'UNCHANGED';
 }
 
 /**
@@ -69,17 +71,15 @@ function isMetadataEqual(a?: Record<string, any>, b?: Record<string, any>): bool
 /**
  * Determines if an entity (Node or Edge) has been modified between the base and current graph.
  */
-function isModified(baseObj: any, currentObj: any): boolean {
-  // If parent changed, it's modified (e.g. moved files but same name/type)
-  if (baseObj.parentBoundaryId !== currentObj.parentBoundaryId) return true;
-  if (baseObj.sourceId !== currentObj.sourceId) return true;
-  if (baseObj.targetId !== currentObj.targetId) return true;
+function getModificationStatus(baseObj: any, currentObj: any): 'UNCHANGED' | 'MODIFIED' | 'LEXICAL_SHIFT' {
+  if (baseObj.parentBoundaryId !== currentObj.parentBoundaryId) return 'MODIFIED';
+  if (baseObj.sourceId !== currentObj.sourceId) return 'MODIFIED';
+  if (baseObj.targetId !== currentObj.targetId) return 'MODIFIED';
   
-  if (!isMetadataEqual(baseObj.metadata, currentObj.metadata)) return true;
+  if (!isMetadataEqual(baseObj.metadata, currentObj.metadata)) return 'MODIFIED';
   
-  if (!isEvidenceEqual(normalizeEvidence(baseObj.evidence), normalizeEvidence(currentObj.evidence))) return true;
-
-  return false;
+  const evidenceStatus = getEvidenceStatus(normalizeEvidence(baseObj.evidence), normalizeEvidence(currentObj.evidence));
+  return evidenceStatus;
 }
 
 function deduplicateNodes(nodes: StructuralNode[]): StructuralNode[] {
@@ -133,11 +133,8 @@ export function compareGraphs(base: RepresentationGraph, current: Representation
     if (!baseNode) {
       diff.nodes.push({ ...currentNode, diffStatus: 'ADDED' });
     } else {
-      if (isModified(baseNode, currentNode)) {
-        diff.nodes.push({ ...currentNode, diffStatus: 'MODIFIED' });
-      } else {
-        diff.nodes.push({ ...currentNode, diffStatus: 'UNCHANGED' });
-      }
+      const status = getModificationStatus(baseNode, currentNode);
+      diff.nodes.push({ ...currentNode, diffStatus: status });
     }
   }
 
@@ -160,11 +157,8 @@ export function compareGraphs(base: RepresentationGraph, current: Representation
     if (!baseEdge) {
       diff.edges.push({ ...currentEdge, diffStatus: 'ADDED' });
     } else {
-      if (isModified(baseEdge, currentEdge)) {
-        diff.edges.push({ ...currentEdge, diffStatus: 'MODIFIED' });
-      } else {
-        diff.edges.push({ ...currentEdge, diffStatus: 'UNCHANGED' });
-      }
+      const status = getModificationStatus(baseEdge, currentEdge);
+      diff.edges.push({ ...currentEdge, diffStatus: status });
     }
   }
 
