@@ -64,7 +64,18 @@ export function resolveModulePath(
   }
   
   // Try common extensions
+
+  // Handle TypeScript ES module imports where .js implies .ts/.tsx
+  if (targetAbsolutePath.endsWith('.js')) {
+    const tsPath = targetAbsolutePath.slice(0, -3) + '.ts';
+    if (fs.existsSync(tsPath)) return path.relative(repoRoot, tsPath);
+    
+    const tsxPath = targetAbsolutePath.slice(0, -3) + '.tsx';
+    if (fs.existsSync(tsxPath)) return path.relative(repoRoot, tsxPath);
+  }
+
   const extensions = ['.ts', '.tsx', '.js', '.jsx', '/index.ts', '/index.js'];
+
   
   for (const ext of extensions) {
     const checkPath = targetAbsolutePath + ext;

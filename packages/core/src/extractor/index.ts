@@ -154,7 +154,7 @@ export function analyzeTarget(
 
   // 2. Emit WORKSPACE_PACKAGE boundaries
   for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
-    const relativePkgPath = path.relative(process.cwd(), pkgPath) || pkgPath;
+    const relativePkgPath = path.relative(actualRepoRoot, pkgPath) || pkgPath;
     const pkgId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);
     nodes.push({
       id: pkgId,
@@ -176,7 +176,7 @@ export function analyzeTarget(
       true
     );
 
-    const relativePath = path.relative(process.cwd(), filePath) || filePath;
+    const relativePath = path.relative(actualRepoRoot, filePath) || filePath;
     let scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK' = 'USER';
     const lowerPath = relativePath.toLowerCase();
     

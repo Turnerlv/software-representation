@@ -345,7 +345,7 @@ export function visitRelationship(
 
         const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
         if (resolvedPath) {
-          const targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+          let targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
           const absoluteTargetPath = path.resolve(repoRoot, resolvedPath);
           
           // Verify export in target module
@@ -371,6 +371,8 @@ export function visitRelationship(
                   targetNode.name.text === methodName
                 ) {
                    exportFound = true;
+
+                   targetId = stableEntityId(resolvedPath, 'CONTRACT', `Exported Function: ${methodName}`);
                    const start = targetNode.getStart(targetSourceFile);
                    const { line } = targetSourceFile.getLineAndCharacterOfPosition(start);
                    targetEvidence = {
@@ -496,7 +498,7 @@ export function visitRelationship(
 
       const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
       if (resolvedPath) {
-        const targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+        let targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
         const absoluteTargetPath = path.resolve(repoRoot, resolvedPath);
         
         // Verify export in target module
@@ -522,6 +524,8 @@ export function visitRelationship(
                 targetNode.name.text === rootText
               ) {
                  exportFound = true;
+
+                 targetId = stableEntityId(resolvedPath, 'CONTRACT', `Exported Function: ${rootText}`);
                  const start = targetNode.getStart(targetSourceFile);
                  const { line } = targetSourceFile.getLineAndCharacterOfPosition(start);
                  targetEvidence = {
