@@ -62,6 +62,9 @@ export function collectFiles(targetPath: string): string[] {
           entry.name === '.git' ||
           entry.name === 'dist' ||
           entry.name === 'build' ||
+          entry.name === '.next' ||
+          entry.name === '.turbo' ||
+          entry.name === 'coverage' ||
           entry.name === 'test' ||
           entry.name === 'tests' ||
           entry.name === '__tests__' ||
