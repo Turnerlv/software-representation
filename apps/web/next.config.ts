@@ -3,10 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   transpilePackages: ["@chomp/core", "@chomp/db"],
   serverExternalPackages: ["better-sqlite3"],
-  experimental: {
-    serverComponentsExternalPackages: ["better-sqlite3"],
-  },
-  webpack: (config, { isServer }) => {
+webpack: (config, { isServer }) => {
     config.resolve.extensionAlias = {
       ".js": [".ts", ".tsx", ".js", ".jsx"],
       ".mjs": [".mts", ".mjs"],

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { condenseGraph } from "@chomp/core";
 
 export async function POST(req: Request) {
   try {
@@ -15,25 +16,28 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "GEMINI_API_KEY is not configured on the server." }, { status: 500 });
     }
 
+    // Preprocess the graph to filter out AST noise and roll up contracts to boundaries
+    const condensed = condenseGraph({ nodes, edges: edges || [] });
+
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
 
     // Minimize payload to save tokens
-    const minNodes = nodes.map(n => ({ id: n.id, name: n.name, type: n.type }));
-    const minEdges = (edges || []).map((e: any) => ({ source: e.sourceId, target: e.targetId, type: e.type }));
+    const minNodes = condensed.nodes.map(n => ({ id: n.id, name: n.name, type: n.type }));
+    const minEdges = condensed.edges.map(e => ({ source: e.sourceId, target: e.targetId, type: e.type }));
 
     const prompt = `
 You are the Chomp Cartographer, an AI expert in software architecture. 
-I am providing you a list of extracted structural nodes and edges.
+I am providing you a condensed macroscopic list of structural nodes and edges representing an application's topology.
 
 Your job is to organize these nodes into a logical Transit Map layout by assigning each node to a 'lane' and giving it a 'role'.
 
-Lanes could be: "Frontend", "API Gateway", "Core Services", "Database", "External APIs", etc.
-Roles could be: "INGRESS", "CORE", "TRANSFORM", "PERSISTENCE", "EGRESS".
+Lanes could be (as numbers): 1 for "Ingress/Gateway", 2 for "Core/Middle", 3 for "Egress/DB/External".
+Roles MUST BE ONE OF: "INGRESS", "CORE", "EGRESS", "TOP_TRAY", "BOTTOM_TRAY".
 
 Return ONLY a valid JSON array where each object has:
 - id: (the exact node id from the input)
-- lane: (string, the lane this node belongs in)
+- lane: (number, the lane this node belongs in, lower numbers are closer to the entry point)
 - role: (string, the role of this node)
 
 Nodes:
