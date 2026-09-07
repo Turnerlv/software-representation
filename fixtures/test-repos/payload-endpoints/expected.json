@@ -1,0 +1,14 @@
+{
+  "boundaries": [
+    { "name": "File: ../../fixtures/test-repos/payload-endpoints/index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
+    { "name": "Payload Collection: MyCollection", "entityType": "PAYLOAD_COLLECTION", "patternId": "boundary.payload-collection-config" }
+  ],
+  "contracts": [
+    { "name": "Payload Endpoints Array", "entityType": "PAYLOAD_ENDPOINTS", "patternId": "contract.payload-endpoint-definition" },
+    { "name": "Payload Fields Array", "entityType": "PAYLOAD_FIELDS", "patternId": "contract.payload-field-definition" }
+  ],
+  "relationships": [
+    { "name": "Call: Response.json()", "entityType": "CALL", "patternId": "relationship.invoke-returned-function" }
+  ],
+  "openConnectors": []
+}

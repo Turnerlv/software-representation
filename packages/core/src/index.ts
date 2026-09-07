@@ -13,3 +13,4 @@
 
 export * from './types/index.js';
 export * from './extractor/index.js';
+export * from './differ/index.js';

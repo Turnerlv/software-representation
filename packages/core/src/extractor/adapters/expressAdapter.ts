@@ -431,6 +431,29 @@ export function extractExpressResponseConnector(
           evidence: getEvidence(node),
         };
       }
+    } else if (methodName === 'set' || methodName === 'setHeader' || methodName === 'header') {
+      let isExpressRes = false;
+      if (ts.isIdentifier(node.expression.expression)) {
+        const rootName = node.expression.expression.text;
+        if (['res'].includes(rootName)) {
+          isExpressRes = true;
+        }
+      }
+
+      if (isExpressRes) {
+        let headerName = 'Unknown';
+        if (node.arguments.length >= 1 && ts.isStringLiteral(node.arguments[0])) {
+          headerName = node.arguments[0].text;
+        }
+
+        return {
+          id: nextId(),
+          name: `Express Response Header: ${headerName}`,
+          type: 'OPEN_CONNECTOR',
+          entityType: 'HTTP_RESPONSE', patternId: 'open-connector.express-response-header', 
+          evidence: getEvidence(node),
+        };
+      }
     }
   }
 

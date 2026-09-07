@@ -32,15 +32,17 @@ export function saveRepresentationGraph(
 ): void {
   const saveTx = db.transaction(() => {
     db.prepare(`
-      INSERT INTO repositories (id, name, path, analyzed_at, extractor_version, commit_sha)
-      VALUES (?, ?, ?, ?, ?, ?)
+      INSERT INTO repositories (id, name, path, analyzed_at, extractor_version, commit_sha, branch_name, project_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         name = excluded.name,
         path = excluded.path,
         analyzed_at = excluded.analyzed_at,
         extractor_version = excluded.extractor_version,
-        commit_sha = excluded.commit_sha
-    `).run(repo.id, repo.name, repo.path, graph.analyzedAt, repo.extractorVersion ?? null, repo.commitSha ?? null);
+        commit_sha = excluded.commit_sha,
+        branch_name = excluded.branch_name,
+        project_id = excluded.project_id
+    `).run(repo.id, repo.name, repo.path, graph.analyzedAt, repo.extractorVersion ?? null, repo.commitSha ?? null, repo.branchName ?? null, repo.projectId ?? null);
 
     db.prepare('DELETE FROM nodes WHERE repository_id = ?').run(repo.id);
     db.prepare('DELETE FROM edges WHERE repository_id = ?').run(repo.id);
@@ -123,9 +125,9 @@ export function getRepresentationGraph(
   options: ScopeOptions = { scopes: ['USER'] }
 ): RepresentationGraph | null {
   const repoRow = db
-    .prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories WHERE id = ?')
+    .prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha, branch_name, project_id FROM repositories WHERE id = ?')
     .get(repoId) as
-    | { id: string; name: string; path: string; analyzed_at: string; extractor_version: string | null; commit_sha: string | null }
+    | { id: string; name: string; path: string; analyzed_at: string; extractor_version: string | null; commit_sha: string | null; branch_name: string | null; project_id: string | null }
     | undefined;
 
   if (!repoRow) {
@@ -249,12 +251,15 @@ export function getRepresentationGraph(
   if (repoRow.commit_sha) {
     result.commitSha = repoRow.commit_sha;
   }
+  if (repoRow.branch_name) {
+    result.branchName = repoRow.branch_name;
+  }
 
   return result;
 }
 
 export function listRepositories(db: Database.Database): Promise<RepositoryInfo[]> {
-  const rows = db.prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha FROM repositories').all();
+  const rows = db.prepare('SELECT id, name, path, analyzed_at, extractor_version, commit_sha, branch_name, project_id FROM repositories').all();
   // Map the snake_case DB columns back to the camelCase RepositoryInfo interface
   const repos = rows.map((row: any) => ({
     id: row.id,
@@ -262,7 +267,9 @@ export function listRepositories(db: Database.Database): Promise<RepositoryInfo[
     path: row.path,
     analyzedAt: row.analyzed_at,
     extractorVersion: row.extractor_version,
-    commitSha: row.commit_sha
+    commitSha: row.commit_sha,
+    branchName: row.branch_name,
+    projectId: row.project_id
   }));
   return Promise.resolve(repos);
 }

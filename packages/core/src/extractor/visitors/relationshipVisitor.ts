@@ -6,10 +6,12 @@ import path from 'path';
 import ts from 'typescript';
 import { EvidenceRecord, StructuralEntity } from '../../types/index.js';
 import { extractExpressRouterMount, extractExpressRouteMiddleware } from '../adapters/expressAdapter.js';
+import { extractPayloadConfigRegistry, extractPayloadHooks } from '../adapters/payloadAdapter.js';
 
 import { resolveModulePath } from '../pathResolver.js';
 import { stableEntityId } from '../index.js';
 import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorVisitor.js';
+import { WorkspaceRegistry } from '../workspaceResolver.js';
 
 /**
  * Inspects a single AST node and returns a RELATIONSHIP entity if it matches a known dependency pattern.
@@ -18,7 +20,6 @@ import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorV
  * - ImportDeclaration         (ES Module `import ... from '...'`)
  * - CallExpression (require)   (CommonJS `require('...')`)
  * - Express Router Mounts      (delegated to `extractExpressRouterMount`)
-
  * - Prototypal Inheritance     (`Object.create(...)`, `Object.setPrototypeOf(...)`)
  * - Inferred Method Calls      (e.g. `userService.createUser()`) with 3-tier confidence classification:
  *   - HIGH:   Root identifier matches a local ES import AND target exported method signature is verified.
@@ -34,6 +35,7 @@ import { HTTP_CLIENT_IDENTIFIERS, DB_CLIENT_IDENTIFIERS } from './openConnectorV
  * @param nextId      Placeholder closure — replaced by stableEntityId() in the orchestrator.
  * @param repoRoot    The repository root for path resolution (defaults to empty string).
  * @param sourceId    The ID of the current enclosing boundary file (defaults to empty string).
+ * @param workspaceRegistry Optional registry of monorepo workspace packages.
  * @returns A StructuralEntity or null if the node does not match any RELATIONSHIP pattern.
  */
 export function visitRelationship(
@@ -42,11 +44,12 @@ export function visitRelationship(
   getEvidence: (node: ts.Node) => EvidenceRecord,
   nextId: () => string,
   repoRoot: string = '',
-  sourceId: string = ''
+  sourceId: string = '',
+  workspaceRegistry?: WorkspaceRegistry
 ): StructuralEntity | StructuralEntity[] | null {
   if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
     const importLiteral = node.moduleSpecifier.text;
-    const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+    const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
     let targetId: string | undefined = undefined;
     
     if (resolvedPath) {
@@ -75,7 +78,7 @@ export function visitRelationship(
     const firstArg = node.arguments[0];
     if (ts.isStringLiteral(firstArg)) {
       const importLiteral = firstArg.text;
-      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
       let targetId: string | undefined = undefined;
       
       if (resolvedPath) {
@@ -119,7 +122,7 @@ export function visitRelationship(
     const firstArg = node.arguments[0];
     if (ts.isStringLiteral(firstArg)) {
       const importLiteral = firstArg.text;
-      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
       let targetId: string | undefined = undefined;
       
       if (resolvedPath) {
@@ -156,6 +159,12 @@ export function visitRelationship(
       };
     }
   }
+
+  const payloadRegistry = extractPayloadConfigRegistry(node, sourceFile, getEvidence, nextId);
+  if (payloadRegistry) return payloadRegistry;
+
+  const payloadHooks = extractPayloadHooks(node, sourceFile, getEvidence, nextId);
+  if (payloadHooks) return payloadHooks;
 
   const expressMount = extractExpressRouterMount(node, sourceFile, getEvidence, nextId);
   if (expressMount) {
@@ -334,9 +343,9 @@ export function visitRelationship(
           evidenceRole: 'import-match'
         });
 
-        const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+        const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
         if (resolvedPath) {
-          const targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+          let targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
           const absoluteTargetPath = path.resolve(repoRoot, resolvedPath);
           
           // Verify export in target module
@@ -362,6 +371,8 @@ export function visitRelationship(
                   targetNode.name.text === methodName
                 ) {
                    exportFound = true;
+
+                   targetId = stableEntityId(resolvedPath, 'CONTRACT', `Exported Function: ${methodName}`);
                    const start = targetNode.getStart(targetSourceFile);
                    const { line } = targetSourceFile.getLineAndCharacterOfPosition(start);
                    targetEvidence = {
@@ -485,9 +496,9 @@ export function visitRelationship(
         evidenceRole: 'import-match'
       });
 
-      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
       if (resolvedPath) {
-        const targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+        let targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
         const absoluteTargetPath = path.resolve(repoRoot, resolvedPath);
         
         // Verify export in target module
@@ -513,6 +524,8 @@ export function visitRelationship(
                 targetNode.name.text === rootText
               ) {
                  exportFound = true;
+
+                 targetId = stableEntityId(resolvedPath, 'CONTRACT', `Exported Function: ${rootText}`);
                  const start = targetNode.getStart(targetSourceFile);
                  const { line } = targetSourceFile.getLineAndCharacterOfPosition(start);
                  targetEvidence = {

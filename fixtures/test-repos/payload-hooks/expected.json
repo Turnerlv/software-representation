@@ -1,0 +1,38 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/payload-hooks/index.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Package: payload",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    },
+    {
+      "name": "Payload Collection: Users",
+      "entityType": "PAYLOAD_COLLECTION",
+      "patternId": "boundary.payload-collection-config"
+    }
+  ],
+  "contracts": [],
+  "relationships": [
+    {
+      "name": "Import: ./hooks",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: payload",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Payload Hook: beforeChange -> logBefore",
+      "entityType": "HOOK_REGISTRATION",
+      "patternId": "relationship.payload-hook-registration"
+    }
+  ],
+  "openConnectors": []
+}

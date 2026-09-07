@@ -1,0 +1,38 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/payload-registry/index.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    },
+    {
+      "name": "Module Export (Default)",
+      "entityType": "MODULE",
+      "patternId": "boundary.es6-export-default"
+    },
+    {
+      "name": "Package: payload",
+      "entityType": "EXTERNAL_PACKAGE",
+      "patternId": "boundary.external-import"
+    }
+  ],
+  "contracts": [],
+  "relationships": [
+    {
+      "name": "Import: ./Posts",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Import: payload",
+      "entityType": "IMPORT",
+      "patternId": "relationship.import-declaration"
+    },
+    {
+      "name": "Payload Config Registry: Posts",
+      "entityType": "REGISTRY_MOUNT",
+      "patternId": "relationship.payload-config-registry"
+    }
+  ],
+  "openConnectors": []
+}

@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
-import { analyzeTarget, collectFiles } from './extractor/index.js';
+import { analyzeTarget, collectFiles, stableEntityId } from './extractor/index.js';
 
 test('collectFiles returns files for directory and single file', () => {
   const sampleDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'sample-app');
@@ -291,3 +291,40 @@ test('analyzeTarget extracts dynamic require and import as RELATIONSHIP', () => 
     'Expected to extract dynamic import() as RELATIONSHIP'
   );
 });
+
+test('analyzeTarget extracts monorepo workspace packages as BOUNDARY and resolves sibling imports as internal', () => {
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'monorepo-pnpm');
+  const graph = analyzeTarget(fixtureDir);
+
+  // Verify WORKSPACE_PACKAGE boundaries are emitted
+  const packageA = graph.nodes.find(n => n.name === 'Package: @acme/a' && n.entityType === 'WORKSPACE_PACKAGE');
+  const packageB = graph.nodes.find(n => n.name === 'Package: @acme/b' && n.entityType === 'WORKSPACE_PACKAGE');
+  
+  assert.ok(packageA, 'Expected @acme/a workspace package boundary');
+  assert.ok(packageB, 'Expected @acme/b workspace package boundary');
+
+  // Verify files are assigned parent_boundary_id
+  const fileA = graph.nodes.find(n => n.entityType === 'FILE' && n.name.includes('packages/a/index.ts'));
+  const fileB = graph.nodes.find(n => n.entityType === 'FILE' && n.name.includes('packages/b/index.ts'));
+  
+  assert.ok(fileA, 'Expected file packages/a/index.ts');
+  assert.ok(fileB, 'Expected file packages/b/index.ts');
+  
+  assert.strictEqual(fileA.parentBoundaryId, packageA.id, 'File A should be parented to Package A');
+  assert.strictEqual(fileB.parentBoundaryId, packageB.id, 'File B should be parented to Package B');
+
+  // Verify sibling import maps to the internal file boundary
+  const siblingImport = graph.edges.find(e => e.name === 'Import: @acme/a');
+  assert.ok(siblingImport, 'Expected Import: @acme/a edge');
+  assert.strictEqual(siblingImport.sourceId, fileB.id, 'Import should originate from File B');
+  
+  // In the test suite, process.cwd() is packages/core but repoRoot is the fixture dir. 
+  // pathResolver uses repoRoot, returning 'packages/a/index.ts'
+  const expectedTargetId = stableEntityId('packages/a/index.ts', 'BOUNDARY', 'File: packages/a/index.ts');
+  assert.strictEqual(siblingImport.targetId, expectedTargetId, 'Import should target File A (resolved via workspace registry)');
+  
+  // Verify NO EXTERNAL_PACKAGE was generated for @acme/a
+  const externalA = graph.nodes.find(n => n.entityType === 'EXTERNAL_PACKAGE' && n.name.includes('@acme/a'));
+  assert.ok(!externalA, 'Should not generate generic EXTERNAL_PACKAGE for workspace imports');
+});
+

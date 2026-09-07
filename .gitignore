@@ -89,3 +89,6 @@ apps/*/package-lock.json
 /fixtures/research/*.db-journal
 
 .chomp/
+
+# Local Dev Notes
+git-workflow-cheatsheet.md

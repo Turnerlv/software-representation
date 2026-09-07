@@ -1,0 +1,17 @@
+{
+  "boundaries": [
+    { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" },
+    { "name": "File: ../../fixtures/test-repos/payload-db-adapter/index.ts", "entityType": "FILE", "patternId": "generic.boundary" }
+  ],
+  "contracts": [
+    { "name": "Exported Function: customOperation", "entityType": "EXPORTED_FUNCTION", "patternId": "contract.exported-function" }
+  ],
+  "relationships": [
+    { "name": "Import: payload", "entityType": "IMPORT", "patternId": "relationship.import-declaration" },
+    { "name": "Call: req.findOne()", "entityType": "CALL", "patternId": "relationship.invoke-returned-function" },
+    { "name": "Call: Payload DB Adapter: findOne", "entityType": "CALL", "patternId": "generic.relationship" }
+  ],
+  "openConnectors": [
+    { "name": "Payload DB Adapter: findOne", "entityType": "DB_OPERATION", "patternId": "open-connector.payload-db-adapter-operation" }
+  ]
+}

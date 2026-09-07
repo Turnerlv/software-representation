@@ -37,7 +37,9 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       path TEXT NOT NULL,
       analyzed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       extractor_version TEXT,
-      commit_sha TEXT
+      commit_sha TEXT,
+      branch_name TEXT,
+      project_id TEXT
     );
 
     CREATE TABLE IF NOT EXISTS nodes (
@@ -81,6 +83,26 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
       UNIQUE(entity_id, file_path, line_number, evidence_role)
     );
 
+    CREATE TABLE IF NOT EXISTS layout_views (
+      id TEXT PRIMARY KEY,
+      repository_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS layout_nodes (
+      layout_id TEXT NOT NULL,
+      node_id TEXT NOT NULL,
+      lane TEXT,
+      role TEXT,
+      x INTEGER,
+      y INTEGER,
+      PRIMARY KEY (layout_id, node_id),
+      FOREIGN KEY (layout_id) REFERENCES layout_views(id) ON DELETE CASCADE,
+      FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE
+    );
+
   `);
 
   try { db.exec("ALTER TABLE nodes ADD COLUMN entity_type TEXT NOT NULL DEFAULT 'UNKNOWN';"); } catch (e) { }
@@ -99,6 +121,8 @@ export function initDatabase(dbPath: string = ':memory:'): Database.Database {
   try { db.exec("ALTER TABLE evidence_records ADD COLUMN evidence_role TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE repositories ADD COLUMN extractor_version TEXT;"); } catch (e) { }
   try { db.exec("ALTER TABLE repositories ADD COLUMN commit_sha TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN branch_name TEXT;"); } catch (e) { }
+  try { db.exec("ALTER TABLE repositories ADD COLUMN project_id TEXT;"); } catch (e) { }
   try { db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_evidence_dedup ON evidence_records(entity_id, file_path, line_number, evidence_role);"); } catch (e) { }
 
   return db;

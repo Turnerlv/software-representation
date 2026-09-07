@@ -1,0 +1,14 @@
+{
+  "boundaries": [
+    { "name": "File: ../../fixtures/test-repos/payload-blocks/index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
+    { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" }
+  ],
+  "contracts": [
+    { "name": "Payload Block: HeroBlock", "entityType": "PAYLOAD_BLOCK", "patternId": "contract.payload-block-definition" },
+    { "name": "Payload Fields Array", "entityType": "PAYLOAD_FIELDS", "patternId": "contract.payload-field-definition" }
+  ],
+  "relationships": [
+    { "name": "Import: payload", "entityType": "IMPORT", "patternId": "relationship.import-declaration" }
+  ],
+  "openConnectors": []
+}

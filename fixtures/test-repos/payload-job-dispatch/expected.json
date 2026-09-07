@@ -1,0 +1,35 @@
+{
+  "boundaries": [
+    {
+      "name": "File: ../../fixtures/test-repos/payload-job-dispatch/index.ts",
+      "entityType": "FILE",
+      "patternId": "generic.boundary"
+    }
+  ],
+  "contracts": [
+    {
+      "name": "Exported Function: queueExport",
+      "entityType": "EXPORTED_FUNCTION",
+      "patternId": "contract.exported-function"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "Call: Payload Job Queue: req.payload.jobs.queue",
+      "entityType": "CALL",
+      "patternId": "generic.relationship"
+    },
+    {
+      "name": "Call: req.queue()",
+      "entityType": "CALL",
+      "patternId": "relationship.invoke-returned-function"
+    }
+  ],
+  "openConnectors": [
+    {
+      "name": "Payload Job Queue: req.payload.jobs.queue",
+      "entityType": "JOB_DISPATCH",
+      "patternId": "open-connector.payload-job-dispatch"
+    }
+  ]
+}

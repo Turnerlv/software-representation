@@ -1,0 +1,16 @@
+{
+  "boundaries": [
+    { "name": "File: ../../fixtures/test-repos/payload-plugins/index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
+    { "name": "Module Export (Default)", "entityType": "MODULE", "patternId": "boundary.es6-export-default" },
+    { "name": "Package: @payloadcms/plugin-seo", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" },
+    { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" }
+  ],
+  "contracts": [],
+  "relationships": [
+    { "name": "Call: seoPlugin()", "entityType": "CALL", "patternId": "relationship.inferred-method-call" },
+    { "name": "Import: @payloadcms/plugin-seo", "entityType": "IMPORT", "patternId": "relationship.import-declaration" },
+    { "name": "Import: payload", "entityType": "IMPORT", "patternId": "relationship.import-declaration" },
+    { "name": "Payload Plugin: seoPlugin", "entityType": "PLUGIN_REGISTRATION", "patternId": "relationship.payload-plugin-registration" }
+  ],
+  "openConnectors": []
+}

@@ -323,3 +323,62 @@ export function extractNextjsLayoutBoundary(
 
   return null;
 }
+
+/**
+ * Extracts Next.js Route Segment Configs as a CONTRACT.
+ * Matches: `export const dynamic = 'force-dynamic'`
+ */
+export function extractNextjsRouteConfig(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity[] | null {
+  if (!ts.isVariableStatement(node)) return null;
+  if (!node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) return null;
+
+  const validConfigs = new Set(['dynamic', 'revalidate', 'fetchCache', 'runtime', 'preferredRegion', 'maxDuration']);
+  const results: StructuralEntity[] = [];
+
+  for (const decl of node.declarationList.declarations) {
+    if (ts.isIdentifier(decl.name) && validConfigs.has(decl.name.text)) {
+      results.push({
+        id: nextId(),
+        name: `Next.js Config: ${decl.name.text}`,
+        type: 'CONTRACT',
+        entityType: 'NEXTJS_ROUTE_CONFIG',
+        patternId: 'contract.nextjs-route-config',
+        evidence: getEvidence(node),
+      });
+    }
+  }
+
+  return results.length > 0 ? results : null;
+}
+
+/**
+ * Extracts Next.js metadata export as a CONTRACT.
+ * Matches: `export const metadata = { ... }` or `export const metadata: Metadata = { ... }`
+ */
+export function extractNextjsMetadataExport(
+  node: ts.Node,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (!ts.isVariableStatement(node)) return null;
+  if (!node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) return null;
+
+  for (const decl of node.declarationList.declarations) {
+    if (ts.isIdentifier(decl.name) && decl.name.text === 'metadata') {
+      return {
+        id: nextId(),
+        name: `Next.js Metadata`,
+        type: 'CONTRACT',
+        entityType: 'NEXTJS_METADATA',
+        patternId: 'contract.nextjs-metadata-export',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  return null;
+}

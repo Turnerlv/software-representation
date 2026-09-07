@@ -7,6 +7,8 @@ import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { resolveModulePath } from '../pathResolver.js';
 import { extractExpressMiddlewareBoundary } from '../adapters/expressAdapter.js';
 import { NextjsFileRole, extractNextjsPageBoundary, extractNextjsLayoutBoundary } from '../adapters/nextjsAdapter.js';
+import { extractPayloadCollectionConfig } from '../adapters/payloadAdapter.js';
+import { WorkspaceRegistry } from '../workspaceResolver.js';
 
 /**
  * Inspects a single AST node and returns a BOUNDARY entity if it matches a known scope pattern.
@@ -18,6 +20,7 @@ import { NextjsFileRole, extractNextjsPageBoundary, extractNextjsLayoutBoundary 
  * - ImportDeclaration  (External packages)
  * - Require Calls      (External packages)
  * - Express Middleware (Express routes/middleware)
+ * - Payload Collection (Payload CMS collection config)
  *
  * @param node         The AST node to inspect.
  * @param sourceFile   TypeScript SourceFile object used for text extraction.
@@ -33,7 +36,8 @@ export function visitBoundary(
   nextId: () => string,
   repoRoot: string = '',
   fileRole?: NextjsFileRole | null,
-  filePath?: string
+  filePath?: string,
+  workspaceRegistry?: WorkspaceRegistry
 ): StructuralEntity | StructuralEntity[] | null {
   if (ts.isClassDeclaration(node) && node.name) {
     return {
@@ -65,11 +69,20 @@ export function visitBoundary(
   const cjsExport = extractCommonjsExport(node, getEvidence, nextId);
   if (cjsExport && cjsExport.type === 'BOUNDARY') return cjsExport;
 
+  // Helper to check if import is a workspace package
+  const isWorkspacePackage = (importLiteral: string) => {
+    if (!workspaceRegistry) return false;
+    for (const pkgName of Object.keys(workspaceRegistry)) {
+       if (importLiteral === pkgName || importLiteral.startsWith(`${pkgName}/`)) return true;
+    }
+    return false;
+  };
+
   // External package boundaries from imports
   if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
     const importLiteral = node.moduleSpecifier.text;
-    const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
-    if (!resolvedPath && !importLiteral.startsWith('.')) {
+    const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
+    if (!resolvedPath && !importLiteral.startsWith('.') && !isWorkspacePackage(importLiteral)) {
       return {
         id: nextId(),
         name: `Package: ${importLiteral}`,
@@ -85,8 +98,8 @@ export function visitBoundary(
     const firstArg = node.arguments[0];
     if (ts.isStringLiteral(firstArg)) {
       const importLiteral = firstArg.text;
-      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot);
-      if (!resolvedPath && !importLiteral.startsWith('.')) {
+      const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
+      if (!resolvedPath && !importLiteral.startsWith('.') && !isWorkspacePackage(importLiteral)) {
         return {
           id: nextId(),
           name: `Package: ${importLiteral}`,
@@ -106,6 +119,9 @@ export function visitBoundary(
 
   const nextjsLayout = extractNextjsLayoutBoundary(node, fileRole ?? null, filePath ?? '', getEvidence, nextId);
   if (nextjsLayout) return nextjsLayout;
+
+  const payloadCollection = extractPayloadCollectionConfig(node, getEvidence, nextId);
+  if (payloadCollection) return payloadCollection;
 
   return null;
 }

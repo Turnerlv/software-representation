@@ -3,6 +3,7 @@
 
 import { createHash } from 'crypto';
 import fs from 'fs';
+import ignore from 'ignore';
 import path from 'path';
 import ts from 'typescript';
 import {
@@ -16,6 +17,7 @@ import { visitContract } from './visitors/contractVisitor.js';
 import { visitRelationship } from './visitors/relationshipVisitor.js';
 import { visitOpenConnector } from './visitors/openConnectorVisitor.js';
 import { classifyNextjsFile, NextjsFileRole } from './adapters/nextjsAdapter.js';
+import { buildWorkspaceRegistry, WorkspaceRegistry } from './workspaceResolver.js';
 
 /**
  * Recursively collects all TypeScript and JavaScript source files under the given path.
@@ -37,18 +39,32 @@ export function collectFiles(targetPath: string): string[] {
     return [absolutePath];
   }
 
+  // Load .chompignore if it exists
+  const ig = (ignore as any).default ? (ignore as any).default() : (ignore as any)();
+  const ignorePath = path.join(absolutePath, '.chompignore');
+  if (fs.existsSync(ignorePath)) {
+    ig.add(fs.readFileSync(ignorePath, 'utf8'));
+  }
+
   const files: string[] = [];
 
   function walkDir(currentDir: string) {
     const entries = fs.readdirSync(currentDir, { withFileTypes: true });
     for (const entry of entries) {
       const fullPath = path.join(currentDir, entry.name);
+      
+      // Calculate path relative to root target for ignore testing
+      const relativePath = path.relative(absolutePath, fullPath);
+
       if (entry.isDirectory()) {
         if (
           entry.name === 'node_modules' ||
           entry.name === '.git' ||
           entry.name === 'dist' ||
           entry.name === 'build' ||
+          entry.name === '.next' ||
+          entry.name === '.turbo' ||
+          entry.name === 'coverage' ||
           entry.name === 'test' ||
           entry.name === 'tests' ||
           entry.name === '__tests__' ||
@@ -60,15 +76,30 @@ export function collectFiles(targetPath: string): string[] {
         ) {
           continue;
         }
+
+        // Apply .chompignore for directories
+        if (fs.existsSync(ignorePath) && ig.ignores(relativePath + '/')) {
+          continue;
+        }
+
         walkDir(fullPath);
       } else if (entry.isFile()) {
+        // Apply .chompignore for files
+        if (fs.existsSync(ignorePath) && ig.ignores(relativePath)) {
+          continue;
+        }
+
         const ext = path.extname(entry.name).toLowerCase();
         if (['.ts', '.tsx', '.js', '.jsx'].includes(ext)) {
           const lowerName = entry.name.toLowerCase();
-          if (lowerName.includes('.test.') || lowerName.includes('.spec.')) {
-            continue;
+          if (
+            !lowerName.includes('.test.') &&
+            !lowerName.includes('.spec.') &&
+            !lowerName.includes('.mock.') &&
+            !lowerName.includes('.d.ts')
+          ) {
+            files.push(fullPath);
           }
-          files.push(fullPath);
         }
       }
     }
@@ -109,7 +140,7 @@ export function stableEntityId(filePath: string, type: string, name: string): st
  */
 export function analyzeTarget(
   targetPath: string,
-  extractorVersion: string = '1.0.0',
+  extractorVersion: string = '1.1.0',
   commitSha?: string
 ): RepresentationGraph {
   const files = collectFiles(targetPath);
@@ -121,6 +152,24 @@ export function analyzeTarget(
   const isTargetFile = fs.statSync(repoRoot).isFile();
   const actualRepoRoot = isTargetFile ? path.dirname(repoRoot) : repoRoot;
 
+  // 1. Build Workspace Registry
+  const workspaceRegistry = buildWorkspaceRegistry(actualRepoRoot);
+
+  // 2. Emit WORKSPACE_PACKAGE boundaries
+  for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
+    const relativePkgPath = path.relative(actualRepoRoot, pkgPath) || pkgPath;
+    const pkgId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);
+    nodes.push({
+      id: pkgId,
+      name: `Package: ${pkgName}`,
+      type: 'BOUNDARY',
+      entityType: 'WORKSPACE_PACKAGE',
+      patternId: 'generic.boundary',
+      scope: 'USER',
+      evidence: { filePath: relativePkgPath }
+    });
+  }
+
   for (const filePath of files) {
     const sourceText = fs.readFileSync(filePath, 'utf8');
     const sourceFile = ts.createSourceFile(
@@ -130,7 +179,7 @@ export function analyzeTarget(
       true
     );
 
-    const relativePath = path.relative(process.cwd(), filePath) || filePath;
+    const relativePath = path.relative(actualRepoRoot, filePath) || filePath;
     let scope: 'USER' | 'TEST' | 'MOCK' | 'CONFIG' | 'EXAMPLE' | 'BENCHMARK' = 'USER';
     const lowerPath = relativePath.toLowerCase();
     
@@ -148,6 +197,15 @@ export function analyzeTarget(
       scope = 'BENCHMARK';
     }
 
+    // Assign parent_boundary_id if file belongs to a workspace package
+    let parentBoundaryId: string | undefined = undefined;
+    for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
+      if (filePath.startsWith(pkgPath + path.sep) || filePath === pkgPath) {
+        parentBoundaryId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);
+        break;
+      }
+    }
+
     const fileId = stableEntityId(relativePath, 'BOUNDARY', `File: ${relativePath}`);
     nodes.push({
       id: fileId,
@@ -155,6 +213,7 @@ export function analyzeTarget(
       type: 'BOUNDARY',
       entityType: 'FILE', patternId: 'generic.boundary',
       scope,
+      parentBoundaryId,
       evidence: { filePath: relativePath },
     });
 
@@ -183,11 +242,16 @@ export function analyzeTarget(
      * Replaces placeholder entity IDs with deterministic stableEntityId() before pushing to graph arrays.
      */
     function visit(node: ts.Node) {
-      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath);
+      const boundaryResult = visitBoundary(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileRole, relativePath, workspaceRegistry);
       const boundaryEntities = Array.isArray(boundaryResult) ? boundaryResult : (boundaryResult ? [boundaryResult] : []);
       for (const boundaryEntity of boundaryEntities) {
-        boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
-        boundaryEntity.parentBoundaryId = fileId;
+        if (boundaryEntity.entityType === 'EXTERNAL_PACKAGE' || boundaryEntity.entityType === 'NODE_BUILTIN') {
+          const importLiteral = boundaryEntity.name.replace('Package: ', '');
+          boundaryEntity.id = stableEntityId(`package:${importLiteral}`, boundaryEntity.type, boundaryEntity.name);
+        } else {
+          boundaryEntity.id = stableEntityId(relativePath, boundaryEntity.type, boundaryEntity.name);
+          boundaryEntity.parentBoundaryId = fileId;
+        }
         boundaryEntity.scope = scope;
         nodes.push(boundaryEntity as StructuralNode);
       }
@@ -201,7 +265,7 @@ export function analyzeTarget(
         nodes.push(contractEntity as StructuralNode);
       }
 
-      const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId);
+      const relationshipResult = visitRelationship(node, sourceFile, getEvidence, () => '', actualRepoRoot, fileId, workspaceRegistry);
       const relationshipEntities = Array.isArray(relationshipResult) ? relationshipResult : (relationshipResult ? [relationshipResult] : []);
       for (const relationshipEntity of relationshipEntities) {
         relationshipEntity.id = stableEntityId(relativePath, relationshipEntity.type, relationshipEntity.name);

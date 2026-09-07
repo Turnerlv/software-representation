@@ -7,9 +7,10 @@ import { extractExpressRoute, extractExpressRouteParameter, extractExpressConten
 import { extractEventEmitterContract, extractSocketOnAnyContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
-import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport } from '../adapters/nextjsAdapter.js';
+import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport, extractNextjsRouteConfig, extractNextjsMetadataExport } from '../adapters/nextjsAdapter.js';
 import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
 import { extractFactoryExport } from './factoryExportVisitor.js';
+import { extractPayloadContracts, extractPayloadTypeRefContracts } from '../adapters/payloadAdapter.js';
 
 /**
  * Inspects a single AST node and returns a CONTRACT entity if it matches a known interface pattern.
@@ -37,7 +38,11 @@ export function visitContract(
   nextId: () => string,
   fileRole?: NextjsFileRole | null
 ): StructuralEntity | StructuralEntity[] | null {
-  if (ts.isInterfaceDeclaration(node) && node.name) {
+  if (
+    ts.isInterfaceDeclaration(node) &&
+    node.name &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  ) {
     return {
       id: nextId(),
       name: `Interface: ${node.name.text}`,
@@ -46,7 +51,11 @@ export function visitContract(
       evidence: getEvidence(node),
     };
   }
-  if (ts.isTypeAliasDeclaration(node) && node.name) {
+  if (
+    ts.isTypeAliasDeclaration(node) &&
+    node.name &&
+    node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)
+  ) {
     return {
       id: nextId(),
       name: `Type: ${node.name.text}`,
@@ -69,7 +78,13 @@ export function visitContract(
       (fileRole === 'PAGE' || fileRole === 'LAYOUT') &&
       node.modifiers?.some((m) => m.kind === ts.SyntaxKind.DefaultKeyword)
     ) {
-      return null;
+      const payloadContracts = extractPayloadContracts(node, getEvidence, nextId);
+  if (payloadContracts) return payloadContracts;
+
+  const payloadTypeRef = extractPayloadTypeRefContracts(node, getEvidence, nextId);
+  if (payloadTypeRef) return payloadTypeRef;
+
+  return null;
     }
     if (!isRouteMethod) {
       return {
@@ -98,6 +113,14 @@ export function visitContract(
   const middleware = extractNextjsMiddlewareExport(node, fileRole ?? null, getEvidence, nextId);
   if (middleware) return middleware;
 
+  // Next.js: Route segment config
+  const routeConfig = extractNextjsRouteConfig(node, getEvidence, nextId);
+  if (routeConfig) return routeConfig;
+
+  // Next.js: Metadata export
+  const metadataExport = extractNextjsMetadataExport(node, getEvidence, nextId);
+  if (metadataExport) return metadataExport;
+
   const expressRoute = extractExpressRoute(node, getEvidence, nextId);
   if (expressRoute) return expressRoute;
 
@@ -124,6 +147,12 @@ export function visitContract(
 
   const factoryExport = extractFactoryExport(node, getEvidence, nextId);
   if (factoryExport) return factoryExport;
+
+  const payloadContracts = extractPayloadContracts(node, getEvidence, nextId);
+  if (payloadContracts) return payloadContracts;
+
+  const payloadTypeRef = extractPayloadTypeRefContracts(node, getEvidence, nextId);
+  if (payloadTypeRef) return payloadTypeRef;
 
   return null;
 }

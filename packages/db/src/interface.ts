@@ -7,6 +7,8 @@ export interface RepositoryInfo {
   analyzedAt?: string;
   extractorVersion?: string;
   commitSha?: string;
+  branchName?: string;
+  projectId?: string;
 }
 
 export interface ScopeOptions {
