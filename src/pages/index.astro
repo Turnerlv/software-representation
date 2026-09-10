@@ -17,21 +17,79 @@ const ledgerHtml = marked(ledgerRaw);
   description="A foundational discipline for software development. Software Representation establishes a rigorous framework for enabling software systems to continuously and autonomously represent their own observable structure."
 >
   <!-- ============================================================
-       SITE HEADER
+       SITE NAV
        ============================================================ -->
-  <header class="max-w-3xl mx-auto px-6 sm:px-8 pt-12 pb-6">
-    <p class="text-xs font-medium tracking-widest uppercase text-accent dark:text-blue-400">
-      A Discipline of Software Development
-    </p>
-    <h1 class="text-3xl font-semibold mt-1 font-sans">
-      Software Representation
-    </h1>
-  </header>
+  <nav class="bg-white border-b border-gray-200 dark:bg-gray-950 dark:border-gray-800">
+    <div class="max-w-3xl mx-auto px-6 sm:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo / Site Name -->
+        <a href="/" class="flex items-center gap-2">
+          <span class="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
+            Software Representation
+          </span>
+        </a>
+
+        <!-- Right side: toggle + CTA + mobile button -->
+        <div class="flex items-center gap-3">
+
+          <!-- Dark mode toggle -->
+          <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle dark mode"
+            class="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
+          >
+            <!-- Sun icon (shown in dark mode) -->
+            <svg id="theme-toggle-light-icon" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 1.78a1 1 0 011.42 1.42l-.71.7a1 1 0 11-1.41-1.41l.7-.71zM18 9a1 1 0 110 2h-1a1 1 0 110-2h1zM4.22 15.78a1 1 0 001.42-1.42l-.71-.7a1 1 0 00-1.41 1.41l.7.71zM10 17a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM3 10a1 1 0 100 2H2a1 1 0 100-2h1zm13.95 4.95a1 1 0 00-1.41-1.41l-.7.71a1 1 0 001.41 1.41l.7-.71zM10 5a5 5 0 100 10A5 5 0 0010 5z"/>
+            </svg>
+            <!-- Moon icon (shown in light mode) -->
+            <svg id="theme-toggle-dark-icon" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            </svg>
+          </button>
+
+          <!-- Newsletter CTA -->
+          <a
+            href="#newsletter"
+            class="hidden sm:inline-flex items-center rounded-md bg-accent dark:bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:opacity-90 transition-opacity"
+          >
+            Stay informed
+          </a>
+
+          <!-- Mobile menu button -->
+          <button
+            data-collapse-toggle="mobile-menu"
+            type="button"
+            class="sm:hidden inline-flex items-center p-2 rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+            aria-controls="mobile-menu"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Open menu</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile menu (Flowbite controlled) -->
+      <div id="mobile-menu" class="hidden sm:hidden pb-4">
+        <a
+          href="#newsletter"
+          class="block w-full text-center rounded-md bg-accent dark:bg-blue-600 px-4 py-2 text-sm font-medium text-white mt-2"
+        >
+          Stay informed
+        </a>
+      </div>
+    </div>
+  </nav>
 
   <!-- ============================================================
        AUTHOR ATTRIBUTION
        ============================================================ -->
-  <div class="max-w-3xl mx-auto px-6 sm:px-8 pb-8 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
+  <div class="max-w-3xl mx-auto px-6 sm:px-8 pt-12 pb-8 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
     <span class="font-medium text-gray-700 dark:text-gray-300">Turner Vickery</span>
     &nbsp;·&nbsp; Software architect and platform engineer
     &nbsp;·&nbsp; Originally published September 2026
@@ -41,7 +99,7 @@ const ledgerHtml = marked(ledgerRaw);
        LEDGER CONTENT
        ============================================================ -->
   <main>
-    <article class="prose prose-gray prose-lg dark:prose-invert max-w-3xl mx-auto px-6 sm:px-8 py-16">
+    <article class="prose prose-gray prose-lg dark:prose-invert max-w-3xl mx-auto px-6 sm:px-8 py-12">
       <Fragment set:html={ledgerHtml} />
     </article>
   </main>
@@ -49,8 +107,8 @@ const ledgerHtml = marked(ledgerRaw);
   <!-- ============================================================
        TOOL TEASER
        ============================================================ -->
-  <div class="max-w-3xl mx-auto px-6 sm:px-8 my-16">
-    <div class="border border-gray-200 dark:border-gray-800 rounded-lg p-8 bg-gray-50 dark:bg-gray-900">
+  <div class="max-w-3xl mx-auto sm:px-8 my-16">
+    <div class="mx-6 sm:mx-0 border border-gray-200 dark:border-gray-800 rounded-lg p-8 bg-gray-50 dark:bg-gray-900">
       <h2 class="text-lg font-semibold font-sans mb-3">A tool is being built.</h2>
       <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
         Chomp is an implementation of this framework — an engine that enables software systems
@@ -68,7 +126,7 @@ const ledgerHtml = marked(ledgerRaw);
   <!-- ============================================================
        EMAIL CAPTURE
        ============================================================ -->
-  <div class="max-w-3xl mx-auto px-6 sm:px-8 my-12">
+  <section id="newsletter" class="max-w-3xl mx-auto px-6 sm:px-8 my-12">
     <h2 class="text-lg font-semibold font-sans mb-1">Stay informed</h2>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
       Get notified when Chomp launches and when new thinking on Software Representation is published.
@@ -94,14 +152,46 @@ const ledgerHtml = marked(ledgerRaw);
         Notify me
       </button>
     </form>
-  </div>
+  </section>
 
   <!-- ============================================================
        FOOTER
        ============================================================ -->
-  <footer class="max-w-3xl mx-auto px-6 sm:px-8 py-12 border-t border-gray-200 dark:border-gray-800">
-    <p class="text-xs text-gray-400 dark:text-gray-600">
-      © 2026 Turner Vickery &nbsp;·&nbsp; CC BY 4.0 &nbsp;·&nbsp; softwarerepresentation.com
-    </p>
+  <footer class="bg-white dark:bg-gray-950 border-t border-gray-200 dark:border-gray-800 mt-24">
+    <div class="max-w-3xl mx-auto px-6 sm:px-8 py-10">
+
+      <!-- Top row: name + links -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
+        <span class="text-sm font-semibold text-gray-900 dark:text-white">
+          Software Representation
+        </span>
+        <ul class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
+          <li>
+            <a href="https://linkedin.com/in/turnervickery" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a href="https://github.com/Turnerlv" target="_blank" rel="noopener" class="hover:text-gray-900 dark:hover:text-white transition-colors">
+              GitHub
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Bottom row: copyright + license -->
+      <div class="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-xs text-gray-400 dark:text-gray-600">
+        <span>© 2026 Turner Vickery</span>
+        <a
+          href="https://creativecommons.org/licenses/by/4.0/"
+          target="_blank"
+          rel="noopener"
+          class="hover:text-gray-600 dark:hover:text-gray-400 transition-colors"
+        >
+          CC BY 4.0
+        </a>
+      </div>
+
+    </div>
   </footer>
 </BaseLayout>

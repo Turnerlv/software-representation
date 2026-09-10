@@ -21,8 +21,43 @@ const { title, description = 'A foundational discipline for software development
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      // On load, respect saved preference or fall back to OS preference
+      const saved = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
   </head>
   <body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-200">
     <slot />
+    <script is:inline>
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+
+      // Show correct icon based on current theme
+      const lightIcon = document.getElementById('theme-toggle-light-icon');
+      const darkIcon = document.getElementById('theme-toggle-dark-icon');
+
+      function syncIcons() {
+        if (document.documentElement.classList.contains('dark')) {
+          lightIcon.classList.remove('hidden');
+          darkIcon.classList.add('hidden');
+        } else {
+          darkIcon.classList.remove('hidden');
+          lightIcon.classList.add('hidden');
+        }
+      }
+      syncIcons();
+      document.getElementById('theme-toggle').addEventListener('click', syncIcons);
+
+      // Initialize Flowbite interactive components (mobile menu etc.)
+      import('flowbite').then(({ initFlowbite }) => initFlowbite());
+    </script>
   </body>
 </html>
