@@ -63,6 +63,19 @@ const { title, description = 'A foundational discipline for software development
         syncIcons();
         themeToggleBtn.addEventListener('click', syncIcons);
       }
+
+      const mobileMenuBtn = document.querySelector('[data-collapse-toggle="mobile-menu"]');
+      const hamburgerIcon = document.getElementById('hamburger-icon');
+      const closeIcon = document.getElementById('close-icon');
+
+      if (mobileMenuBtn && hamburgerIcon && closeIcon) {
+        mobileMenuBtn.addEventListener('click', () => {
+          // Flowbite updates aria-expanded, but it might happen slightly after or before our listener.
+          // By simply toggling the classes, we ensure it flips on every click.
+          hamburgerIcon.classList.toggle('hidden');
+          closeIcon.classList.toggle('hidden');
+        });
+      }
     </script>
   </body>
 </html>

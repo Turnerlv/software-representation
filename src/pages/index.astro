@@ -13,8 +13,8 @@ const ledgerHtml = marked(ledgerRaw);
 ---
 
 <BaseLayout
-  title="Software Representation"
-  description="A foundational discipline for software development. Software Representation establishes a rigorous framework for enabling software systems to continuously and autonomously represent their own observable structure."
+  title="Software representation"
+  description="A foundational discipline for software development. Software representation establishes a rigorous framework for enabling software systems to continuously and autonomously represent their own observable structure."
 >
   <!-- ============================================================
        SITE NAV
@@ -26,7 +26,7 @@ const ledgerHtml = marked(ledgerRaw);
         <!-- Logo / Site Name -->
         <a href="/" class="flex items-center gap-2">
           <span class="text-sm font-semibold tracking-tight text-gray-900 dark:text-white">
-            Software Representation
+            Software representation
           </span>
         </a>
 
@@ -69,8 +69,13 @@ const ledgerHtml = marked(ledgerRaw);
             aria-expanded="false"
           >
             <span class="sr-only">Open menu</span>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <!-- Hamburger Icon (Menu) -->
+            <svg id="hamburger-icon" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+            <!-- Close Icon (X) -->
+            <svg id="close-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
             </svg>
           </button>
         </div>
@@ -122,7 +127,7 @@ const ledgerHtml = marked(ledgerRaw);
   <section id="newsletter" class="max-w-3xl mx-auto px-6 sm:px-8 my-12">
     <h2 class="text-lg font-semibold font-heading mb-1">Stay informed</h2>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-      Get notified when Chomp launches and when new thinking on Software Representation is published.
+      Get notified when Chomp launches and when new thinking on Software representation is published.
     </p>
 
     <form
@@ -156,7 +161,7 @@ const ledgerHtml = marked(ledgerRaw);
       <!-- Top row: name + links -->
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-gray-200 dark:border-gray-800">
         <span class="text-sm font-semibold text-gray-900 dark:text-white">
-          Software Representation
+          Software representation
         </span>
         <ul class="flex flex-wrap gap-x-6 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
           <li>

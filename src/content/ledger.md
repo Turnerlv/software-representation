@@ -1,5 +1,5 @@
-# Software Representation Ledger
-## Foundational Thesis v3.0
+# Software representation ledger
+## Foundational thesis v3.0
 
 **Turner Vickery** · Software architect and platform engineer · Originally published September 2026
 
@@ -15,20 +15,20 @@ Establish Software Representation as a missing, first-class engineering discipli
 
 ⸻
 
-### Core Hypothesis
+### Core hypothesis
 A software system can autonomously derive and maintain an accurate structural representation of itself from the artifacts it already produces.
 This representation must evolve continuously alongside the software, require zero manual maintenance, and remain strictly grounded in observable code evidence.
 
 ⸻
 
-### The Missing Discipline
+### The missing discipline
 Modern software development has established rigorous disciplines for Software Engineering, Testing, Deployment, Observability, Security, and Design Systems. Each optimizes a distinct operational or lifecycle stage.
 None exists primarily to continuously maintain a shared structural understanding of the software system itself.
 Software Representation proposes this missing discipline. Its purpose is to make the structure of software continuously knowable, queryable, and understandable to both human developers and intelligent systems.
 
 ⸻
 
-### The Foundational Distinction
+### The foundational distinction
 Software Representation begins with a fundamental separation between three distinct categories of system knowledge:
 *   **Structure (What exists?):** The identifiable entities, boundaries, contracts, relationships, and connection points that can be established directly from artifact evidence.
 *   **Behavior (What happens?):** The execution paths, runtime telemetries, and system flows that emerge dynamically when the system operates.
@@ -39,7 +39,7 @@ Crucially, a structural representation must never claim certainty about one cate
 
 ⸻
 
-### Source of Truth
+### Source of truth
 *   Source code is implementation.
 *   Documentation is interpretation.
 *   Architecture diagrams are snapshots.
@@ -49,7 +49,7 @@ A structural representation is continuously derived from evidence. It does not r
 
 ⸻
 
-### The Principle of Incomplete Truth
+### The principle of incomplete truth
 A trustworthy representation does not need to be complete. It needs to be accurate about what it knows and completely honest about what it does not.
 *   An unknown is a valid structural state.
 *   An open connector is a valid structural representation.
@@ -58,7 +58,7 @@ A trustworthy representation does not need to be complete. It needs to be accura
 
 ⸻
 
-### The Structural Ontology & Primitives
+### The structural ontology & primitives
 The core ontology models software systems through three primary structural primitives and one distinct non-peer extension:
 
 #### Core Primitives:
@@ -72,14 +72,14 @@ The core ontology models software systems through three primary structural primi
 
 ⸻
 
-### Lexical Scope vs. Compositional Usage
+### Lexical scope vs. compositional usage
 To scale representations to large codebases without graph explosion or structural "spaghetti," the framework separates containment from interaction:
 *   **Lexical Scope (Containment Hierarchy):** Represents where code physically resides. It forms a strict, acyclic tree modeled via `parent_boundary_id`. A boundary has at most one lexical parent.
 *   **Compositional Usage (Interaction Graph):** Represents how code communicates. It forms the network graph modeled strictly as directional `RELATIONSHIP` edges. A boundary supports an arbitrary number of incoming and outgoing relationships.
 
 ⸻
 
-### Dynamic Derivation of Architectural Roles
+### Dynamic derivation of architectural roles
 Rather than relying on fragile, subjective human tags (e.g., "Controller," "Service"), a representation dynamically derives structural roles from **graph topology metrics**—such as In-Degree and Out-Degree edge densities:
 *   *Horizontal Utilities:* High In-Degree, Low Out-Degree (e.g., cross-cutting aspects like loggers, auth guards, utility components).
 *   *Entry Orchestrators:* Low In-Degree, High Out-Degree (e.g., entry routers, message subscribers).
@@ -88,7 +88,7 @@ Rather than relying on fragile, subjective human tags (e.g., "Controller," "Serv
 
 ⸻
 
-### The Human-in-the-Loop & Evidence Confidence Model
+### The human-in-the-loop & evidence confidence model
 A structural representation respects the boundaries of deterministic compilation: **AI proposes, evidence corroborates, and humans validate**.
 *   Deterministic code structures extracted directly by AST parsers form the baseline ground truth.
 *   Probabilistic semantic links or exit-connector matchings are explicitly flagged as hypotheses.
@@ -100,7 +100,7 @@ A structural representation respects the boundaries of deterministic compilation
 
 ⸻
 
-### Spatial-Semantic Mapping: Vertical Flows vs. Horizontal Invariants
+### Spatial-semantic mapping: vertical flows vs. horizontal invariants
 The spatial layout of a software representation is not merely an aesthetic choice or a random visual diagram. Spatial arrangement represents **semantic meaning**—it is a cognitive map designed to align human mental models with software reality.
 *   **Vertical Execution Flows (The X-Axis):** Represents request lifecycles. Execution flows sequentially through strict vertical columns, moving from entry contracts, to orchestration components, to domain logic, and finally to infrastructure terminals and database exit points.
 *   **Horizontal Invariants (The Y-Axis):** Represents isolated business domains or feature contexts (e.g., "Auth", "Billing"). Isolating parallel domains into horizontal swimlanes prevents cross-domain intersections from cluttering the architectural model.
@@ -111,7 +111,7 @@ This spatial-semantic architecture is not a visual UI library standard; it is a 
 
 ⸻
 
-### The Autonomy of the Core Product (Downstream Applications)
+### The autonomy of the core product (downstream applications)
 The **Software Representation is the core product**. It is the structured database, the verified ontology, and the deterministic evidence map.
 All tools that interact with or present this data are **downstream consumers** of the representation:
 *   *Visualizers (React Flow) and Diagrams:* Render distinct, filtered visual projections of the core model.
@@ -123,14 +123,14 @@ The core representation is completely decoupled from these downstream manifestat
 
 ⸻
 
-### The Scientific Research Loop & Vacuum Testing
+### The scientific research loop & vacuum testing
 To maintain the integrity of the software representation discipline, the parsing engine must be subjected to a rigorous, scientific feedback loop:
 *   **Coverage (The Pattern Ledger) vs. Correctness (The Bug Tracker):** Discovered issues are strictly separated based on *Visitor Intent*. Coverage gaps (lack of parser code) are logged in the Pattern Ledger; correctness defects (broken parser execution) are logged in the Bug Tracker. This separation ensures coverage metrics remain mathematically pure.
 *   **The Vacuum Testing Protocol:** Extraction logic must operate as a pure, mathematical function. It is tested in a sterile, offline sandbox with zero database connections or file-system mutations. All parser updates are validated through deep structural assertions against pre-committed, immutable expected manifests.
 
 ⸻
 
-### MVP Success Criteria
+### MVP success criteria
 We evaluate the validity of the Software Representation discipline through two progressive tests:
 1.  **The Accuracy Test:** Connect the engine to a complex, unfamiliar repository and produce a structural representation that experienced developers of that system recognize as accurate. The desired response is: *"Yes, that is how our system actually works."*
 2.  **The Reusability Test:** Can an outside developer or intelligent machine use the exported representation schema to understand, query, or build something useful on top of the codebase without the original authors explaining it manually?
@@ -139,7 +139,7 @@ This transitions software architecture from fragile human narrative to an active
 
 ⸻
 
-### North Star
+### North star
 **Software should continuously represent itself.** Everything else is an application of that principle.
 
 ---
