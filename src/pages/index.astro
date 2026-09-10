@@ -41,19 +41,21 @@ const ledgerHtml = marked(ledgerRaw);
             class="rounded-md p-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 transition-colors"
           >
             <!-- Sun icon (shown in dark mode) -->
-            <svg id="theme-toggle-light-icon" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.22 1.78a1 1 0 011.42 1.42l-.71.7a1 1 0 11-1.41-1.41l.7-.71zM18 9a1 1 0 110 2h-1a1 1 0 110-2h1zM4.22 15.78a1 1 0 001.42-1.42l-.71-.7a1 1 0 00-1.41 1.41l.7.71zM10 17a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM3 10a1 1 0 100 2H2a1 1 0 100-2h1zm13.95 4.95a1 1 0 00-1.41-1.41l-.7.71a1 1 0 001.41 1.41l.7-.71zM10 5a5 5 0 100 10A5 5 0 0010 5z"/>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="4"/>
+              <path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+              <path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
             </svg>
             <!-- Moon icon (shown in light mode) -->
-            <svg id="theme-toggle-dark-icon" class="hidden w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
             </svg>
           </button>
 
           <!-- Newsletter CTA -->
           <a
             href="#newsletter"
-            class="hidden sm:inline-flex items-center rounded-md bg-accent dark:bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:opacity-90 transition-opacity"
+            class="hidden sm:inline-flex items-center rounded-md bg-accent dark:bg-yellow-500 px-4 py-2 text-xs font-semibold text-gray-900 hover:opacity-90 transition-opacity"
           >
             Stay informed
           </a>
@@ -78,7 +80,7 @@ const ledgerHtml = marked(ledgerRaw);
       <div id="mobile-menu" class="hidden sm:hidden pb-4">
         <a
           href="#newsletter"
-          class="block w-full text-center rounded-md bg-accent dark:bg-blue-600 px-4 py-2 text-sm font-medium text-white mt-2"
+          class="block w-full text-center rounded-md bg-accent dark:bg-yellow-500 px-4 py-2 text-sm font-semibold text-gray-900 mt-2"
         >
           Stay informed
         </a>
@@ -87,19 +89,10 @@ const ledgerHtml = marked(ledgerRaw);
   </nav>
 
   <!-- ============================================================
-       AUTHOR ATTRIBUTION
-       ============================================================ -->
-  <div class="max-w-3xl mx-auto px-6 sm:px-8 pt-12 pb-8 text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800">
-    <span class="font-medium text-gray-700 dark:text-gray-300">Turner Vickery</span>
-    &nbsp;·&nbsp; Software architect and platform engineer
-    &nbsp;·&nbsp; Originally published September 2026
-  </div>
-
-  <!-- ============================================================
        LEDGER CONTENT
        ============================================================ -->
   <main>
-    <article class="prose prose-gray prose-lg dark:prose-invert max-w-3xl mx-auto px-6 sm:px-8 py-12">
+    <article class="prose prose-gray sm:prose-lg dark:prose-invert max-w-3xl mx-auto px-6 sm:px-8 py-12">
       <Fragment set:html={ledgerHtml} />
     </article>
   </main>
@@ -109,7 +102,7 @@ const ledgerHtml = marked(ledgerRaw);
        ============================================================ -->
   <div class="max-w-3xl mx-auto sm:px-8 my-16">
     <div class="mx-6 sm:mx-0 border border-gray-200 dark:border-gray-800 rounded-lg p-8 bg-gray-50 dark:bg-gray-900">
-      <h2 class="text-lg font-semibold font-sans mb-3">A tool is being built.</h2>
+      <h2 class="text-lg font-semibold font-heading mb-3">A tool is being built.</h2>
       <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
         Chomp is an implementation of this framework — an engine that enables software systems
         to continuously and autonomously represent their own structure.
@@ -127,7 +120,7 @@ const ledgerHtml = marked(ledgerRaw);
        EMAIL CAPTURE
        ============================================================ -->
   <section id="newsletter" class="max-w-3xl mx-auto px-6 sm:px-8 my-12">
-    <h2 class="text-lg font-semibold font-sans mb-1">Stay informed</h2>
+    <h2 class="text-lg font-semibold font-heading mb-1">Stay informed</h2>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
       Get notified when Chomp launches and when new thinking on Software Representation is published.
     </p>
@@ -147,7 +140,7 @@ const ledgerHtml = marked(ledgerRaw);
       />
       <button
         type="submit"
-        class="rounded-md bg-accent dark:bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:opacity-90 transition-opacity"
+        class="rounded-md bg-accent dark:bg-yellow-500 px-6 py-2.5 text-sm font-semibold text-gray-900 hover:opacity-90 transition-opacity"
       >
         Notify me
       </button>

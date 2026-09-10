@@ -1,5 +1,8 @@
 # Software Representation Ledger
 ## Foundational Thesis v3.0
+
+**Turner Vickery** · Software architect and platform engineer · Originally published September 2026
+
 ⸻
 
 ### Mission
