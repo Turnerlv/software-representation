@@ -34,30 +34,35 @@ const { title, description = 'A foundational discipline for software development
   </head>
   <body class="bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-200">
     <slot />
-    <script is:inline>
-      document.getElementById('theme-toggle').addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
-
-      // Show correct icon based on current theme
-      const lightIcon = document.getElementById('theme-toggle-light-icon');
-      const darkIcon = document.getElementById('theme-toggle-dark-icon');
-
-      function syncIcons() {
-        if (document.documentElement.classList.contains('dark')) {
-          lightIcon.classList.remove('hidden');
-          darkIcon.classList.add('hidden');
-        } else {
-          darkIcon.classList.remove('hidden');
-          lightIcon.classList.add('hidden');
-        }
-      }
-      syncIcons();
-      document.getElementById('theme-toggle').addEventListener('click', syncIcons);
-
+    <script>
+      import { initFlowbite } from 'flowbite';
+      
       // Initialize Flowbite interactive components (mobile menu etc.)
-      import('flowbite').then(({ initFlowbite }) => initFlowbite());
+      initFlowbite();
+
+      const themeToggleBtn = document.getElementById('theme-toggle');
+      if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        });
+
+        // Show correct icon based on current theme
+        const lightIcon = document.getElementById('theme-toggle-light-icon');
+        const darkIcon = document.getElementById('theme-toggle-dark-icon');
+
+        function syncIcons() {
+          if (document.documentElement.classList.contains('dark')) {
+            lightIcon?.classList.remove('hidden');
+            darkIcon?.classList.add('hidden');
+          } else {
+            darkIcon?.classList.remove('hidden');
+            lightIcon?.classList.add('hidden');
+          }
+        }
+        syncIcons();
+        themeToggleBtn.addEventListener('click', syncIcons);
+      }
     </script>
   </body>
 </html>
