@@ -21,3 +21,4 @@ The site uses Buttondown for email capture. To avoid hardcoding your username in
 
 1. **Local Development:** Copy `.env.example` to `.env` and set `PUBLIC_BUTTONDOWN_USERNAME`.
 2. **Production:** Add `PUBLIC_BUTTONDOWN_USERNAME` to your Cloudflare Pages environment variables.
+**Note**: Cloudflare Pages build environment variables are not available in the browser. See **Build Time Variables** in the Cloudflare Pages documentation for more information.
