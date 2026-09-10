@@ -1,0 +1,221 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { marked } from 'marked';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Read and parse the ledger markdown
+const ledgerPath = path.resolve('./src/content/ledger.md');
+const ledgerRaw = fs.readFileSync(ledgerPath, 'utf-8');
+
+// Configure marked for proper rendering
+marked.setOptions({
+  gfm: true,
+  breaks: false,
+});
+
+const ledgerHtml = marked(ledgerRaw);
+---
+
+<BaseLayout
+  title="Software Representation"
+  description="A foundational discipline for software development. Software Representation establishes a rigorous framework for enabling software systems to continuously and autonomously represent their own observable structure."
+>
+  <div class="min-h-screen">
+    <!-- ============================================================
+         SITE HEADER
+         ============================================================ -->
+    <header class="border-b border-ink-100 bg-white">
+      <div class="max-w-3xl mx-auto px-6 py-10 sm:py-14">
+        <h1 class="font-serif text-3xl sm:text-4xl font-semibold text-ink-950 leading-tight tracking-tight">
+          Software Representation
+        </h1>
+        <p class="mt-2 text-base sm:text-lg text-ink-500 font-sans italic">
+          A foundational discipline for software development
+        </p>
+      </div>
+    </header>
+
+    <!-- ============================================================
+         AUTHOR ATTRIBUTION
+         ============================================================ -->
+    <div class="max-w-3xl mx-auto px-6 pt-8 pb-2">
+      <div class="text-sm text-ink-500 border-l-2 border-ink-200 pl-4 leading-relaxed">
+        <span class="font-medium text-ink-700">Turner Vickery</span>
+        <span class="text-ink-400"> — </span>
+        <span>Software architect and platform engineer.</span>
+        <br />
+        <span>Originally published September 2026.</span>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         LEDGER CONTENT
+         ============================================================ -->
+    <main class="max-w-3xl mx-auto px-6 pt-10 pb-16">
+      <article class="ledger-content">
+        <Fragment set:html={ledgerHtml} />
+      </article>
+    </main>
+
+    <!-- ============================================================
+         TOOL TEASER
+         ============================================================ -->
+    <section class="border-t border-ink-100 bg-ink-50">
+      <div class="max-w-3xl mx-auto px-6 py-14">
+        <p class="font-serif text-xl font-semibold text-ink-900 mb-4">
+          A tool is being built.
+        </p>
+        <p class="text-ink-700 leading-relaxed mb-4">
+          Chomp is an implementation of this framework — an engine that enables software systems to
+          continuously and autonomously represent their own structure.
+        </p>
+        <p class="text-ink-700 leading-relaxed mb-6">
+          It is currently in development and not yet publicly available.
+        </p>
+        <p class="text-ink-500 italic text-sm">
+          If you are interested in early access or want to follow its progress, leave your email below.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         EMAIL CAPTURE
+         ============================================================ -->
+    <section class="border-t border-ink-100 bg-white">
+      <div class="max-w-3xl mx-auto px-6 py-14">
+        <h2 class="font-serif text-xl font-semibold text-ink-900 mb-2">
+          Stay informed
+        </h2>
+        <p class="text-ink-500 text-sm italic mb-8">
+          Get notified when Chomp launches and when new thinking on Software Representation is published.
+        </p>
+
+        <form
+          action="https://buttondown.com/api/emails/embed-subscribe/YOUR_BUTTONDOWN_USERNAME"
+          method="post"
+          target="popupwindow"
+          class="flex flex-col sm:flex-row gap-3 max-w-md"
+        >
+          <input
+            type="email"
+            name="email"
+            placeholder="your@email.com"
+            required
+            class="flex-1 px-4 py-2.5 text-sm border border-ink-200 rounded focus:outline-none focus:ring-2 focus:ring-ink-400 focus:border-transparent text-ink-900 placeholder-ink-400 bg-white"
+          />
+          <button
+            type="submit"
+            class="px-6 py-2.5 text-sm font-medium bg-ink-900 text-white rounded hover:bg-ink-700 transition-colors duration-150 whitespace-nowrap cursor-pointer"
+          >
+            Notify me
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="border-t border-ink-100 bg-white">
+      <div class="max-w-3xl mx-auto px-6 py-6">
+        <p class="text-xs text-ink-400 text-center">
+          © 2026 Turner Vickery · CC BY 4.0 · softwarerepresentation.com
+        </p>
+      </div>
+    </footer>
+  </div>
+</BaseLayout>
+
+<style>
+  /* ================================================================
+     LEDGER CONTENT TYPOGRAPHY
+     ================================================================ */
+  .ledger-content :global(h1) {
+    @apply font-serif text-3xl font-semibold text-ink-950 mt-12 mb-4 leading-tight;
+  }
+
+  .ledger-content :global(h2) {
+    @apply font-serif text-2xl font-semibold text-ink-900 mt-10 mb-4 leading-snug;
+  }
+
+  .ledger-content :global(h3) {
+    @apply font-serif text-xl font-semibold text-ink-900 mt-10 mb-3 leading-snug;
+  }
+
+  .ledger-content :global(h4) {
+    @apply font-sans text-base font-semibold text-ink-800 mt-6 mb-2 uppercase tracking-wide text-sm;
+  }
+
+  .ledger-content :global(p) {
+    @apply text-ink-800 leading-relaxed mb-4 text-base;
+  }
+
+  .ledger-content :global(ul) {
+    @apply mb-5 space-y-2 pl-0;
+    list-style: none;
+  }
+
+  .ledger-content :global(ul > li) {
+    @apply text-ink-800 leading-relaxed text-base relative pl-5;
+  }
+
+  .ledger-content :global(ul > li)::before {
+    content: '·';
+    @apply absolute left-0 text-ink-400 font-bold;
+  }
+
+  .ledger-content :global(ol) {
+    @apply mb-5 space-y-3 pl-0;
+    list-style: none;
+    counter-reset: list-counter;
+  }
+
+  .ledger-content :global(ol > li) {
+    @apply text-ink-800 leading-relaxed text-base relative pl-7;
+    counter-increment: list-counter;
+  }
+
+  .ledger-content :global(ol > li)::before {
+    content: counter(list-counter) '.';
+    @apply absolute left-0 text-ink-400 font-medium text-sm tabular-nums;
+    padding-top: 2px;
+  }
+
+  .ledger-content :global(strong) {
+    @apply font-semibold text-ink-950;
+  }
+
+  .ledger-content :global(em) {
+    @apply italic text-ink-700;
+  }
+
+  .ledger-content :global(code) {
+    @apply font-mono text-sm bg-ink-50 text-ink-800 px-1.5 py-0.5 rounded;
+    font-size: 0.875em;
+  }
+
+  .ledger-content :global(hr) {
+    @apply my-10 border-0;
+    border-top: 1px solid theme('colors.ink.100');
+  }
+
+  /* The ⸻ em-dash dividers rendered as styled hr */
+  .ledger-content :global(p:has(> em:only-child):empty),
+  .ledger-content :global(p > em) {
+    /* handled by italic rule */
+  }
+
+  .ledger-content :global(a) {
+    @apply text-ink-700 underline underline-offset-2 decoration-ink-300 hover:text-ink-950 hover:decoration-ink-600 transition-colors duration-100;
+  }
+
+  /* Nested list items inside ordered lists */
+  .ledger-content :global(ol > li > ul) {
+    @apply mt-2 mb-0 ml-2;
+  }
+
+  .ledger-content :global(ol > li > ul > li) {
+    @apply pl-5;
+  }
+</style>
