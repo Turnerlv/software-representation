@@ -131,7 +131,7 @@ const ledgerHtml = marked(ledgerRaw);
     </p>
 
     <form
-      action="https://buttondown.com/api/emails/embed-subscribe/YOUR_BUTTONDOWN_USERNAME"
+      action={`https://buttondown.com/api/emails/embed-subscribe/${import.meta.env.PUBLIC_BUTTONDOWN_USERNAME || 'YOUR_BUTTONDOWN_USERNAME'}`}
       method="post"
       target="popupwindow"
       class="flex flex-col sm:flex-row gap-3"

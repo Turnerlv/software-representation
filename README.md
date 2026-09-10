@@ -17,4 +17,7 @@ Connect this repo to Cloudflare Pages. Build command: `npm run build`. Output di
 
 ## Email Capture
 
-Replace `YOUR_BUTTONDOWN_USERNAME` in `src/pages/index.astro` with your Buttondown username before deploying.
+The site uses Buttondown for email capture. To avoid hardcoding your username in this public repository, configure it via an environment variable.
+
+1. **Local Development:** Copy `.env.example` to `.env` and set `PUBLIC_BUTTONDOWN_USERNAME`.
+2. **Production:** Add `PUBLIC_BUTTONDOWN_USERNAME` to your Cloudflare Pages environment variables.
