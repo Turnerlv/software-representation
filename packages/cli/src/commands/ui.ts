@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, basename, dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { createSQLiteStorage } from "@chomp/db";
 import { condenseGraph } from "@chomp/core";
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -15,6 +16,8 @@ export function registerUiCommand(program: Command): void {
     .option("--db <path>", "Path to SQLite database file (default: ./.chomp/graph.db)")
     .action(async (options: { port: string; db?: string }) => {
       const port = parseInt(options.port, 10);
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
       const baseDir = process.env.INIT_CWD ?? process.cwd();
       
       const repoName = basename(baseDir);
@@ -152,7 +155,7 @@ ${JSON.stringify(minEdges, null, 2)}
       });
 
       // 4. Fallback for React Router / SPA
-      app.get("*", (req, res) => {
+      app.use((req, res) => {
           res.sendFile(join(uiPath, "index.html"));
       });
 
