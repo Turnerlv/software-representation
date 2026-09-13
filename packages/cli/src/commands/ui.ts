@@ -19,10 +19,10 @@ export function registerUiCommand(program: Command): void {
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = dirname(__filename);
       const baseDir = process.env.INIT_CWD ?? process.cwd();
-      
+
       const repoName = basename(baseDir);
       const repoId = repoName.toLowerCase().replace(/[^a-z0-9_-]/g, "_");
-      
+
       const defaultDbDir = resolve(baseDir, ".chomp");
       const dbPath = options.db
         ? resolve(baseDir, options.db)
@@ -35,15 +35,15 @@ export function registerUiCommand(program: Command): void {
       }
 
       const app = express();
-      
+
       app.use(cors());
-      app.use(express.json());
+      app.use(express.json({ limit: "50mb" }));
 
       // 1. Serve the bundled Next.js static export
       // In production, this points to dist/ui. During monorepo dev, it points to apps/web/out.
       let uiPath = join(__dirname, '../../../../apps/web/out');
       if (!existsSync(uiPath)) {
-          uiPath = join(__dirname, '../ui'); // Production CLI location
+        uiPath = join(__dirname, '../ui'); // Production CLI location
       }
       app.use(express.static(uiPath));
 
@@ -52,7 +52,7 @@ export function registerUiCommand(program: Command): void {
         try {
           const storage = createSQLiteStorage(dbPath);
           const repos = await storage.listRepositories();
-          
+
           if (repos.length === 0) {
             await storage.close();
             return res.status(404).json({ error: "No repositories found in database." });
@@ -61,7 +61,7 @@ export function registerUiCommand(program: Command): void {
           const targetRepoId = repos[0].id;
           const graph = await storage.getRepresentationGraph(targetRepoId);
           await storage.close();
-          
+
           if (!graph) {
             return res.status(404).json({ error: "Graph not found for this repository." });
           }
@@ -70,17 +70,17 @@ export function registerUiCommand(program: Command): void {
           let gridLayout = null;
           const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
           if (existsSync(gridLayoutPath)) {
-              try {
-                  gridLayout = JSON.parse(readFileSync(gridLayoutPath, "utf-8"));
-              } catch (e) {
-                  console.error("Failed to parse grid_layout.json");
-              }
+            try {
+              gridLayout = JSON.parse(readFileSync(gridLayoutPath, "utf-8"));
+            } catch (e) {
+              console.error("Failed to parse grid_layout.json");
+            }
           }
-          
+
           res.json({
-              nodes: graph.nodes,
-              edges: graph.edges,
-              gridLayout
+            nodes: graph.nodes,
+            edges: graph.edges,
+            gridLayout
           });
         } catch (error) {
           console.error("Error fetching graph:", error);
@@ -89,74 +89,100 @@ export function registerUiCommand(program: Command): void {
       });
 
       // 3. API: Cartographer Layout
+      // Reads the graph directly from the DB — no client payload needed, eliminating
+      // the 413 Payload Too Large error that occurs when POSTing the full raw graph.
       app.post("/api/cartographer", async (req, res) => {
-          try {
-            const { nodes, edges } = req.body;
-            if (!nodes || !Array.isArray(nodes)) {
-              return res.status(400).json({ error: "Invalid nodes array provided." });
-            }
+        try {
+          const apiKey = process.env.GEMINI_API_KEY;
+          if (!apiKey) {
+            return res.status(500).json({ error: "GEMINI_API_KEY is not configured in environment." });
+          }
 
-            const apiKey = process.env.GEMINI_API_KEY;
-            if (!apiKey) {
-              return res.status(500).json({ error: "GEMINI_API_KEY is not configured in environment." });
-            }
+          // Read the graph from the DB directly — dbPath is already in scope
+          const storage = createSQLiteStorage(dbPath);
+          const repos = await storage.listRepositories();
+          if (repos.length === 0) {
+            await storage.close();
+            return res.status(404).json({ error: "No repositories found in database." });
+          }
+          const graph = await storage.getRepresentationGraph(repos[0].id);
+          await storage.close();
 
-            const condensed = condenseGraph({ nodes, edges: edges || [], extractorVersion: "0", analyzedAt: "" });
+          if (!graph) {
+            return res.status(404).json({ error: "Graph not found for this repository." });
+          }
 
-            const genAI = new GoogleGenerativeAI(apiKey);
-            const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
+          // Condense to package-level topology before sending to the AI
+          const condensed = condenseGraph(graph);
 
-            const minNodes = condensed.nodes.map(n => ({ id: n.id, name: n.name, type: n.type }));
-            const minEdges = condensed.edges.map(e => ({ source: e.sourceId, target: e.targetId, type: e.type }));
+          const genAI = new GoogleGenerativeAI(apiKey);
+          const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
 
-            const prompt = `
-You are the Chomp Cartographer, an AI expert in software architecture. 
-I am providing you a condensed macroscopic list of structural nodes and edges representing an application's topology.
+          const minNodes = condensed.nodes.map(n => ({ id: n.id, name: n.name, type: n.type, entityType: n.entityType }));
+          const minEdges = condensed.edges.map(e => ({ source: e.sourceId, target: e.targetId }));
+
+          console.log(`\n🗺️  Cartographer: condensed graph to ${minNodes.length} nodes, ${minEdges.length} edges. Calling AI...`);
+
+          const prompt = `
+You are the Chomp Cartographer, an AI expert in software architecture.
+I am providing you a condensed macroscopic list of structural nodes and edges representing a monorepo's package topology.
 
 Your job is to organize these nodes into a logical Transit Map layout by assigning each node to a 'lane' and giving it a 'role'.
 
-Lanes could be (as numbers): 1 for "Ingress/Gateway", 2 for "Core/Middle", 3 for "Egress/DB/External".
+Lanes (numbers): lower numbers are closer to the user-facing entry point.
+  1 = "Frontend / CLI Entry"
+  2 = "Core Logic / Processing"  
+  3 = "Data / Storage / External Services"
+
 Roles MUST BE ONE OF: "INGRESS", "CORE", "EGRESS", "TOP_TRAY", "BOTTOM_TRAY".
+  - INGRESS: user-facing entry points (CLI commands, web pages, API routes)
+  - CORE: internal processing packages
+  - EGRESS: data stores, databases, external APIs
+  - TOP_TRAY: cross-cutting utilities used by many (e.g. shared types, config)
+  - BOTTOM_TRAY: leaf-level external dependencies (npm packages, sdks)
+
+Also provide human-readable labels:
+  - label_primary: short display name (e.g. "@chomp/cli", "React", "SQLite")
+  - label_secondary: one-line description of what this node does
 
 Return ONLY a valid JSON array where each object has:
-- id: (the exact node id from the input)
-- lane: (number, the lane this node belongs in, lower numbers are closer to the entry point)
-- role: (string, the role of this node)
+  { "id": string, "lane": number, "role": string, "label_primary": string, "label_secondary": string }
 
 Nodes:
 ${JSON.stringify(minNodes, null, 2)}
 
-Edges:
+Edges (source → target means source depends on target):
 ${JSON.stringify(minEdges, null, 2)}
 `;
 
-            const result = await model.generateContent({
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: { responseMimeType: "application/json" }
-            });
-            
-            const responseText = result.response.text();
-            
-            try {
-                const layoutAssignments = JSON.parse(responseText);
-                const layoutData = { nodes: layoutAssignments, edges: minEdges };
-                
-                // Save it back to the workspace
-                const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
-                writeFileSync(gridLayoutPath, JSON.stringify(layoutData, null, 2));
+          const result = await model.generateContent({
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" }
+          });
 
-                return res.json({ assignments: layoutAssignments });
-            } catch (e) {
-                return res.status(500).json({ error: "AI returned invalid JSON", raw: responseText });
-            }
-          } catch (error: any) {
-            return res.status(500).json({ error: error.message || "Internal server error" });
+          const responseText = result.response.text();
+
+          try {
+            const layoutAssignments = JSON.parse(responseText);
+            const layoutData = { nodes: layoutAssignments, edges: minEdges };
+
+            const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
+            writeFileSync(gridLayoutPath, JSON.stringify(layoutData, null, 2));
+
+            console.log(`✅  Cartographer: layout saved to ${gridLayoutPath}`);
+            return res.json({ assignments: layoutAssignments });
+          } catch (e) {
+            return res.status(500).json({ error: "AI returned invalid JSON", raw: responseText });
           }
+        } catch (error: any) {
+          console.error("Cartographer error:", error);
+          return res.status(500).json({ error: error.message || "Internal server error" });
+        }
       });
 
       // 4. Fallback for React Router / SPA
       app.use((req, res) => {
-          res.sendFile(join(uiPath, "index.html"));
+        res.sendFile(join(uiPath, "index.html"));
       });
 
       app.listen(port, () => {
