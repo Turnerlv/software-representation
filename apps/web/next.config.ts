@@ -1,19 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@chomp/core", "@chomp/db"],
-  serverExternalPackages: ["better-sqlite3"],
-webpack: (config, { isServer }) => {
-    config.resolve.extensionAlias = {
-      ".js": [".ts", ".tsx", ".js", ".jsx"],
-      ".mjs": [".mts", ".mjs"],
-      ".cjs": [".cts", ".cjs"],
-    };
-    if (isServer) {
-      config.externals.push("better-sqlite3");
-    }
-    return config;
-  },
+  output: 'export',
+  // Since we are exporting a static site, we don't need server packages
+  // or turbopack server-side config.
 };
 
 export default nextConfig;
