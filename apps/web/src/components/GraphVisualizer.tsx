@@ -14,7 +14,7 @@ const CELL_HEIGHT = 150;
 import { routeOrthogonal } from '../lib/orthogonal-router';
 import { calculateTransitLayout } from '../lib/transit-layout-engine';
 
-function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX, targetY, style, markerEnd, id }: any) {
+function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX, targetY, style, markerEnd, id, selected }: any) {
   const rfNodes = useNodes();
   
   const rects = rfNodes
@@ -30,13 +30,14 @@ function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX
     { x: sourceX, y: sourceY },
     { x: targetX, y: targetY },
     rects,
-    20,
+    50, // paddingX
+    35, // paddingY
     sourcePosition,
     targetPosition
   );
 
   let path = `M ${points[0].x},${points[0].y}`;
-  const r = 15;
+  const r = 15; // corner radius
   
   for (let i = 1; i < points.length - 1; i++) {
     const prev = points[i - 1];
@@ -64,7 +65,29 @@ function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX
   const last = points[points.length - 1];
   path += ` L ${last.x},${last.y}`;
   
-  return <path d={path} style={style} markerEnd={markerEnd} fill="none" />;
+  const strokeColor = selected ? '#ffffff' : (style?.stroke || '#8892b0');
+  const strokeWidth = selected ? 4 : (style?.strokeWidth || 2);
+  const zIndex = selected ? 1000 : 0;
+
+  return (
+    <>
+      {/* Invisible thicker path for easier clicking */}
+      <path
+        d={path}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={20}
+        className="react-flow__edge-interaction"
+      />
+      <path 
+        id={id} 
+        d={path} 
+        style={{ ...style, stroke: strokeColor, strokeWidth, zIndex }} 
+        markerEnd={markerEnd} 
+        fill="none" 
+      />
+    </>
+  );
 }
 
 const edgeTypes = {
@@ -282,11 +305,11 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
 
         if (sourceNode && targetNode) {
           if (sourceNode.position.x > targetNode.position.x) {
-            // Backwards edge (e.g. db -> core): exit left, enter right
-            sourceHandle = 'left-source';
+            // Backwards edge (e.g. db -> core): exit right, enter right (loops around)
+            sourceHandle = 'right-source';
             targetHandle = 'right-target';
           } else if (sourceNode.position.x === targetNode.position.x) {
-            // Same column edge: exit right, enter right (custom routing handles this)
+            // Same column edge: exit right, enter right
             sourceHandle = 'right-source';
             targetHandle = 'right-target';
           }

@@ -115,57 +115,72 @@ export function calculateTransitLayout(nodes: LayoutNode[], edges: LayoutEdge[])
     if (d > maxDepth) maxDepth = d;
   }
 
-  const rowAssignments = new Map<string, number>(); // node.id -> exact row integer
+  const rowAssignments = new Map<string, number>();
+  for (const n of layoutNodes) rowAssignments.set(n.id, 0);
+
   let maxGlobalRow = 0;
 
-  for (let d = 0; d <= maxDepth; d++) {
-    const siblings = depthGroups.get(d) || [];
-    if (siblings.length === 0) continue;
+  for (let pass = 1; pass <= 3; pass++) {
+    const isForward = pass % 2 !== 0; // Pass 1 and 3 are forward
+    maxGlobalRow = 0;
+    
+    const startD = isForward ? 0 : maxDepth;
+    const endD = isForward ? maxDepth : 0;
+    const step = isForward ? 1 : -1;
 
-    const barycenters = new Map<string, number>();
+    for (let d = startD; d !== endD + step; d += step) {
+      const siblings = depthGroups.get(d) || [];
+      if (siblings.length === 0) continue;
 
-    for (const n of siblings) {
-      // Find parents from ANY depth strictly less than d
-      // We use layoutEdges here so dummy segments pull on each other!
-      const parents = layoutEdges.filter(
-        e => e.target === n.id && (layoutNodes.find(ln => ln.id === e.source)?._depth ?? 0) < d
-      );
+      const barycenters = new Map<string, number>();
 
-      if (parents.length > 0) {
-        let sum = 0;
-        let count = 0;
-        for (const p of parents) {
-          const pRow = rowAssignments.get(p.source);
-          if (pRow !== undefined) {
-            sum += pRow;
-            count++;
+      for (const n of siblings) {
+        const connectedEdges = layoutEdges.filter(e => {
+          if (isForward) {
+            return e.target === n.id && (layoutNodes.find(ln => ln.id === e.source)?._depth ?? 0) < d;
+          } else {
+            return e.source === n.id && (layoutNodes.find(ln => ln.id === e.target)?._depth ?? 0) > d;
           }
-        }
-        if (count > 0) {
-          barycenters.set(n.id, sum / count);
+        });
+
+        if (connectedEdges.length > 0) {
+          let sum = 0;
+          let count = 0;
+          for (const e of connectedEdges) {
+            const neighborId = isForward ? e.source : e.target;
+            const neighborRow = rowAssignments.get(neighborId);
+            if (neighborRow !== undefined) {
+              sum += neighborRow;
+              count++;
+            }
+          }
+          if (count > 0) {
+            barycenters.set(n.id, sum / count);
+          } else {
+            barycenters.set(n.id, maxGlobalRow + 0.1);
+          }
         } else {
-          barycenters.set(n.id, maxGlobalRow + 0.1);
+          // Keep current assignment if no neighbors in this direction
+          barycenters.set(n.id, rowAssignments.get(n.id) ?? (maxGlobalRow + 0.1));
         }
-      } else {
-        barycenters.set(n.id, maxGlobalRow + 0.1);
       }
-    }
 
-    // Sort siblings by their ideal barycenter
-    siblings.sort((a, b) => (barycenters.get(a.id) ?? 0) - (barycenters.get(b.id) ?? 0));
+      // Sort siblings by their ideal barycenter
+      siblings.sort((a, b) => (barycenters.get(a.id) ?? 0) - (barycenters.get(b.id) ?? 0));
 
-    const takenRows = new Set<number>();
-    for (const n of siblings) {
-      let targetRow = Math.round(barycenters.get(n.id) ?? 0);
-      // Collision resolution: push down until we find an empty row in this depth
-      while (takenRows.has(targetRow)) {
-        targetRow++;
-      }
-      takenRows.add(targetRow);
-      rowAssignments.set(n.id, targetRow);
-      
-      if (targetRow > maxGlobalRow) {
-        maxGlobalRow = targetRow;
+      const takenRows = new Set<number>();
+      for (const n of siblings) {
+        let targetRow = Math.round(barycenters.get(n.id) ?? 0);
+        // Collision resolution: push down until we find an empty row in this depth
+        while (takenRows.has(targetRow)) {
+          targetRow++;
+        }
+        takenRows.add(targetRow);
+        rowAssignments.set(n.id, targetRow);
+        
+        if (targetRow > maxGlobalRow) {
+          maxGlobalRow = targetRow;
+        }
       }
     }
   }

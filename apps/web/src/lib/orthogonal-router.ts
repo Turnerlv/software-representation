@@ -5,7 +5,8 @@ export function routeOrthogonal(
   source: Point,
   target: Point,
   rects: Rect[],
-  padding: number = 20,
+  paddingX: number = 50,
+  paddingY: number = 35,
   sourcePosition: string = 'right',
   targetPosition: string = 'left'
 ): Point[] {
@@ -14,10 +15,10 @@ export function routeOrthogonal(
   const ys = new Set<number>([source.y, target.y]);
 
   for (const r of rects) {
-    xs.add(r.x - padding);
-    xs.add(r.x + r.width + padding);
-    ys.add(r.y - padding);
-    ys.add(r.y + r.height + padding);
+    xs.add(r.x - paddingX);
+    xs.add(r.x + r.width + paddingX);
+    ys.add(r.y - paddingY);
+    ys.add(r.y + r.height + paddingY);
     // Add centers for better routing options
     ys.add(r.y + r.height / 2);
   }
