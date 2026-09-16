@@ -8,13 +8,13 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
-const CELL_WIDTH = 280;
-const CELL_HEIGHT = 120;
+const CELL_WIDTH = 340;
+const CELL_HEIGHT = 150;
 
 import { routeOrthogonal } from '../lib/orthogonal-router';
 import { calculateTransitLayout } from '../lib/transit-layout-engine';
 
-function TransitEdge({ sourceX, sourceY, targetX, targetY, style, markerEnd, id }: any) {
+function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX, targetY, style, markerEnd, id }: any) {
   const rfNodes = useNodes();
   
   const rects = rfNodes
@@ -30,7 +30,9 @@ function TransitEdge({ sourceX, sourceY, targetX, targetY, style, markerEnd, id 
     { x: sourceX, y: sourceY },
     { x: targetX, y: targetY },
     rects,
-    20
+    20,
+    sourcePosition,
+    targetPosition
   );
 
   let path = `M ${points[0].x},${points[0].y}`;
@@ -172,7 +174,8 @@ function WireframeNode({ data }: any) {
       overflow: 'hidden',
       borderRadius: '4px'
     }}>
-      <Handle type="target" position={Position.Left} style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+      <Handle type="target" position={Position.Left} id="left-target" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+      <Handle type="source" position={Position.Left} id="left-source" style={{ opacity: 0, width: 6, height: 6 }} />
 
       <div style={{
         fontSize: '13px',
@@ -202,7 +205,8 @@ function WireframeNode({ data }: any) {
         </div>
       )}
 
-      <Handle type="source" position={Position.Right} style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+      <Handle type="source" position={Position.Right} id="right-source" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+      <Handle type="target" position={Position.Right} id="right-target" style={{ opacity: 0, width: 6, height: 6 }} />
     </div>
   );
 }
@@ -270,10 +274,30 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
 
         const isDashed = isInterface || isConfig || isDotted;
 
+        const sourceNode = mappedNodes.find(n => n.id === e.source);
+        const targetNode = mappedNodes.find(n => n.id === e.target);
+        
+        let sourceHandle = 'right-source';
+        let targetHandle = 'left-target';
+
+        if (sourceNode && targetNode) {
+          if (sourceNode.position.x > targetNode.position.x) {
+            // Backwards edge (e.g. db -> core): exit left, enter right
+            sourceHandle = 'left-source';
+            targetHandle = 'right-target';
+          } else if (sourceNode.position.x === targetNode.position.x) {
+            // Same column edge: exit right, enter right (custom routing handles this)
+            sourceHandle = 'right-source';
+            targetHandle = 'right-target';
+          }
+        }
+
         return {
           id: `e-${e.source}-${e.target}-${idx}`,
           source: e.source,
+          sourceHandle,
           target: e.target,
+          targetHandle,
           type: 'transit',
           style: {
             stroke: strokeColor,

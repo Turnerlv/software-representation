@@ -1,5 +1,5 @@
-export const CELL_WIDTH = 280;
-export const CELL_HEIGHT = 120;
+export const CELL_WIDTH = 340;
+export const CELL_HEIGHT = 150;
 export const NODE_WIDTH = 240;
 export const NODE_HEIGHT = 80;
 
@@ -59,113 +59,140 @@ export function calculateTransitLayout(nodes: LayoutNode[], edges: LayoutEdge[])
     n._depth = calculatedDepth.get(n.id) ?? 0;
   }
 
-  // 2. Group nodes by Domain
-  const domainGroups = new Map<string, LayoutNode[]>();
-  for (const n of nodes) {
-    let key = n.domain ?? 'Default';
-    if (n.role === 'TOP_TRAY') key = '__TOP_TRAY__';
-    if (n.role === 'BOTTOM_TRAY') key = '__BOTTOM_TRAY__';
-    if (!domainGroups.has(key)) domainGroups.set(key, []);
-    domainGroups.get(key)!.push(n);
+  // 1.5 Inject Dummy Nodes for long edges (Sugiyama segmentation)
+  const layoutNodes = [...nodes];
+  const layoutEdges: LayoutEdge[] = [];
+
+  for (const e of edges) {
+    const u = nodes.find(n => n.id === e.source);
+    const v = nodes.find(n => n.id === e.target);
+    if (!u || !v) {
+      layoutEdges.push(e);
+      continue;
+    }
+    
+    const dU = u._depth!;
+    const dV = v._depth!;
+    
+    if (Math.abs(dU - dV) > 1) {
+      const step = dU < dV ? 1 : -1;
+      let prevId = e.source;
+      
+      for (let d = dU + step; d !== dV; d += step) {
+        const dummyId = `__dummy_${e.source}_${e.target}_${d}`;
+        layoutNodes.push({
+          id: dummyId,
+          role: 'DUMMY',
+          label_primary: '',
+          _depth: d
+        });
+        
+        layoutEdges.push({
+          source: prevId,
+          target: dummyId,
+          edge_type: e.edge_type
+        });
+        prevId = dummyId;
+      }
+      
+      layoutEdges.push({
+        source: prevId,
+        target: e.target,
+        edge_type: e.edge_type
+      });
+    } else {
+      layoutEdges.push(e);
+    }
   }
 
-  const sortedDomains = Array.from(domainGroups.keys()).sort((a, b) => {
-    if (a === '__TOP_TRAY__') return -1;
-    if (b === '__TOP_TRAY__') return 1;
-    if (a === '__BOTTOM_TRAY__') return 1;
-    if (b === '__BOTTOM_TRAY__') return -1;
-    return a.localeCompare(b);
-  });
+  // 2. Barycenter Layout (Center of Gravity) - Global Pass
+  const depthGroups = new Map<number, LayoutNode[]>();
+  let maxDepth = 0;
+  for (const n of layoutNodes) {
+    const d = n._depth!;
+    if (!depthGroups.has(d)) depthGroups.set(d, []);
+    depthGroups.get(d)!.push(n);
+    if (d > maxDepth) maxDepth = d;
+  }
 
-  // 3. Barycenter Layout (Center of Gravity)
-  let currentDomainStartY = 0;
-  const positionedNodes: (LayoutNode & { x: number; y: number })[] = [];
+  const rowAssignments = new Map<string, number>(); // node.id -> exact row integer
+  let maxGlobalRow = 0;
 
-  for (const domain of sortedDomains) {
-    const domainNodes = domainGroups.get(domain)!;
-    
-    // Group by Depth
-    const depthGroups = new Map<number, LayoutNode[]>();
-    let maxDepth = 0;
-    for (const n of domainNodes) {
-      const d = n._depth!;
-      if (!depthGroups.has(d)) depthGroups.set(d, []);
-      depthGroups.get(d)!.push(n);
-      if (d > maxDepth) maxDepth = d;
-    }
+  for (let d = 0; d <= maxDepth; d++) {
+    const siblings = depthGroups.get(d) || [];
+    if (siblings.length === 0) continue;
 
-    const rowAssignments = new Map<string, number>(); // node.id -> exact row integer
-    let maxRowInDomain = 0;
+    const barycenters = new Map<string, number>();
 
-    for (let d = 0; d <= maxDepth; d++) {
-      const siblings = depthGroups.get(d) || [];
-      if (siblings.length === 0) continue;
+    for (const n of siblings) {
+      // Find parents from ANY depth strictly less than d
+      // We use layoutEdges here so dummy segments pull on each other!
+      const parents = layoutEdges.filter(
+        e => e.target === n.id && (layoutNodes.find(ln => ln.id === e.source)?._depth ?? 0) < d
+      );
 
-      const barycenters = new Map<string, number>();
-
-      for (const n of siblings) {
-        // Find DATA_FLOW parents from ANY depth strictly less than d
-        const parents = edges.filter(
-          e => e.target === n.id && e.edge_type === 'DATA_FLOW' && (calculatedDepth.get(e.source) ?? 0) < d
-        );
-
-        if (parents.length > 0) {
-          let sum = 0;
-          let count = 0;
-          for (const p of parents) {
-            const pRow = rowAssignments.get(p.source);
-            if (pRow !== undefined) {
-              sum += pRow;
-              count++;
-            }
+      if (parents.length > 0) {
+        let sum = 0;
+        let count = 0;
+        for (const p of parents) {
+          const pRow = rowAssignments.get(p.source);
+          if (pRow !== undefined) {
+            sum += pRow;
+            count++;
           }
-          if (count > 0) {
-            barycenters.set(n.id, sum / count);
-          } else {
-            barycenters.set(n.id, maxRowInDomain + 0.1); // Fallback below existing
-          }
+        }
+        if (count > 0) {
+          barycenters.set(n.id, sum / count);
         } else {
-          barycenters.set(n.id, maxRowInDomain + 0.1);
+          barycenters.set(n.id, maxGlobalRow + 0.1);
         }
-      }
-
-      // Sort siblings by their ideal barycenter
-      siblings.sort((a, b) => (barycenters.get(a.id) ?? 0) - (barycenters.get(b.id) ?? 0));
-
-      const takenRows = new Set<number>();
-      for (const n of siblings) {
-        let targetRow = Math.round(barycenters.get(n.id) ?? 0);
-        // Collision resolution: push down until we find an empty row in this depth
-        while (takenRows.has(targetRow)) {
-          targetRow++;
-        }
-        takenRows.add(targetRow);
-        rowAssignments.set(n.id, targetRow);
-        
-        if (targetRow > maxRowInDomain) {
-          maxRowInDomain = targetRow;
-        }
+      } else {
+        barycenters.set(n.id, maxGlobalRow + 0.1);
       }
     }
 
-    // Assign final coordinates for this domain
-    for (const n of domainNodes) {
-      const d = n._depth!;
-      const r = rowAssignments.get(n.id) ?? 0;
-      
-      const x = d * CELL_WIDTH;
-      const y = currentDomainStartY + (r * CELL_HEIGHT);
-      
-      positionedNodes.push({
-        ...n,
-        x,
-        y
-      });
-    }
+    // Sort siblings by their ideal barycenter
+    siblings.sort((a, b) => (barycenters.get(a.id) ?? 0) - (barycenters.get(b.id) ?? 0));
 
-    // Advance Y space for the next domain
-    // Add an extra 50px gap between domains
-    currentDomainStartY += (maxRowInDomain + 1) * CELL_HEIGHT + 50;
+    const takenRows = new Set<number>();
+    for (const n of siblings) {
+      let targetRow = Math.round(barycenters.get(n.id) ?? 0);
+      // Collision resolution: push down until we find an empty row in this depth
+      while (takenRows.has(targetRow)) {
+        targetRow++;
+      }
+      takenRows.add(targetRow);
+      rowAssignments.set(n.id, targetRow);
+      
+      if (targetRow > maxGlobalRow) {
+        maxGlobalRow = targetRow;
+      }
+    }
+  }
+
+  const positionedNodes: (LayoutNode & { x: number; y: number })[] = [];
+  
+  // Assign final coordinates (skipping DUMMY nodes so they just leave empty grid spaces)
+  for (const n of layoutNodes) {
+    if (n.role === 'DUMMY') continue;
+    const d = n._depth!;
+    const r = rowAssignments.get(n.id) ?? 0;
+    
+    // Check if it's a tray node
+    const isTopTray = n.role === 'TOP_TRAY';
+    const isBottomTray = n.role === 'BOTTOM_TRAY';
+    
+    const x = d * CELL_WIDTH;
+    let y = r * CELL_HEIGHT;
+    
+    if (isTopTray) y = -CELL_HEIGHT;
+    if (isBottomTray) y = (maxGlobalRow + 2) * CELL_HEIGHT;
+    
+    positionedNodes.push({
+      ...n,
+      x,
+      y
+    });
   }
 
   return {

@@ -4,54 +4,52 @@ export type Point = { x: number; y: number };
 export function routeOrthogonal(
   source: Point,
   target: Point,
-  nodes: Rect[],
-  padding: number = 20
+  rects: Rect[],
+  padding: number = 20,
+  sourcePosition: string = 'right',
+  targetPosition: string = 'left'
 ): Point[] {
-  const xs = new Set<number>();
-  const ys = new Set<number>();
+  // 1. Gather all unique X and Y coordinates
+  const xs = new Set<number>([source.x, target.x]);
+  const ys = new Set<number>([source.y, target.y]);
 
-  xs.add(source.x);
-  xs.add(target.x);
-  ys.add(source.y);
-  ys.add(target.y);
-
-  for (const n of nodes) {
-    xs.add(n.x - padding);
-    xs.add(n.x + n.width + padding);
-    ys.add(n.y - padding);
-    ys.add(n.y + n.height + padding);
+  for (const r of rects) {
+    xs.add(r.x - padding);
+    xs.add(r.x + r.width + padding);
+    ys.add(r.y - padding);
+    ys.add(r.y + r.height + padding);
+    // Add centers for better routing options
+    ys.add(r.y + r.height / 2);
   }
 
   const xArr = Array.from(xs).sort((a, b) => a - b);
   const yArr = Array.from(ys).sort((a, b) => a - b);
 
-  const xIdx = (x: number) => xArr.indexOf(x);
-  const yIdx = (y: number) => yArr.indexOf(y);
-
   const cols = xArr.length;
   const rows = yArr.length;
 
-  function isBlocked(x1: number, y1: number, x2: number, y2: number): boolean {
+  const start = { xi: xArr.indexOf(source.x), yi: yArr.indexOf(source.y) };
+  const goal = { xi: xArr.indexOf(target.x), yi: yArr.indexOf(target.y) };
+
+  // Helper: check if line segment strictly intersects any rect
+  const isBlocked = (x1: number, y1: number, x2: number, y2: number) => {
     const minX = Math.min(x1, x2);
     const maxX = Math.max(x1, x2);
     const minY = Math.min(y1, y2);
     const maxY = Math.max(y1, y2);
 
-    for (const n of nodes) {
+    for (const r of rects) {
       if (
-        maxX > n.x &&
-        minX < n.x + n.width &&
-        maxY > n.y &&
-        minY < n.y + n.height
+        maxX > r.x &&
+        minX < r.x + r.width &&
+        maxY > r.y &&
+        minY < r.y + r.height
       ) {
         return true;
       }
     }
     return false;
-  }
-
-  const start = { xi: xIdx(source.x), yi: yIdx(source.y) };
-  const goal = { xi: xIdx(target.x), yi: yIdx(target.y) };
+  };
 
   type NodeState = {
     xi: number;
@@ -106,23 +104,27 @@ export function routeOrthogonal(
 
       if (isBlocked(curX, curY, nx, ny)) continue;
 
-      // Must exit source node going RIGHT
-      if (curr.dir === -1 && d.dxi !== 1) {
-        continue;
+      // Must exit source node in the correct direction
+      if (curr.dir === -1) {
+        if (sourcePosition === 'right' && d.dxi !== 1) continue;
+        if (sourcePosition === 'left' && d.dxi !== -1) continue;
       }
 
-      // Must enter target node from LEFT (meaning we move RIGHT into it)
-      if (nxi === goal.xi && nyi === goal.yi && d.dxi !== 1) {
-        continue;
+      // Must enter target node from the correct direction
+      if (nxi === goal.xi && nyi === goal.yi) {
+        if (targetPosition === 'left' && d.dxi !== 1) continue;
+        if (targetPosition === 'right' && d.dxi !== -1) continue;
       }
 
       const dist = Math.abs(nx - curX) + Math.abs(ny - curY);
       
-      // Heavy penalty for turns to keep lines as straight as possible
       const turnPenalty = curr.dir !== -1 && curr.dir !== d.dir ? 500 : 0;
-
-      // Slight penalty for moving backward against the flow to prefer forward progress
-      const backwardPenalty = d.dxi === -1 ? 50 : 0;
+      
+      // We no longer strictly penalize backward flow if the handles expect it
+      let backwardPenalty = 0;
+      if (sourcePosition === 'right' && targetPosition === 'left' && d.dxi === -1) {
+        backwardPenalty = 50;
+      }
 
       queue.push({
         xi: nxi,
