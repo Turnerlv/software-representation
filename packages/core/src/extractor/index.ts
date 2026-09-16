@@ -141,7 +141,8 @@ export function stableEntityId(filePath: string, type: string, name: string): st
 export function analyzeTarget(
   targetPath: string,
   extractorVersion: string = '1.1.0',
-  commitSha?: string
+  commitSha?: string,
+  excludeWorkspaces: string[] = []
 ): RepresentationGraph {
   const files = collectFiles(targetPath);
 
@@ -152,10 +153,16 @@ export function analyzeTarget(
   const isTargetFile = fs.statSync(repoRoot).isFile();
   const actualRepoRoot = isTargetFile ? path.dirname(repoRoot) : repoRoot;
 
-  // 1. Build Workspace Registry
-  const workspaceRegistry = buildWorkspaceRegistry(actualRepoRoot);
+  // 1. Build Workspace Registry — then apply exclusions
+  const rawRegistry = buildWorkspaceRegistry(actualRepoRoot);
+  const workspaceRegistry: WorkspaceRegistry = {};
+  for (const [pkgName, pkgPath] of Object.entries(rawRegistry)) {
+    if (!excludeWorkspaces.includes(pkgName)) {
+      workspaceRegistry[pkgName] = pkgPath;
+    }
+  }
 
-  // 2. Emit WORKSPACE_PACKAGE boundaries
+  // 2. Emit WORKSPACE_PACKAGE boundaries (excluded packages are already filtered out)
   for (const [pkgName, pkgPath] of Object.entries(workspaceRegistry)) {
     const relativePkgPath = path.relative(actualRepoRoot, pkgPath) || pkgPath;
     const pkgId = stableEntityId(`package:${pkgName}`, 'BOUNDARY', `Package: ${pkgName}`);

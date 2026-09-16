@@ -6,96 +6,157 @@ export interface CondensedGraph {
 }
 
 /**
+ * Entity types that represent macroscopic package-level boundaries considered
+ * candidates for the L1 condensed graph.
+ * EXTERNAL_PACKAGE nodes are candidates but subject to fan-in filtering below.
+ * NODE_BUILTIN is never included — OS/filesystem interfaces carry no data-flow meaning.
+ */
+const MACRO_ENTITY_TYPES = new Set(['WORKSPACE_PACKAGE', 'EXTERNAL_PACKAGE']);
+
+/**
+ * Filesystem and OS-level utility packages that have no data-flow meaning
+ * in a transit map — they are implementation details of any package that uses them.
+ * Excluded at all view levels regardless of fan-in count.
+ */
+const FILESYSTEM_UTILITY_PACKAGES = new Set([
+  'fs', 'node:fs',
+  'path', 'node:path',
+  'crypto', 'node:crypto',
+  'os', 'node:os',
+  'url', 'node:url',
+  'util', 'node:util',
+  'child_process', 'node:child_process',
+  'stream', 'node:stream',
+  'events', 'node:events',
+  'ignore',   // gitignore pattern matching — filesystem concern, not data flow
+]);
+
+
+/**
  * Compresses the raw AST-level representation graph into a macroscopic "Transit Map"
  * topology suitable for LLM layout generation and high-level visualization.
- * 
- * - Prunes AST noise (types, directives, node built-ins)
- * - Rolls up contracts (functions, classes) into their parent boundaries (files/modules)
- * - Deduplicates rewired edges
+ *
+ * Strategy:
+ *   Pass 1 — collect only WORKSPACE_PACKAGE and EXTERNAL_PACKAGE nodes as macro nodes.
+ *   Pass 2 — for every other node, resolve it to its nearest macro ancestor by
+ *             walking the parentBoundaryId chain. Build a rollup map.
+ *   Pass 3 — rewire all edges so both endpoints are macro nodes, then deduplicate.
+ *
+ * This guarantees the AI cartographer always receives a clean N-package graph,
+ * never raw file boundaries or fine-grained contract nodes.
  */
 export function condenseGraph(graph: RepresentationGraph): CondensedGraph {
-  const PRUNED_TYPES = new Set([
-    'EXPORTED_TYPE', 
-    'INTERFACE', 
-    'NEXTJS_METADATA', 
-    'NEXTJS_DIRECTIVE', 
-    'NODE_BUILTIN', 
-    'PROPERTY_GETTER',
-    'TYPE'
-  ]);
+  // Pass 1a: index all nodes and collect workspace + candidate external packages
+  const nodeById = new Map<string, StructuralNode>();
+  const workspaceNodes = new Map<string, StructuralNode>(); // WORKSPACE_PACKAGE only
+  const externalCandidates = new Map<string, StructuralNode>(); // EXTERNAL_PACKAGE candidates
 
-  const boundaryMap = new Map<string, StructuralNode>();
-  const contractToBoundaryMap = new Map<string, string>();
-  const keptNodes = new Map<string, StructuralNode>();
-
-  // 1. Identify boundaries and inherently macroscopic nodes
   for (const node of graph.nodes) {
-    if (PRUNED_TYPES.has(node.entityType)) continue;
+    nodeById.set(node.id, node);
 
-    if (node.type === 'BOUNDARY' || node.entityType === 'EXTERNAL_PACKAGE' || node.entityType === 'WORKSPACE_PACKAGE') {
-      boundaryMap.set(node.id, node);
-      keptNodes.set(node.id, node);
-    }
-  }
-
-  // 2. Map fine-grained contracts to their macroscopic boundaries
-  for (const node of graph.nodes) {
-    if (PRUNED_TYPES.has(node.entityType)) continue;
-
-    if (node.type === 'CONTRACT') {
-      if (node.parentBoundaryId && boundaryMap.has(node.parentBoundaryId)) {
-        // Queue for rollup
-        contractToBoundaryMap.set(node.id, node.parentBoundaryId);
-      
-        // Orphaned contract or one without a clear boundary. Keep it.
-        keptNodes.set(node.id, node);
+    if (node.entityType === 'WORKSPACE_PACKAGE') {
+      workspaceNodes.set(node.id, node);
+    } else if (node.entityType === 'EXTERNAL_PACKAGE') {
+      // Strip the "Package: " prefix to get the bare package name for utility check
+      const pkgName = node.name.replace(/^Package:\s*/, '');
+      if (!FILESYSTEM_UTILITY_PACKAGES.has(pkgName)) {
+        externalCandidates.set(node.id, node);
       }
-    } else if (node.type === 'OPEN_CONNECTOR') {
-      keptNodes.set(node.id, node);
+    }
+    // NODE_BUILTIN: never included
+  }
+
+  // Pass 1b: fan-in filter — an external package only survives at L1 if ≥2 distinct
+  // workspace packages depend on it (directly or via a file/contract rollup chain).
+  // We do a lightweight pre-scan: for each edge, resolve source to its workspace package
+  // ancestor and check if the target is an external candidate.
+  const workspaceAncestorCache = new Map<string, string | null>();
+
+  function resolveToWorkspace(nodeId: string): string | null {
+    if (workspaceAncestorCache.has(nodeId)) return workspaceAncestorCache.get(nodeId)!;
+    if (workspaceNodes.has(nodeId)) return nodeId;
+    const visited = new Set<string>();
+    let cur: string | undefined = nodeId;
+    while (cur) {
+      if (workspaceNodes.has(cur)) { workspaceAncestorCache.set(nodeId, cur); return cur; }
+      if (visited.has(cur)) break;
+      visited.add(cur);
+      cur = nodeById.get(cur)?.parentBoundaryId ?? undefined;
+    }
+    workspaceAncestorCache.set(nodeId, null);
+    return null;
+  }
+
+  // Count distinct workspace packages that have at least one edge pointing to each external candidate
+  const externalFanIn = new Map<string, Set<string>>(); // externalId → Set<workspacePkgId>
+  for (const edge of graph.edges) {
+    if (!edge.targetId) continue;
+    const targetNode = nodeById.get(edge.targetId);
+    if (!targetNode || !externalCandidates.has(edge.targetId)) continue;
+
+    const srcWorkspace = resolveToWorkspace(edge.sourceId);
+    if (!srcWorkspace) continue;
+
+    if (!externalFanIn.has(edge.targetId)) externalFanIn.set(edge.targetId, new Set());
+    externalFanIn.get(edge.targetId)!.add(srcWorkspace);
+  }
+
+  // Build final macro node set: all workspace packages + external packages with fan-in ≥ 2
+  const macroNodes = new Map<string, StructuralNode>(workspaceNodes);
+  for (const [extId, dependents] of externalFanIn) {
+    if (dependents.size >= 2) {
+      macroNodes.set(extId, externalCandidates.get(extId)!);
     }
   }
 
-  // 3. Rewire and deduplicate edges based on rollups
-  const newEdges = new Map<string, StructuralEdge>();
+  // Pass 2: resolve every non-macro node to its nearest macro ancestor
+  const rollupCache = new Map<string, string | null>();
+
+  function resolveToMacro(nodeId: string): string | null {
+    if (rollupCache.has(nodeId)) return rollupCache.get(nodeId)!;
+    if (macroNodes.has(nodeId)) return nodeId;
+    const visited = new Set<string>();
+    let cur: string | undefined = nodeId;
+    while (cur) {
+      if (macroNodes.has(cur)) { rollupCache.set(nodeId, cur); return cur; }
+      if (visited.has(cur)) break;
+      visited.add(cur);
+      cur = nodeById.get(cur)?.parentBoundaryId ?? undefined;
+    }
+    rollupCache.set(nodeId, null);
+    return null;
+  }
+
+  // Pass 3: rewire edges between macro nodes and deduplicate
+  const condensedEdges = new Map<string, StructuralEdge>();
 
   for (const edge of graph.edges) {
-    // Resolve to parent boundary if the node was rolled up
-    const sourceId = contractToBoundaryMap.get(edge.sourceId) || edge.sourceId;
-    const targetId = edge.targetId ? (contractToBoundaryMap.get(edge.targetId) || edge.targetId) : undefined;
-    
-    if (!sourceId || !targetId) continue;
-    
+    if (!edge.targetId) continue;
 
-    // Drop edges pointing to/from completely pruned nodes
-    if (!keptNodes.has(sourceId) || !keptNodes.has(targetId)) {
-      continue;
-    }
+    const srcId = resolveToMacro(edge.sourceId);
+    const tgtId = resolveToMacro(edge.targetId);
 
-    // Drop self-referential edges after rollup (e.g., File A calling File A)
-    if (sourceId === targetId) {
-      continue;
-    }
+    if (!srcId || !tgtId) continue;
+    if (srcId === tgtId) continue;
 
-    const edgeKey = `${sourceId}::${targetId}`;
-    if (!newEdges.has(edgeKey)) {
-      newEdges.set(edgeKey, {
-        id: `edge_${sourceId}_${targetId}`,
-        sourceId,
-        targetId,
+    const edgeKey = `${srcId}::${tgtId}`;
+    if (!condensedEdges.has(edgeKey)) {
+      condensedEdges.set(edgeKey, {
+        id: `edge_${srcId}_${tgtId}`,
+        sourceId: srcId,
+        targetId: tgtId,
         type: 'RELATIONSHIP',
-        name: `${sourceId} -> ${targetId}`,
+        name: `${srcId} -> ${tgtId}`,
         entityType: 'MACRO_EDGE',
         patternId: 'cartographer.macro',
-        evidence: { filePath: 'synthetic' }
-        
+        evidence: { filePath: 'synthetic' },
       });
-    
-      
     }
   }
 
   return {
-    nodes: Array.from(keptNodes.values()),
-    edges: Array.from(newEdges.values())
+    nodes: Array.from(macroNodes.values()),
+    edges: Array.from(condensedEdges.values()),
   };
 }
+

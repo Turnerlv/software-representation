@@ -161,6 +161,7 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 7. **Controlled Fixtures:** Visitor logic is proven against `fixtures/test-repos/<framework>/expected.json` ground truths, never directly against live cloned repos.
 8. **Do NOT commit:** Cloned repos, `.db` files, or `fixtures/research/handoffs/` directories.
 9. **Git Submodule Workflow:** `fixtures/research` is a Git Submodule containing proprietary research. You MUST commit and push research state changes from *inside* `fixtures/research/` before staging the submodule hash update in the root monorepo.
+10. **Always Consult Chomp:** Before planning changes, writing code, or answering architectural questions, you MUST consult the `chomp` tool for structural guidance. Use the available `chomp-server` MCP tools (`chomp_get_nodes`, `chomp_get_edges`) or run `pnpm chomp` to understand the current graph representation of the codebase. Do not guess architectural boundaries.
 
 ---
 

@@ -59,7 +59,11 @@ FRONTEND DATA CONDUIT:
 
 Deterministic graph layouts (Sugiyama, pure DAG longest-path) fail on raw AST code because codebases contain cyclical imports, asymmetric call trees, and cross-cutting utility noise. 
 
-The architecture strictly separates the **Surveyor** from the **Cartographer**:
+More importantly, **AST is Evidence, Not Meaning.** An AST import deterministically proves that `db` depends on `core`, but it does not specify *why*. If a visualizer blindly draws arrows based on AST imports, it will inevitably draw the architecture backwards (e.g., drawing the Core domain as downstream of the Database because the database imports its interfaces).
+
+To solve this, the architecture strictly separates the **Surveyor**, the **Cartographer (AI)**, and the **Layout Engine (Math)**. This is best understood as the **City Planner vs. Civil Engineer** model:
+* **The AI is the City Planner:** It provides semantic oversight (tagging priorities, assigning subsystems, and classifying edges) but does not draw the tracks.
+* **The Math is the Civil Engineer:** It strictly enforces the physical layout (columns, rows, straight lines) using deterministic algorithms, preventing structural hallucinations.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -72,9 +76,9 @@ The architecture strictly separates the **Surveyor** from the **Cartographer**:
                              ▼
 ┌──────────────────────────────────────────────────────────┐
 │              2. THE CARTOGRAPHER (AI via MCP)            │
-│  - Organizes discrete topology (lane, depth, role)       │
-│  - Assigns human semantic labels (label_primary)         │
-│  - Hypothesizes missing connections (is_inferred: true)  │
+│  - Classifies the semantic meaning of deterministic facts│
+│  - Organizes discrete topology (lane, role)              │
+│  - Classifies edges (DATA_FLOW vs. INTERFACE vs. CONFIG) │
 │  - STRICTLY GUARDED: Cannot invent non-existent node IDs │
 └────────────────────────────┬─────────────────────────────┘
                              │
@@ -82,10 +86,16 @@ The architecture strictly separates the **Surveyor** from the **Cartographer**:
 ┌──────────────────────────────────────────────────────────┐
 │             3. THE TRANSIT BOARD (apps/web)              │
 │  - React Flow + Topological Grid Layout Engine           │
-│  - Renders solid deterministic edges vs. dashed inferred │
-│  - Handles compound domain boxes & cross-cutting trays   │
+│  - Uses AI Lane for Y-axis (Horizontal Bands)            │
+│  - Runs Bellman-Ford ONLY on DATA_FLOW edges for X-axis  │
+│  - Renders solid data-flow edges vs. dashed interfaces   │
 └──────────────────────────────────────────────────────────┘
 ```
+
+### Key Lessons on Deterministic vs. AI Boundaries
+1. **Never use AI to draw the graph.** Asking an LLM to manage grid positions or layout properties directly leads to hallucinations.
+2. **Use AI to classify semantic meaning.** The AI should only add metadata tags (`lane`, `edge_type`) to the deterministic edges and nodes.
+3. **The Layout Engine must enforce the math.** The deterministic React layout engine uses the AI's metadata as strict mathematical constraints. By filtering Bellman-Ford to evaluate ONLY `DATA_FLOW` edges, we completely eliminate layout inversions caused by `INTERFACE` (type) dependencies, while preserving them visually as distinct dashed lines.
 
 ---
 
@@ -231,3 +241,12 @@ When code changes and `chomp analyze` runs:
 - [ ] Build Copilot Chat Drawer powered by the MCP/server-action protocol.
 - [ ] Support ephemeral lens switching with "Save View" and "Reset" action controls.
 - [ ] Implement drag-and-drop position auto-saving with human spatial lock.
+
+## 9. L2 Scaling & Persistent Spatial Memory (Fractal Grid)
+
+When scaling from a high-level package view (L1) to a detailed internal view (L2), traditional force-directed graphs explode outward, destroying the user's spatial memory. Chomp solves this using a **Fractal Grid Layout**.
+
+1. **Expanding a Grid Cell:** The L1 topology acts like a spreadsheet. If `@chomp/core` (in Column 2, Row 2) is expanded to reveal its internal L2 nodes, we do not recalculate the entire graph. We simply expand the width and height of Cell (2, 2).
+2. **Preserving Topology:** As Cell (2, 2) expands, Column 3 is pushed cleanly to the right, and Row 3 is pushed cleanly down. The relative spatial topology remains perfectly preserved.
+3. **Recursive Math:** Inside the expanded bounding box (the `parentNode`), the exact same layout algorithm (Longest Path + Barycenter) is applied recursively to the L2 internal files.
+4. **Cross-Cluster Routing:** The A* orthogonal grid router allows edges starting deep inside one cluster (e.g., `@chomp/web`) to navigate out of their parent bounding box, drop into the global L1 "busway", and perfectly navigate into a completely different cluster (e.g., `@chomp/db`).

@@ -2,6 +2,15 @@
 // packages/cli/src/index.ts
 // Chomp CLI entry point.
 
+// Load .env from the package root, anchored to this file's location so it
+// works whether invoked via `pnpm --filter @chomp/cli dev` from the repo root
+// or directly from inside packages/cli/.
+import { config as dotenvConfig } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+dotenvConfig({ path: resolve(__dirname, '../.env') }); // packages/cli/.env
+
 import { Command } from "commander";
 import { registerAnalyzeCommand } from "./commands/analyze.js";
 import { registerHealthCommand } from "./commands/health.js";

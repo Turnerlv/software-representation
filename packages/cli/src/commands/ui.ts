@@ -127,31 +127,52 @@ export function registerUiCommand(program: Command): void {
 You are the Chomp Cartographer, an AI expert in software architecture.
 I am providing you a condensed macroscopic list of structural nodes and edges representing a monorepo's package topology.
 
-Your job is to organize these nodes into a logical Transit Map layout by assigning each node to a 'lane' and giving it a 'role'.
+Your job has TWO parts:
 
-Lanes (numbers): lower numbers are closer to the user-facing entry point.
-  1 = "Frontend / CLI Entry"
-  2 = "Core Logic / Processing"  
-  3 = "Data / Storage / External Services"
+PART 1 — NODE LAYOUT: Assign each node a domain, role, and human-readable labels.
 
-Roles MUST BE ONE OF: "INGRESS", "CORE", "EGRESS", "TOP_TRAY", "BOTTOM_TRAY".
-  - INGRESS: user-facing entry points (CLI commands, web pages, API routes)
-  - CORE: internal processing packages
-  - EGRESS: data stores, databases, external APIs
-  - TOP_TRAY: cross-cutting utilities used by many (e.g. shared types, config)
-  - BOTTOM_TRAY: leaf-level external dependencies (npm packages, sdks)
+Domains represent semantic boundaries or subsystems (e.g., "Frontend", "Backend", "Data Layer", "Infrastructure", "Core Engine").
+Nodes that belong to the same logical subsystem should share the same domain string. The layout engine will mathematically calculate their exact position, but it will group nodes with the same domain together.
 
-Also provide human-readable labels:
-  - label_primary: short display name (e.g. "@chomp/cli", "React", "SQLite")
-  - label_secondary: one-line description of what this node does
+CRITICAL ROLE RULES:
+- Nodes with entityType "WORKSPACE_PACKAGE" MUST use ONLY: "INGRESS", "CORE", or "EGRESS"
+  - INGRESS: user-facing packages (CLI entry, web frontend, API gateway)
+  - CORE: internal processing packages (parsers, engines, protocol servers, business logic)
+  - EGRESS: data storage and persistence packages (databases, ORMs, queue sinks)
+- Nodes with entityType "EXTERNAL_PACKAGE" use "TOP_TRAY" or "BOTTOM_TRAY"
+- NEVER assign TOP_TRAY or BOTTOM_TRAY to a WORKSPACE_PACKAGE
 
-Return ONLY a valid JSON array where each object has:
-  { "id": string, "lane": number, "role": string, "label_primary": string, "label_secondary": string }
+PART 2 — EDGE CLASSIFICATION: For every edge, determine whether it represents actual
+DATA FLOW (data moves through it at runtime) or a TYPE/INTERFACE DEPENDENCY
+(one package imports types, interfaces, or abstract contracts defined by another, but
+data does not flow through this relationship at runtime).
+
+Edge types:
+  "DATA_FLOW"  — runtime data passes through: function calls with results, HTTP requests,
+                 queue messages, events, database queries. The source CALLS the target.
+  "INTERFACE"  — structural/type dependency: implements an interface, extends a class,
+                 imports types/schemas for type-checking only. No runtime data exchange.
+  "CONFIG"     — configuration or build-time dependency only.
+
+IMPORTANT: An edge where a storage/persistence package imports from a core/domain package
+to implement its storage interface is almost always "INTERFACE", not "DATA_FLOW".
+
+Return a single JSON object with this exact shape:
+{
+  "nodes": [
+    { "id": string, "domain": string, "role": string, "label_primary": string, "label_secondary": string }
+  ],
+  "edges": [
+    { "source": string, "target": string, "edge_type": "DATA_FLOW" | "INTERFACE" | "CONFIG" }
+  ]
+}
+
+Every input edge must appear in the output edges array. Do not add or remove edges.
 
 Nodes:
 ${JSON.stringify(minNodes, null, 2)}
 
-Edges (source → target means source depends on target):
+Edges (source imports/depends on target):
 ${JSON.stringify(minEdges, null, 2)}
 `;
 
@@ -163,8 +184,47 @@ ${JSON.stringify(minEdges, null, 2)}
           const responseText = result.response.text();
 
           try {
-            const layoutAssignments = JSON.parse(responseText);
-            const layoutData = { nodes: layoutAssignments, edges: minEdges };
+            const parsed = JSON.parse(responseText);
+
+            // Support both old flat-array format and new { nodes, edges } format
+            const layoutAssignments: any[] = Array.isArray(parsed) ? parsed : (parsed.nodes ?? []);
+            const edgeClassifications: any[] = Array.isArray(parsed) ? [] : (parsed.edges ?? []);
+
+            // Guard: WORKSPACE_PACKAGE nodes must never receive tray roles.
+            const workspaceIds = new Set(condensed.nodes
+              .filter(n => n.entityType === 'WORKSPACE_PACKAGE')
+              .map(n => n.id));
+            const TRAY_ROLES = new Set(['TOP_TRAY', 'BOTTOM_TRAY']);
+            for (const assignment of layoutAssignments) {
+              if (workspaceIds.has(assignment.id) && TRAY_ROLES.has(assignment.role)) {
+                console.warn(`⚠️  Cartographer: corrected ${assignment.label_primary ?? assignment.id} from ${assignment.role} → CORE`);
+                assignment.role = 'CORE';
+              }
+            }
+
+            // Merge AI edge classifications with the condensed edge list.
+            // Build a lookup from the AI's classified edges: "srcId::tgtId" → edge_type
+            const classifiedMap = new Map<string, string>();
+            for (const ce of edgeClassifications) {
+              classifiedMap.set(`${ce.source}::${ce.target}`, ce.edge_type ?? 'DATA_FLOW');
+            }
+
+            // Produce final edges: every condensed edge gets an edge_type.
+            // Default to DATA_FLOW for any edge the AI didn't classify (backward compat).
+            const classifiedEdges = minEdges.map(e => ({
+              source: e.source,
+              target: e.target,
+              edge_type: classifiedMap.get(`${e.source}::${e.target}`) ?? 'DATA_FLOW',
+            }));
+
+            // Log the classification for debugging
+            for (const e of classifiedEdges) {
+              const srcLabel = layoutAssignments.find((n: any) => n.id === e.source)?.label_primary ?? e.source;
+              const tgtLabel = layoutAssignments.find((n: any) => n.id === e.target)?.label_primary ?? e.target;
+              console.log(`  ${e.edge_type === 'DATA_FLOW' ? '→' : '⇢'} ${srcLabel} → ${tgtLabel} [${e.edge_type}]`);
+            }
+
+            const layoutData = { nodes: layoutAssignments, edges: classifiedEdges };
 
             const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
             writeFileSync(gridLayoutPath, JSON.stringify(layoutData, null, 2));

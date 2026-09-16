@@ -1,0 +1,5 @@
+{
+  "excludeWorkspaces": [
+    "chomp-research"
+  ]
+}

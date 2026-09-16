@@ -1,5 +1,1 @@
-fixtures/test-repos/
-fixtures/cloned-repos/
-.next/
-.turbo/
-coverage/
+fixtures/

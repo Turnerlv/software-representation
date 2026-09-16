@@ -9,7 +9,7 @@
  * @module @chomp/cli/commands/analyze
  */
 
-import { existsSync, statSync, mkdirSync } from "node:fs";
+import { existsSync, statSync, mkdirSync, readFileSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import { Command } from "commander";
 import { analyzeTarget } from "@chomp/core";
@@ -81,8 +81,21 @@ export function registerAnalyzeCommand(program: Command): void {
       // Fetch git info for commit anchoring
       const { commitSha, branchName } = getGitInfo(repoPath);
 
+      // Load optional repo-level config for extraction options
+      const configPath = resolve(repoPath, 'chomp.config.json');
+      let excludeWorkspaces: string[] = [];
+      if (existsSync(configPath)) {
+        try {
+          const config = JSON.parse(readFileSync(configPath, 'utf8'));
+          excludeWorkspaces = Array.isArray(config.excludeWorkspaces) ? config.excludeWorkspaces : [];
+        } catch (e) {
+          console.warn('Warning: Failed to parse chomp.config.json');
+        }
+      }
+
       console.log(`Analyzing structural entities in: ${targetPath}...`);
-      const graph = analyzeTarget(targetPath);
+      const graph = analyzeTarget(targetPath, '1.1.0', commitSha, excludeWorkspaces);
+
 
       // Initialize persistent SQLite storage location
       const defaultDbDir = resolve(repoPath, ".chomp");

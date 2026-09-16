@@ -7,10 +7,12 @@
     "dev": "turbo run dev",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "chomp": "packages/cli/node_modules/.bin/tsx packages/cli/src/index.ts"
+    "chomp": "packages/cli/node_modules/.bin/tsx packages/cli/src/index.ts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "husky": "^9.1.7",
     "turbo": "^1.10.0",
     "typescript": "^5.3.0"
   },

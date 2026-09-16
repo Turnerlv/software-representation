@@ -1,15 +1,73 @@
 "use client";
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  ReactFlow, Background, Controls, MiniMap,
+  ReactFlow, Background, Controls, MiniMap, Panel,
   Node, Edge, BackgroundVariant, ReactFlowProvider,
-  MarkerType, Handle, Position
+  MarkerType, Handle, Position, useNodes
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
 const CELL_WIDTH = 280;
 const CELL_HEIGHT = 120;
+
+import { routeOrthogonal } from '../lib/orthogonal-router';
+import { calculateTransitLayout } from '../lib/transit-layout-engine';
+
+function TransitEdge({ sourceX, sourceY, targetX, targetY, style, markerEnd, id }: any) {
+  const rfNodes = useNodes();
+  
+  const rects = rfNodes
+    .filter(n => n.type === 'wireframe')
+    .map(n => ({
+      x: n.position.x,
+      y: n.position.y,
+      width: (n.width as number) || 240,
+      height: (n.height as number) || 80
+    }));
+
+  const points = routeOrthogonal(
+    { x: sourceX, y: sourceY },
+    { x: targetX, y: targetY },
+    rects,
+    20
+  );
+
+  let path = `M ${points[0].x},${points[0].y}`;
+  const r = 15;
+  
+  for (let i = 1; i < points.length - 1; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const next = points[i + 1];
+    
+    const len1 = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+    const len2 = Math.hypot(next.x - curr.x, next.y - curr.y);
+    
+    if (len1 === 0 || len2 === 0) continue;
+    
+    const dirX1 = (curr.x - prev.x) / len1;
+    const dirY1 = (curr.y - prev.y) / len1;
+    const dirX2 = (next.x - curr.x) / len2;
+    const dirY2 = (next.y - curr.y) / len2;
+    
+    const startX = curr.x - dirX1 * Math.min(r, len1 / 2);
+    const startY = curr.y - dirY1 * Math.min(r, len1 / 2);
+    const endX = curr.x + dirX2 * Math.min(r, len2 / 2);
+    const endY = curr.y + dirY2 * Math.min(r, len2 / 2);
+    
+    path += ` L ${startX},${startY} Q ${curr.x},${curr.y} ${endX},${endY}`;
+  }
+  
+  const last = points[points.length - 1];
+  path += ` L ${last.x},${last.y}`;
+  
+  return <path d={path} style={style} markerEnd={markerEnd} fill="none" />;
+}
+
+const edgeTypes = {
+  transit: TransitEdge
+};
 
 
 function GhostNode({ data }: any) {
@@ -154,12 +212,15 @@ const nodeTypes = {
 };
 
 function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout }: { initialNodes: any[], initialEdges: any[], gridLayout: any }) {
+  const [viewLevel, setViewLevel] = useState<'L1' | 'L2'>('L1');
 
   const { rfNodes, rfEdges } = useMemo(() => {
     if (!gridLayout || !gridLayout.nodes || !gridLayout.edges) {
       return { rfNodes: [], rfEdges: [] };
     }
 
+    // In the future, we will branch here based on viewLevel === 'L2'
+    // For now, we always render L1 and lay the groundwork for L2 bounding boxes.
     const nodeDataMap = new Map(initialNodes.map(n => [n.id, n]));
 
     const NODE_WIDTH = 240;
@@ -167,155 +228,67 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
     const offsetX = (CELL_WIDTH - NODE_WIDTH) / 2;
     const offsetY = (CELL_HEIGHT - NODE_HEIGHT) / 2;
 
-    // 1. Calculate Dynamic Topological Depth
-    const inDegree = new Map<string, number>();
-
-    for (const n of gridLayout.nodes) {
-      inDegree.set(n.id, 0);
-    }
-    for (const e of gridLayout.edges) {
-      if (inDegree.has(e.target)) {
-        inDegree.set(e.target, inDegree.get(e.target)! + 1);
-      }
-    }
-
-    const calculatedDepth = new Map<string, number>();
-    for (const n of gridLayout.nodes) {
-      if (inDegree.get(n.id) === 0 || n.role === 'INGRESS') {
-        calculatedDepth.set(n.id, 0);
-      } else {
-        calculatedDepth.set(n.id, -1);
-      }
-    }
-
-    // Bellman-Ford longest path relaxation
-    const numNodes = gridLayout.nodes.length;
-    for (let i = 0; i < numNodes; i++) {
-      let changed = false;
-      for (const e of gridLayout.edges) {
-        const u = e.source;
-        const v = e.target;
-        if (calculatedDepth.has(u) && calculatedDepth.has(v)) {
-          if (calculatedDepth.get(u)! !== -1) {
-            const newDepth = calculatedDepth.get(u)! + 1;
-            if (newDepth > calculatedDepth.get(v)!) {
-              calculatedDepth.set(v, newDepth);
-              changed = true;
-            }
-          }
-        }
-      }
-      if (!changed) break;
-    }
-
-    let currentMaxDepth = 0;
-    for (const n of gridLayout.nodes) {
-      if (calculatedDepth.get(n.id) === -1) {
-        calculatedDepth.set(n.id, 0);
-      }
-      if (calculatedDepth.get(n.id)! > currentMaxDepth) {
-        currentMaxDepth = calculatedDepth.get(n.id)!;
-      }
-    }
-
-    const finalMaxDepth = currentMaxDepth + 1;
-    for (const n of gridLayout.nodes) {
-      if (n.role === 'EGRESS') {
-        calculatedDepth.set(n.id, finalMaxDepth);
-      }
-    }
-
-    const laneGroups = new Map<number, any[]>();
-    for (const n of gridLayout.nodes) {
-      let sortKey = n.lane || 0;
-      if (n.role === 'TOP_TRAY') sortKey = -9999;
-      if (n.role === 'BOTTOM_TRAY') sortKey = 9999;
-
-      if (!laneGroups.has(sortKey)) {
-        laneGroups.set(sortKey, []);
-      }
-      laneGroups.get(sortKey)!.push(n);
-    }
-
-    const sortedLanes = Array.from(laneGroups.entries()).sort((a, b) => a[0] - b[0]);
-
-    let currentY = 0;
-    const rfNodes: Node[] = [];
-
-    for (const [sortKey, laneNodes] of sortedLanes) {
-      const depthGroups = new Map<number, any[]>();
-      for (const n of laneNodes) {
-        const d = calculatedDepth.get(n.id) || 0;
-        if (!depthGroups.has(d)) depthGroups.set(d, []);
-        depthGroups.get(d)!.push(n);
-      }
-
-      let maxSiblings = 1;
-      for (const siblings of depthGroups.values()) {
-        if (siblings.length > maxSiblings) {
-          maxSiblings = siblings.length;
-        }
-      }
-
-      for (const [depth, siblings] of depthGroups.entries()) {
-        siblings.forEach((n: any, siblingIndex: number) => {
-          let x = depth * CELL_WIDTH;
-          if (n.role === 'EGRESS') {
-            x = finalMaxDepth * CELL_WIDTH;
-          }
-
-          let y = currentY + (siblingIndex * CELL_HEIGHT);
-
-          const dbNode = nodeDataMap.get(n.id);
-          const name = dbNode?.name || n.id;
-
-          rfNodes.push({
-            id: n.id,
-            type: 'wireframe',
-            position: { x: x + offsetX, y: y + offsetY },
-            data: {
-              label_primary: n.label_primary,
-              label_secondary: n.label_secondary,
-              name,
-              role: n.role
-            }
-          });
-        });
-      }
-
-      currentY += (maxSiblings * CELL_HEIGHT) + 50;
-    }
-
-    const trayNodeIds = new Set(
-      gridLayout.nodes
-        .filter((n: any) => n.role === 'TOP_TRAY' || n.role === 'BOTTOM_TRAY')
-        .map((n: any) => n.id)
-    );
-
-    const rfEdges: Edge[] = gridLayout.edges
-      .filter((e: any) => !trayNodeIds.has(e.source) && !trayNodeIds.has(e.target))
-      .map((e: any, idx: number) => {
-      const isDotted = e.is_inferred === true;
-      const strokeColor = isDotted ? '#f85149' : '#8892b0';
+    const layoutResult = calculateTransitLayout(gridLayout.nodes, gridLayout.edges);
+    
+    const mappedNodes: Node[] = layoutResult.nodes.map(n => {
+      const dbNode = nodeDataMap.get(n.id);
+      const name = dbNode?.name || n.id;
       return {
-        id: `e-${e.source}-${e.target}-${idx}`,
-        source: e.source,
-        target: e.target,
-        type: 'step',
-        style: {
-          stroke: strokeColor,
-          strokeWidth: 2,
-          ...(isDotted ? { strokeDasharray: '5 5' } : {})
-        },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: strokeColor,
+        id: n.id,
+        type: 'wireframe',
+        position: { x: n.x + offsetX, y: n.y + offsetY },
+        width: NODE_WIDTH,
+        height: NODE_HEIGHT,
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+        data: {
+          label_primary: n.label_primary,
+          label_secondary: n.label_secondary,
+          name,
+          role: n.role,
         }
       };
     });
 
-    return { rfNodes, rfEdges };
-  }, [initialNodes, gridLayout]);
+    const trayNodeIds = new Set(
+      layoutResult.nodes
+        .filter((n: any) => n.role === 'TOP_TRAY' || n.role === 'BOTTOM_TRAY')
+        .map((n: any) => n.id)
+    );
+
+    const mappedEdges: Edge[] = gridLayout.edges
+      .filter((e: any) => !trayNodeIds.has(e.source) && !trayNodeIds.has(e.target))
+      .map((e: any, idx: number) => {
+        const isInterface = e.edge_type === 'INTERFACE';
+        const isConfig = e.edge_type === 'CONFIG';
+        const isDotted = e.is_inferred === true;
+
+        let strokeColor = '#8892b0';
+        if (isInterface) strokeColor = '#238636';
+        else if (isConfig) strokeColor = '#8957e5';
+        else if (isDotted) strokeColor = '#f85149';
+
+        const isDashed = isInterface || isConfig || isDotted;
+
+        return {
+          id: `e-${e.source}-${e.target}-${idx}`,
+          source: e.source,
+          target: e.target,
+          type: 'transit',
+          style: {
+            stroke: strokeColor,
+            strokeWidth: 2,
+            ...(isDashed ? { strokeDasharray: '5 5' } : {})
+          },
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+            color: strokeColor,
+          }
+        };
+      });
+
+    return { rfNodes: mappedNodes, rfEdges: mappedEdges };
+  }, [initialNodes, gridLayout, viewLevel]);
 
   if (!gridLayout) {
     return (
@@ -331,12 +304,38 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
         nodes={rfNodes}
         edges={rfEdges}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         colorMode="dark"
       >
         <Background variant={BackgroundVariant.Lines} gap={[CELL_WIDTH, CELL_HEIGHT]} size={1} color="#30363d" />
         <Controls />
         <MiniMap />
+        
+        <Panel position="top-right" style={{ background: '#161b22', padding: '8px', borderRadius: '6px', border: '1px solid #30363d', display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => setViewLevel('L1')}
+            style={{ 
+              background: viewLevel === 'L1' ? '#238636' : 'transparent', 
+              color: viewLevel === 'L1' ? '#fff' : '#8b949e',
+              border: viewLevel === 'L1' ? '1px solid #2ea043' : '1px solid #30363d',
+              padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600
+            }}
+          >
+            L1 (Packages)
+          </button>
+          <button
+            onClick={() => setViewLevel('L2')}
+            style={{ 
+              background: viewLevel === 'L2' ? '#238636' : 'transparent', 
+              color: viewLevel === 'L2' ? '#fff' : '#8b949e',
+              border: viewLevel === 'L2' ? '1px solid #2ea043' : '1px solid #30363d',
+              padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontWeight: 600
+            }}
+          >
+            L2 (Internals)
+          </button>
+        </Panel>
       </ReactFlow>
     </div>
   );
