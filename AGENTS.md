@@ -162,6 +162,7 @@ Always use the **`research-loop`** skill to start a new research session. Do not
 8. **Do NOT commit:** Cloned repos, `.db` files, or `fixtures/research/handoffs/` directories.
 9. **Git Submodule Workflow:** `fixtures/research` is a Git Submodule containing proprietary research. You MUST commit and push research state changes from *inside* `fixtures/research/` before staging the submodule hash update in the root monorepo.
 10. **Always Consult Chomp:** Before planning changes, writing code, or answering architectural questions, you MUST consult the `chomp` tool for structural guidance. Use the available `chomp-server` MCP tools (`chomp_get_nodes`, `chomp_get_edges`) or run `pnpm chomp` to understand the current graph representation of the codebase. Do not guess architectural boundaries.
+11. **Validate Architectural Impact:** After making code changes (and before committing or concluding your task), you MUST call the `chomp_get_diff` MCP tool. This dynamically compares your dirty working tree against the saved base graph, allowing you to verify the exact structural blast radius (ADDED, REMOVED, MODIFIED entities) of your uncommitted code.
 
 ---
 
