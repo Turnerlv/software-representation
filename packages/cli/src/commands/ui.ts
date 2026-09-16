@@ -98,7 +98,6 @@ export function registerUiCommand(program: Command): void {
             return res.status(500).json({ error: "GEMINI_API_KEY is not configured in environment." });
           }
 
-          // Read the graph from the DB directly — dbPath is already in scope
           const storage = createSQLiteStorage(dbPath);
           const repos = await storage.listRepositories();
           if (repos.length === 0) {
@@ -112,62 +111,47 @@ export function registerUiCommand(program: Command): void {
             return res.status(404).json({ error: "Graph not found for this repository." });
           }
 
-          // Condense to package-level topology before sending to the AI
-          const condensed = condenseGraph(graph);
-
           const genAI = new GoogleGenerativeAI(apiKey);
           const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
 
-          const minNodes = condensed.nodes.map(n => ({ id: n.id, name: n.name, type: n.type, entityType: n.entityType }));
-          const minEdges = condensed.edges.map(e => ({ source: e.sourceId, target: e.targetId }));
-
-          console.log(`\n🗺️  Cartographer: condensed graph to ${minNodes.length} nodes, ${minEdges.length} edges. Calling AI...`);
-
-          const prompt = `
+          async function generateLayout(minNodes: any[], minEdges: any[], isL1: boolean, pkgName?: string) {
+            const prompt = `
 You are the Chomp Cartographer, an AI expert in software architecture.
-I am providing you a condensed macroscopic list of structural nodes and edges representing a monorepo's package topology.
+I am providing you a structural subgraph representing ${isL1 ? "a monorepo's macroscopic package topology" : `the internal files of the package: ${pkgName}`}.
 
 Your job has TWO parts:
 
 PART 1 — NODE LAYOUT: Assign each node a domain, role, and human-readable labels.
-
-Domains represent semantic boundaries or subsystems (e.g., "Frontend", "Backend", "Data Layer", "Infrastructure", "Core Engine").
-Nodes that belong to the same logical subsystem should share the same domain string. The layout engine will mathematically calculate their exact position, but it will group nodes with the same domain together.
+Domains represent semantic boundaries or subsystems (e.g., "Frontend", "Backend", "Data Layer", "Infrastructure").
+Nodes in the same logical subsystem should share the same domain string.
 
 CRITICAL ROLE RULES:
+${isL1 ? `
 - Nodes with entityType "WORKSPACE_PACKAGE" MUST use ONLY: "INGRESS", "CORE", or "EGRESS"
-  - INGRESS: user-facing packages (CLI entry, web frontend, API gateway)
-  - CORE: internal processing packages (parsers, engines, protocol servers, business logic)
-  - EGRESS: data storage and persistence packages (databases, ORMs, queue sinks)
+  - INGRESS: user-facing packages (CLI, web frontend)
+  - CORE: internal processing packages
+  - EGRESS: data storage and persistence packages
 - Nodes with entityType "EXTERNAL_PACKAGE" use "TOP_TRAY" or "BOTTOM_TRAY"
 - NEVER assign TOP_TRAY or BOTTOM_TRAY to a WORKSPACE_PACKAGE
+` : `
+- You must use ONLY: "INGRESS", "CORE", or "EGRESS" for internal files.
+  - INGRESS: Entry points (index.ts, API handlers, UI components)
+  - CORE: Business logic, utilities, services
+  - EGRESS: Repositories, database clients, external adapters
+`}
 
-PART 2 — EDGE CLASSIFICATION: For every edge, determine whether it represents actual
-DATA FLOW (data moves through it at runtime) or a TYPE/INTERFACE DEPENDENCY
-(one package imports types, interfaces, or abstract contracts defined by another, but
-data does not flow through this relationship at runtime).
-
+PART 2 — EDGE CLASSIFICATION: For every edge, determine whether it represents actual DATA FLOW or an INTERFACE/TYPE DEPENDENCY.
 Edge types:
-  "DATA_FLOW"  — runtime data passes through: function calls with results, HTTP requests,
-                 queue messages, events, database queries. The source CALLS the target.
-  "INTERFACE"  — structural/type dependency: implements an interface, extends a class,
-                 imports types/schemas for type-checking only. No runtime data exchange.
-  "CONFIG"     — configuration or build-time dependency only.
-
-IMPORTANT: An edge where a storage/persistence package imports from a core/domain package
-to implement its storage interface is almost always "INTERFACE", not "DATA_FLOW".
+  "DATA_FLOW" — runtime data passes through (function calls, HTTP, queries). The source CALLS the target.
+  "INTERFACE" — structural/type dependency (implements, extends, imports types only). No runtime data exchange.
+  "CONFIG"    — configuration or build-time dependency.
 
 Return a single JSON object with this exact shape:
 {
-  "nodes": [
-    { "id": string, "domain": string, "role": string, "label_primary": string, "label_secondary": string }
-  ],
-  "edges": [
-    { "source": string, "target": string, "edge_type": "DATA_FLOW" | "INTERFACE" | "CONFIG" }
-  ]
+  "nodes": [ { "id": string, "domain": string, "role": string, "label_primary": string, "label_secondary": string } ],
+  "edges": [ { "source": string, "target": string, "edge_type": "DATA_FLOW" | "INTERFACE" | "CONFIG" } ]
 }
-
-Every input edge must appear in the output edges array. Do not add or remove edges.
+Every input edge must appear in the output edges array.
 
 Nodes:
 ${JSON.stringify(minNodes, null, 2)}
@@ -175,65 +159,73 @@ ${JSON.stringify(minNodes, null, 2)}
 Edges (source imports/depends on target):
 ${JSON.stringify(minEdges, null, 2)}
 `;
-
-          const result = await model.generateContent({
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: "application/json" }
-          });
-
-          const responseText = result.response.text();
-
-          try {
+            const result = await model.generateContent({
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              generationConfig: { responseMimeType: "application/json" }
+            });
+            const responseText = result.response.text();
             const parsed = JSON.parse(responseText);
 
-            // Support both old flat-array format and new { nodes, edges } format
             const layoutAssignments: any[] = Array.isArray(parsed) ? parsed : (parsed.nodes ?? []);
             const edgeClassifications: any[] = Array.isArray(parsed) ? [] : (parsed.edges ?? []);
 
-            // Guard: WORKSPACE_PACKAGE nodes must never receive tray roles.
-            const workspaceIds = new Set(condensed.nodes
-              .filter(n => n.entityType === 'WORKSPACE_PACKAGE')
-              .map(n => n.id));
-            const TRAY_ROLES = new Set(['TOP_TRAY', 'BOTTOM_TRAY']);
-            for (const assignment of layoutAssignments) {
-              if (workspaceIds.has(assignment.id) && TRAY_ROLES.has(assignment.role)) {
-                console.warn(`⚠️  Cartographer: corrected ${assignment.label_primary ?? assignment.id} from ${assignment.role} → CORE`);
-                assignment.role = 'CORE';
+            if (isL1) {
+              const workspaceIds = new Set(minNodes.filter(n => n.entityType === 'WORKSPACE_PACKAGE').map(n => n.id));
+              const TRAY_ROLES = new Set(['TOP_TRAY', 'BOTTOM_TRAY']);
+              for (const assignment of layoutAssignments) {
+                if (workspaceIds.has(assignment.id) && TRAY_ROLES.has(assignment.role)) {
+                  assignment.role = 'CORE';
+                }
               }
             }
 
-            // Merge AI edge classifications with the condensed edge list.
-            // Build a lookup from the AI's classified edges: "srcId::tgtId" → edge_type
             const classifiedMap = new Map<string, string>();
             for (const ce of edgeClassifications) {
               classifiedMap.set(`${ce.source}::${ce.target}`, ce.edge_type ?? 'DATA_FLOW');
             }
 
-            // Produce final edges: every condensed edge gets an edge_type.
-            // Default to DATA_FLOW for any edge the AI didn't classify (backward compat).
             const classifiedEdges = minEdges.map(e => ({
               source: e.source,
               target: e.target,
               edge_type: classifiedMap.get(`${e.source}::${e.target}`) ?? 'DATA_FLOW',
             }));
 
-            // Log the classification for debugging
-            for (const e of classifiedEdges) {
-              const srcLabel = layoutAssignments.find((n: any) => n.id === e.source)?.label_primary ?? e.source;
-              const tgtLabel = layoutAssignments.find((n: any) => n.id === e.target)?.label_primary ?? e.target;
-              console.log(`  ${e.edge_type === 'DATA_FLOW' ? '→' : '⇢'} ${srcLabel} → ${tgtLabel} [${e.edge_type}]`);
-            }
-
-            const layoutData = { nodes: layoutAssignments, edges: classifiedEdges };
-
-            const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
-            writeFileSync(gridLayoutPath, JSON.stringify(layoutData, null, 2));
-
-            console.log(`✅  Cartographer: layout saved to ${gridLayoutPath}`);
-            return res.json({ assignments: layoutAssignments });
-          } catch (e) {
-            return res.status(500).json({ error: "AI returned invalid JSON", raw: responseText });
+            return { nodes: layoutAssignments, edges: classifiedEdges };
           }
+
+          // 1. Condense and run L1 Macro Layout
+          const condensed = condenseGraph(graph);
+          const l1MinNodes = condensed.nodes.map(n => ({ id: n.id, name: n.name, type: n.type, entityType: n.entityType }));
+          const l1MinEdges = condensed.edges.map(e => ({ source: e.sourceId, target: e.targetId }));
+          
+          console.log(`\n🗺️  Cartographer L1: mapping ${l1MinNodes.length} packages...`);
+          const l1Layout = await generateLayout(l1MinNodes, l1MinEdges, true);
+          
+          const layoutData: any = { nodes: l1Layout.nodes, edges: l1Layout.edges, subgraphs: {} };
+
+          // 2. Iterate through packages and run L2 Micro Layouts
+          const workspacePackages = condensed.nodes.filter(n => n.entityType === 'WORKSPACE_PACKAGE');
+          
+          for (const pkg of workspacePackages) {
+            const internalNodes = graph.nodes.filter(n => n.parentBoundaryId === pkg.id);
+            if (internalNodes.length === 0) continue;
+
+            const internalIds = new Set(internalNodes.map(n => n.id));
+            const internalEdges = graph.edges.filter(e => internalIds.has(e.sourceId) && internalIds.has(e.targetId!));
+
+            const l2MinNodes = internalNodes.map(n => ({ id: n.id, name: n.name, type: n.type, entityType: n.entityType }));
+            const l2MinEdges = internalEdges.map(e => ({ source: e.sourceId, target: e.targetId }));
+
+            console.log(`🗺️  Cartographer L2: mapping ${l2MinNodes.length} internals for ${pkg.name}...`);
+            const l2Layout = await generateLayout(l2MinNodes, l2MinEdges, false, pkg.name);
+            layoutData.subgraphs[pkg.id] = l2Layout;
+          }
+
+          const gridLayoutPath = join(dirname(dbPath), "grid_layout.json");
+          writeFileSync(gridLayoutPath, JSON.stringify(layoutData, null, 2));
+
+          console.log(`✅  Cartographer: multi-stage layout saved to ${gridLayoutPath}`);
+          return res.json({ assignments: layoutData.nodes, subgraphs: layoutData.subgraphs });
         } catch (error: any) {
           console.error("Cartographer error:", error);
           return res.status(500).json({ error: error.message || "Internal server error" });

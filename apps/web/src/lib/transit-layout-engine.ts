@@ -26,7 +26,11 @@ export interface LayoutResult {
   edges: LayoutEdge[];
 }
 
-export function calculateTransitLayout(nodes: LayoutNode[], edges: LayoutEdge[]): LayoutResult {
+export interface LayoutOptions {
+  dynamicSizes?: Map<string, { width: number; height: number }>;
+}
+
+export function calculateTransitLayout(nodes: LayoutNode[], edges: LayoutEdge[], options?: LayoutOptions): LayoutResult {
   // 1. Calculate Bellman-Ford depth using ONLY DATA_FLOW edges.
   const calculatedDepth = new Map<string, number>();
   for (const n of nodes) {
@@ -185,29 +189,69 @@ export function calculateTransitLayout(nodes: LayoutNode[], edges: LayoutEdge[])
     }
   }
 
-  const positionedNodes: (LayoutNode & { x: number; y: number })[] = [];
+  const positionedNodes: (LayoutNode & { x: number; y: number; width?: number; height?: number })[] = [];
   
+  // First pass: compute maximum widths and heights for each row and column
+  const colWidths = new Map<number, number>();
+  const rowHeights = new Map<number, number>();
+
+  for (const n of layoutNodes) {
+    if (n.role === 'DUMMY') continue;
+    const d = n._depth!;
+    const r = rowAssignments.get(n.id) ?? 0;
+    
+    let w = CELL_WIDTH;
+    let h = CELL_HEIGHT;
+    
+    if (options?.dynamicSizes?.has(n.id)) {
+      const size = options.dynamicSizes.get(n.id)!;
+      // Add 100px padding between dynamic L1 boxes
+      w = Math.max(w, size.width + 100);
+      h = Math.max(h, size.height + 100);
+    }
+    
+    colWidths.set(d, Math.max(colWidths.get(d) ?? CELL_WIDTH, w));
+    rowHeights.set(r, Math.max(rowHeights.get(r) ?? CELL_HEIGHT, h));
+  }
+
+  // Calculate cumulative physical offsets for the dynamic grid
+  const colOffsets = new Map<number, number>();
+  let currentX = 0;
+  for (let d = 0; d <= maxDepth; d++) {
+    colOffsets.set(d, currentX);
+    currentX += colWidths.get(d) ?? CELL_WIDTH;
+  }
+
+  const rowOffsets = new Map<number, number>();
+  let currentY = 0;
+  for (let r = 0; r <= maxGlobalRow; r++) {
+    rowOffsets.set(r, currentY);
+    currentY += rowHeights.get(r) ?? CELL_HEIGHT;
+  }
+
   // Assign final coordinates (skipping DUMMY nodes so they just leave empty grid spaces)
   for (const n of layoutNodes) {
     if (n.role === 'DUMMY') continue;
     const d = n._depth!;
     const r = rowAssignments.get(n.id) ?? 0;
     
-    // Check if it's a tray node
     const isTopTray = n.role === 'TOP_TRAY';
     const isBottomTray = n.role === 'BOTTOM_TRAY';
     
-    const x = d * CELL_WIDTH;
-    let y = r * CELL_HEIGHT;
+    const x = colOffsets.get(d) ?? (d * CELL_WIDTH);
+    let y = rowOffsets.get(r) ?? (r * CELL_HEIGHT);
     
     if (isTopTray) y = -CELL_HEIGHT;
-    if (isBottomTray) y = (maxGlobalRow + 2) * CELL_HEIGHT;
+    if (isBottomTray) y = currentY + CELL_HEIGHT;
     
-    positionedNodes.push({
-      ...n,
-      x,
-      y
-    });
+    const nodeObj: any = { ...n, x, y };
+    if (options?.dynamicSizes?.has(n.id)) {
+      const size = options.dynamicSizes.get(n.id)!;
+      nodeObj.width = size.width;
+      nodeObj.height = size.height;
+    }
+    
+    positionedNodes.push(nodeObj);
   }
 
   return {

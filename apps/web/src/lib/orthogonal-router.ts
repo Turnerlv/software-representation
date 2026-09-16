@@ -23,6 +23,14 @@ export function routeOrthogonal(
     ys.add(r.y + r.height / 2);
   }
 
+  // Add outer boundary channels to allow routing completely around the graph
+  const currentXs = Array.from(xs);
+  const currentYs = Array.from(ys);
+  xs.add(Math.min(...currentXs) - paddingX);
+  xs.add(Math.max(...currentXs) + paddingX);
+  ys.add(Math.min(...currentYs) - paddingY);
+  ys.add(Math.max(...currentYs) + paddingY);
+
   const xArr = Array.from(xs).sort((a, b) => a - b);
   const yArr = Array.from(ys).sort((a, b) => a - b);
 
@@ -102,6 +110,12 @@ export function routeOrthogonal(
 
       const nx = xArr[nxi];
       const ny = yArr[nyi];
+
+      // Prevent 180-degree physical switchbacks
+      if (curr.path.length >= 2) {
+        const prevPt = curr.path[curr.path.length - 2];
+        if (prevPt.x === nx && prevPt.y === ny) continue;
+      }
 
       if (isBlocked(curX, curY, nx, ny)) continue;
 

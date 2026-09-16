@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   ReactFlow, Background, Controls, MiniMap, Panel,
   Node, Edge, BackgroundVariant, ReactFlowProvider,
-  MarkerType, Handle, Position, useNodes
+  MarkerType, Handle, Position, useNodes,
+  useNodesState, useEdgesState, useReactFlow
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -27,8 +28,8 @@ function TransitEdge({ sourcePosition, targetPosition, sourceX, sourceY, targetX
     }));
 
   const points = routeOrthogonal(
-    { x: sourceX, y: sourceY },
-    { x: targetX, y: targetY },
+    { x: Math.round(sourceX), y: Math.round(sourceY) },
+    { x: Math.round(targetX), y: Math.round(targetY) },
     rects,
     50, // paddingX
     35, // paddingY
@@ -181,55 +182,64 @@ function WireframeNode({ data }: any) {
   const primary = data.label_primary || data.name;
   const secondary = data.label_secondary;
 
+  const isBackground = data.role === 'BACKGROUND';
+
   return (
     <div style={{
-      width: 240,
-      height: 80,
-      border: '2px solid #58a6ff',
-      background: '#0d1117',
+      width: '100%',
+      height: '100%',
+      border: isBackground ? '1px dashed #484f58' : '2px solid #58a6ff',
+      background: isBackground ? 'rgba(48, 54, 61, 0.3)' : '#0d1117',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: '0 10px',
+      justifyContent: isBackground ? 'flex-start' : 'center',
+      padding: isBackground ? '12px' : '0 10px',
       boxSizing: 'border-box',
       textAlign: 'center',
       overflow: 'hidden',
       borderRadius: '4px'
     }}>
-      <Handle type="target" position={Position.Left} id="left-target" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
-      <Handle type="source" position={Position.Left} id="left-source" style={{ opacity: 0, width: 6, height: 6 }} />
+      {!isBackground && (
+        <>
+          <Handle type="target" position={Position.Left} id="left-target" style={{ opacity: 0, width: 6, height: 6 }} />
+          <Handle type="source" position={Position.Left} id="left-source" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+        </>
+      )}
 
       <div style={{
         fontSize: '13px',
         fontWeight: 600,
-        color: '#e6edf3',
+        color: isBackground ? '#8b949e' : '#e6edf3',
         textOverflow: 'ellipsis',
         overflow: 'hidden',
         whiteSpace: 'nowrap',
-        width: '100%'
+        width: '100%',
+        marginBottom: isBackground ? 'auto' : 0,
       }}>
         {primary}
       </div>
-
-      {secondary && (
+      
+      {secondary && !isBackground && (
         <div style={{
-          fontSize: '10px',
-          fontWeight: 400,
+          fontSize: '11px',
           color: '#8b949e',
-          marginTop: '4px',
-          fontFamily: 'monospace',
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           whiteSpace: 'nowrap',
-          width: '100%'
+          width: '100%',
+          marginTop: '4px'
         }}>
           {secondary}
         </div>
       )}
 
-      <Handle type="source" position={Position.Right} id="right-source" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
-      <Handle type="target" position={Position.Right} id="right-target" style={{ opacity: 0, width: 6, height: 6 }} />
+      {!isBackground && (
+        <>
+          <Handle type="source" position={Position.Right} id="right-source" style={{ background: '#58a6ff', width: 6, height: 6, border: 'none' }} />
+          <Handle type="target" position={Position.Right} id="right-target" style={{ opacity: 0, width: 6, height: 6 }} />
+        </>
+      )}
     </div>
   );
 }
@@ -240,14 +250,14 @@ const nodeTypes = {
 
 function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout }: { initialNodes: any[], initialEdges: any[], gridLayout: any }) {
   const [viewLevel, setViewLevel] = useState<'L1' | 'L2'>('L1');
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
 
-  const { rfNodes, rfEdges } = useMemo(() => {
+  const { mappedNodes, mappedEdges } = useMemo(() => {
     if (!gridLayout || !gridLayout.nodes || !gridLayout.edges) {
-      return { rfNodes: [], rfEdges: [] };
+      return { mappedNodes: [], mappedEdges: [] };
     }
 
-    // In the future, we will branch here based on viewLevel === 'L2'
-    // For now, we always render L1 and lay the groundwork for L2 bounding boxes.
     const nodeDataMap = new Map(initialNodes.map(n => [n.id, n]));
 
     const NODE_WIDTH = 240;
@@ -255,87 +265,264 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
     const offsetX = (CELL_WIDTH - NODE_WIDTH) / 2;
     const offsetY = (CELL_HEIGHT - NODE_HEIGHT) / 2;
 
-    const layoutResult = calculateTransitLayout(gridLayout.nodes, gridLayout.edges);
-    
-    const mappedNodes: Node[] = layoutResult.nodes.map(n => {
-      const dbNode = nodeDataMap.get(n.id);
-      const name = dbNode?.name || n.id;
-      return {
-        id: n.id,
-        type: 'wireframe',
-        position: { x: n.x + offsetX, y: n.y + offsetY },
-        width: NODE_WIDTH,
-        height: NODE_HEIGHT,
-        sourcePosition: Position.Right,
-        targetPosition: Position.Left,
-        data: {
-          label_primary: n.label_primary,
-          label_secondary: n.label_secondary,
-          name,
-          role: n.role,
-        }
-      };
-    });
+    let finalNodes: Node[] = [];
+    let finalEdges: Edge[] = [];
 
-    const trayNodeIds = new Set(
-      layoutResult.nodes
-        .filter((n: any) => n.role === 'TOP_TRAY' || n.role === 'BOTTOM_TRAY')
-        .map((n: any) => n.id)
-    );
-
-    const mappedEdges: Edge[] = gridLayout.edges
-      .filter((e: any) => !trayNodeIds.has(e.source) && !trayNodeIds.has(e.target))
-      .map((e: any, idx: number) => {
-        const isInterface = e.edge_type === 'INTERFACE';
-        const isConfig = e.edge_type === 'CONFIG';
-        const isDotted = e.is_inferred === true;
-
-        let strokeColor = '#8892b0';
-        if (isInterface) strokeColor = '#238636';
-        else if (isConfig) strokeColor = '#8957e5';
-        else if (isDotted) strokeColor = '#f85149';
-
-        const isDashed = isInterface || isConfig || isDotted;
-
-        const sourceNode = mappedNodes.find(n => n.id === e.source);
-        const targetNode = mappedNodes.find(n => n.id === e.target);
-        
-        let sourceHandle = 'right-source';
-        let targetHandle = 'left-target';
-
-        if (sourceNode && targetNode) {
-          if (sourceNode.position.x > targetNode.position.x) {
-            // Backwards edge (e.g. db -> core): exit right, enter right (loops around)
-            sourceHandle = 'right-source';
-            targetHandle = 'right-target';
-          } else if (sourceNode.position.x === targetNode.position.x) {
-            // Same column edge: exit right, enter right
-            sourceHandle = 'right-source';
-            targetHandle = 'right-target';
-          }
-        }
-
+    if (viewLevel === 'L1') {
+      const layoutResult = calculateTransitLayout(gridLayout.nodes, gridLayout.edges);
+      
+      finalNodes = layoutResult.nodes.map((n: any) => {
+        const dbNode = nodeDataMap.get(n.id);
+        const name = dbNode?.name || n.id;
         return {
-          id: `e-${e.source}-${e.target}-${idx}`,
-          source: e.source,
-          sourceHandle,
-          target: e.target,
-          targetHandle,
-          type: 'transit',
-          style: {
-            stroke: strokeColor,
-            strokeWidth: 2,
-            ...(isDashed ? { strokeDasharray: '5 5' } : {})
-          },
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
-            color: strokeColor,
+          id: n.id,
+          type: 'wireframe',
+          position: { x: n.x + offsetX, y: n.y + offsetY },
+          width: NODE_WIDTH,
+          height: NODE_HEIGHT,
+          sourcePosition: Position.Right,
+          targetPosition: Position.Left,
+          data: {
+            label_primary: n.label_primary,
+            label_secondary: n.label_secondary,
+            name,
+            role: n.role,
           }
         };
       });
 
-    return { rfNodes: mappedNodes, rfEdges: mappedEdges };
-  }, [initialNodes, gridLayout, viewLevel]);
+      const trayNodeIds = new Set(
+        layoutResult.nodes
+          .filter((n: any) => n.role === 'TOP_TRAY' || n.role === 'BOTTOM_TRAY')
+          .map((n: any) => n.id)
+      );
+
+      finalEdges = gridLayout.edges
+        .filter((e: any) => !trayNodeIds.has(e.source) && !trayNodeIds.has(e.target))
+        .map((e: any, idx: number) => {
+          const isInterface = e.edge_type === 'INTERFACE';
+          const isConfig = e.edge_type === 'CONFIG';
+          const isDotted = e.is_inferred === true;
+
+          let strokeColor = '#8892b0';
+          if (isInterface) strokeColor = '#238636';
+          else if (isConfig) strokeColor = '#8957e5';
+          else if (isDotted) strokeColor = '#f85149';
+
+          const sourceNode = finalNodes.find(n => n.id === e.source);
+          const targetNode = finalNodes.find(n => n.id === e.target);
+          
+          let sourceHandle = 'right-source';
+          let targetHandle = 'left-target';
+
+          if (sourceNode && targetNode) {
+            if (sourceNode.position.x > targetNode.position.x) {
+              sourceHandle = 'right-source';
+              targetHandle = 'right-target';
+            } else if (sourceNode.position.x === targetNode.position.x) {
+              sourceHandle = 'right-source';
+              targetHandle = 'right-target';
+            }
+          }
+
+          const isDashed = isInterface || isConfig || isDotted;
+
+          return {
+            id: `e-${e.source}-${e.target}-${idx}`,
+            source: e.source,
+            sourceHandle,
+            target: e.target,
+            targetHandle,
+            type: 'transit',
+            style: {
+              stroke: strokeColor,
+              strokeWidth: 2,
+              ...(isDashed ? { strokeDasharray: '5 5' } : {})
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: strokeColor,
+            }
+          };
+        });
+    } else {
+      // L2 Layout - AI Curated
+      const dynamicSizes = new Map<string, { width: number; height: number }>();
+      const validL2Nodes = new Set<string>();
+
+      // 1. Determine local sizes based on AI subgraphs
+      for (const l1 of gridLayout.nodes) {
+        if (l1.role === 'TOP_TRAY' || l1.role === 'BOTTOM_TRAY') continue;
+        
+        const subgraph = gridLayout.subgraphs?.[l1.id];
+        if (!subgraph || !subgraph.nodes || subgraph.nodes.length === 0) continue;
+
+        const localResult = calculateTransitLayout(subgraph.nodes, subgraph.edges);
+        
+        let maxLocalX = 0;
+        let maxLocalY = 0;
+        for (const ln of localResult.nodes) {
+          maxLocalX = Math.max(maxLocalX, ln.x);
+          maxLocalY = Math.max(maxLocalY, ln.y);
+          validL2Nodes.add(ln.id);
+        }
+        
+        dynamicSizes.set(l1.id, {
+          width: maxLocalX + CELL_WIDTH,
+          height: maxLocalY + CELL_HEIGHT
+        });
+      }
+
+      // 2. Global L1 Layout using dynamic sizes
+      const l1Result = calculateTransitLayout(gridLayout.nodes, gridLayout.edges, { dynamicSizes });
+
+      // 3. Construct Absolute Nodes using Group plots
+      for (const l1 of l1Result.nodes) {
+        if (l1.role === 'TOP_TRAY' || l1.role === 'BOTTOM_TRAY') continue;
+        
+        const size = dynamicSizes.get(l1.id);
+        const subgraph = gridLayout.subgraphs?.[l1.id];
+
+        if (size && subgraph) {
+          // Render L1 as a Group Plot background
+          finalNodes.push({
+            id: l1.id,
+            type: 'group',
+            position: { x: l1.x, y: l1.y },
+            style: {
+              width: size.width,
+              height: size.height,
+              background: 'rgba(35, 134, 54, 0.05)',
+              border: '2px solid rgba(35, 134, 54, 0.4)',
+              borderRadius: '8px',
+              zIndex: -1,
+            },
+            data: { label: l1.label_primary }
+          });
+          
+          // Add a custom label node for the group (since group nodes don't easily style their labels at the top)
+          finalNodes.push({
+            id: `${l1.id}-label`,
+            type: 'default',
+            position: { x: l1.x + 16, y: l1.y + 16 },
+            style: {
+              background: 'transparent',
+              border: 'none',
+              color: '#2ea043',
+              fontSize: '18px',
+              fontWeight: 'bold',
+              boxShadow: 'none',
+              zIndex: -1
+            },
+            data: { label: l1.label_primary }
+          });
+
+          // Render internal L2 nodes at absolute coordinates
+          const localResult = calculateTransitLayout(subgraph.nodes, subgraph.edges);
+          for (const ln of localResult.nodes) {
+            finalNodes.push({
+              id: ln.id,
+              type: 'wireframe',
+              position: { 
+                x: l1.x + ln.x + offsetX, 
+                y: l1.y + ln.y + offsetY 
+              },
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+              sourcePosition: Position.Right,
+              targetPosition: Position.Left,
+              data: {
+                label_primary: ln.label_primary,
+                label_secondary: ln.domain,
+                name: ln.label_primary,
+                role: ln.role,
+              },
+              style: { zIndex: 10 }
+            });
+          }
+        } else {
+          // Fallback if no L2 children
+          finalNodes.push({
+            id: l1.id,
+            type: 'wireframe',
+            position: { x: l1.x + offsetX, y: l1.y + offsetY },
+            width: NODE_WIDTH,
+            height: NODE_HEIGHT,
+            sourcePosition: Position.Right,
+            targetPosition: Position.Left,
+            data: {
+              label_primary: l1.label_primary,
+              role: l1.role,
+            }
+          });
+        }
+      }
+
+      // 4. Construct granular L2 edges (using AI-curated edges)
+      for (const l1 of gridLayout.nodes) {
+        const subgraph = gridLayout.subgraphs?.[l1.id];
+        if (!subgraph) continue;
+
+        for (const [idx, e] of subgraph.edges.entries()) {
+          const isInterface = e.edge_type === 'INTERFACE';
+          const isConfig = e.edge_type === 'CONFIG';
+          const isDashed = isInterface || isConfig;
+
+          let strokeColor = '#8892b0';
+          if (isInterface) strokeColor = '#238636';
+          else if (isConfig) strokeColor = '#8957e5';
+
+          const sourceNode = finalNodes.find(n => n.id === e.source);
+          const targetNode = finalNodes.find(n => n.id === e.target);
+          
+          let sourceHandle = 'right-source';
+          let targetHandle = 'left-target';
+
+          if (sourceNode && targetNode) {
+            if (sourceNode.position.x > targetNode.position.x) {
+              sourceHandle = 'right-source';
+              targetHandle = 'right-target';
+            } else if (sourceNode.position.x === targetNode.position.x) {
+              sourceHandle = 'right-source';
+              targetHandle = 'right-target';
+            }
+          }
+
+          finalEdges.push({
+            id: `e-l2-${l1.id}-${e.source}-${e.target}-${idx}`,
+            source: e.source,
+            sourceHandle,
+            target: e.target,
+            targetHandle,
+            type: 'transit',
+            style: {
+              stroke: strokeColor,
+              strokeWidth: 2,
+              ...(isDashed ? { strokeDasharray: '5 5' } : {})
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: strokeColor,
+            }
+          });
+        }
+      }
+    }
+
+    return { mappedNodes: finalNodes, mappedEdges: finalEdges };
+  }, [initialNodes, initialEdges, gridLayout, viewLevel]);
+
+  const { fitView } = useReactFlow();
+
+  useEffect(() => {
+    setNodes(mappedNodes);
+    setEdges(mappedEdges);
+    
+    // Smoothly animate the camera to frame the new layout when viewLevel changes
+    setTimeout(() => {
+      fitView({ duration: 800, padding: 0.2 });
+    }, 50);
+  }, [mappedNodes, mappedEdges, setNodes, setEdges, fitView, viewLevel]);
 
   if (!gridLayout) {
     return (
@@ -348,8 +535,10 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
   return (
     <div style={{ width: '100%', height: '100%', background: '#0d1117' }}>
       <ReactFlow
-        nodes={rfNodes}
-        edges={rfEdges}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
@@ -357,7 +546,15 @@ function GraphVisualizerInner({ initialNodes = [], initialEdges = [], gridLayout
       >
         <Background variant={BackgroundVariant.Lines} gap={[CELL_WIDTH, CELL_HEIGHT]} size={1} color="#30363d" />
         <Controls />
-        <MiniMap />
+        <MiniMap 
+          nodeColor={(n: any) => {
+            if (n.type === 'group') return '#2ea043';
+            if (n.data?.role === 'TOP_TRAY' || n.data?.role === 'BOTTOM_TRAY') return '#8957e5';
+            return '#58a6ff';
+          }}
+          maskColor="rgba(13, 17, 23, 0.7)"
+          style={{ background: '#161b22', border: '1px solid #30363d' }}
+        />
         
         <Panel position="top-right" style={{ background: '#161b22', padding: '8px', borderRadius: '6px', border: '1px solid #30363d', display: 'flex', gap: '8px' }}>
           <button
