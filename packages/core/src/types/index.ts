@@ -6,3 +6,4 @@
 
 export * from './ontology.js';
 export * from './ledger.js';
+export * from './diff.js';

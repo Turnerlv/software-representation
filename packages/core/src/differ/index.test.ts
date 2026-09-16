@@ -33,16 +33,20 @@ describe('compareGraphs', () => {
   it('should identify UNCHANGED, REMOVED, MODIFIED, and ADDED nodes', () => {
     const diff = compareGraphs(baseGraph, currentGraph);
 
-    assert.equal(diff.nodes.find(n => n.id === '1')?.diffStatus, 'UNCHANGED');
-    assert.equal(diff.nodes.find(n => n.id === '2')?.diffStatus, 'REMOVED');
-    assert.equal(diff.nodes.find(n => n.id === '3')?.diffStatus, 'MODIFIED');
-    assert.equal(diff.nodes.find(n => n.id === '4')?.diffStatus, 'ADDED');
+    assert.equal(diff.nodes['1']?.status, 'UNCHANGED');
+    assert.equal(diff.nodes['2']?.status, 'REMOVED');
+    assert.equal(diff.nodes['3']?.status, 'LEXICAL_SHIFT'); // line number drifting triggers LEXICAL_SHIFT
+    assert.equal(diff.nodes['4']?.status, 'ADDED');
+    
+    // Check that base and target are correctly assigned
+    assert.equal(diff.nodes['2'].base?.name, 'removedNode');
+    assert.equal(diff.nodes['4'].target?.name, 'addedNode');
   });
 
   it('should identify UNCHANGED, REMOVED, MODIFIED, and ADDED edges', () => {
     const diff = compareGraphs(baseGraph, currentGraph);
     
-    assert.equal(diff.edges.find(e => e.id === 'e1')?.diffStatus, 'REMOVED');
-    assert.equal(diff.edges.find(e => e.id === 'e2')?.diffStatus, 'ADDED');
+    assert.equal(diff.edges['e1']?.status, 'REMOVED');
+    assert.equal(diff.edges['e2']?.status, 'ADDED');
   });
 });

@@ -1,1 +1,1 @@
-pnpm chomp analyze
+pnpm chomp analyze .

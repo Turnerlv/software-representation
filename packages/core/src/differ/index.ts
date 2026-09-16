@@ -1,19 +1,5 @@
 import { RepresentationGraph, StructuralNode, StructuralEdge, EvidenceRecord } from "../types/ontology.js";
-
-export type DiffStatus = 'ADDED' | 'REMOVED' | 'MODIFIED' | 'UNCHANGED' | 'LEXICAL_SHIFT';
-
-export interface DiffNode extends StructuralNode {
-  diffStatus: DiffStatus;
-}
-
-export interface DiffEdge extends StructuralEdge {
-  diffStatus: DiffStatus;
-}
-
-export interface IntentDiff {
-  nodes: DiffNode[];
-  edges: DiffEdge[];
-}
+import { GraphDelta, DiffStatus, DiffNode, DiffEdge } from "../types/diff.js";
 
 /**
  * Normalizes an array of EvidenceRecords or a single EvidenceRecord to an array.
@@ -31,11 +17,6 @@ function normalizeEvidence(evidence: EvidenceRecord | EvidenceRecord[]): Evidenc
 
 /**
  * Deep compares two arrays of EvidenceRecords.
- * Since evidence can shift in line numbers safely (e.g. adding imports at top of file),
- * we only mark MODIFIED if the snippet or file actually changes?
- * Wait, in Chomp, line numbers shifting is technically a modification, but
- * the user might want to know if the actual structure changed.
- * For now, strict deep equality is safest to detect any AST location change.
  */
 function getEvidenceStatus(a: EvidenceRecord[], b: EvidenceRecord[]): 'UNCHANGED' | 'MODIFIED' | 'LEXICAL_SHIFT' {
   if (a.length !== b.length) return 'MODIFIED';
@@ -113,12 +94,14 @@ function deduplicateEdges(edges: StructuralEdge[]): StructuralEdge[] {
  * 
  * @param base - The previously committed representation graph
  * @param current - The fresh representation graph from the working directory
- * @returns An IntentDiff containing all nodes and edges marked with ADDED, REMOVED, MODIFIED, or UNCHANGED.
+ * @returns A GraphDelta mapping nodes and edges to their diff status and preserving base/target integrity.
  */
-export function compareGraphs(base: RepresentationGraph, current: RepresentationGraph): IntentDiff {
-  const diff: IntentDiff = {
-    nodes: [],
-    edges: []
+export function compareGraphs(base: RepresentationGraph, current: RepresentationGraph): GraphDelta {
+  const diff: GraphDelta = {
+    baseCommitSha: base.commitSha,
+    targetCommitSha: current.commitSha,
+    nodes: {},
+    edges: {}
   };
 
   const baseNodes = deduplicateNodes(base.nodes);
@@ -131,17 +114,17 @@ export function compareGraphs(base: RepresentationGraph, current: Representation
   for (const currentNode of currentNodes) {
     const baseNode = baseNodeMap.get(currentNode.id);
     if (!baseNode) {
-      diff.nodes.push({ ...currentNode, diffStatus: 'ADDED' });
+      diff.nodes[currentNode.id] = { status: 'ADDED', target: currentNode };
     } else {
       const status = getModificationStatus(baseNode, currentNode);
-      diff.nodes.push({ ...currentNode, diffStatus: status });
+      diff.nodes[currentNode.id] = { status, base: baseNode, target: currentNode };
     }
   }
 
   // 2. Process base nodes (find REMOVED)
   for (const baseNode of baseNodes) {
     if (!currentNodeMap.has(baseNode.id)) {
-      diff.nodes.push({ ...baseNode, diffStatus: 'REMOVED' });
+      diff.nodes[baseNode.id] = { status: 'REMOVED', base: baseNode };
     }
   }
 
@@ -155,17 +138,17 @@ export function compareGraphs(base: RepresentationGraph, current: Representation
   for (const currentEdge of currentEdges) {
     const baseEdge = baseEdgeMap.get(currentEdge.id);
     if (!baseEdge) {
-      diff.edges.push({ ...currentEdge, diffStatus: 'ADDED' });
+      diff.edges[currentEdge.id] = { status: 'ADDED', target: currentEdge };
     } else {
       const status = getModificationStatus(baseEdge, currentEdge);
-      diff.edges.push({ ...currentEdge, diffStatus: status });
+      diff.edges[currentEdge.id] = { status, base: baseEdge, target: currentEdge };
     }
   }
 
   // 4. Process base edges (find REMOVED)
   for (const baseEdge of baseEdges) {
     if (!currentEdgeMap.has(baseEdge.id)) {
-      diff.edges.push({ ...baseEdge, diffStatus: 'REMOVED' });
+      diff.edges[baseEdge.id] = { status: 'REMOVED', base: baseEdge };
     }
   }
 
