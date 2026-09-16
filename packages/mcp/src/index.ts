@@ -5,6 +5,7 @@ import { createSQLiteStorage } from "@chomp/db";
 import { basename, resolve, dirname } from "node:path";
 import { existsSync, statSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { analyzeTarget, compareGraphs } from "@chomp/core";
 
 export async function runMcpServer(targetPath: string = process.cwd()) {
   const server = new McpServer({
@@ -88,6 +89,35 @@ export async function runMcpServer(targetPath: string = process.cwd()) {
 
       return {
         content: [{ type: "text", text: JSON.stringify(filteredEdges, null, 2) }]
+      };
+    }
+  );
+
+  server.tool(
+    "chomp_get_diff",
+    "Compares the dirty working directory tree against the last saved graph in the Chomp SQLite database (base). Returns a structural delta containing ADDED, REMOVED, MODIFIED, and UNCHANGED entities.",
+    {},
+    async () => {
+      if (!existsSync(dbPath)) {
+        throw new Error(`Chomp database not found at ${dbPath}. Please ask the user to run 'chomp analyze .' in the repository root first to establish a base graph.`);
+      }
+
+      const storage = createSQLiteStorage(dbPath);
+      const baseGraph = await storage.getRepresentationGraph(repoId);
+      await storage.close();
+
+      if (!baseGraph) {
+        throw new Error(`Base graph data for repository '${repoId}' not found in the database. Please run 'chomp analyze .' first.`);
+      }
+
+      // Analyze current working directory state
+      const currentGraph = analyzeTarget(repoPath);
+
+      // Compute the Delta
+      const delta = compareGraphs(baseGraph, currentGraph);
+
+      return {
+        content: [{ type: "text", text: JSON.stringify(delta, null, 2) }]
       };
     }
   );
