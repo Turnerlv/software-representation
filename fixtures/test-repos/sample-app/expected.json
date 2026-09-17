@@ -6,12 +6,12 @@
       "patternId": "boundary.class-declaration"
     },
     {
-      "name": "File: ../../fixtures/test-repos/sample-app/types.ts",
+      "name": "File: types.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/sample-app/userService.ts",
+      "name": "File: userService.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     }

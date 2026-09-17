@@ -6,7 +6,7 @@
       "patternId": "boundary.class-declaration"
     },
     {
-      "name": "File: ../../fixtures/test-repos/node-events/index.js",
+      "name": "File: index.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },

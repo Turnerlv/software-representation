@@ -1,12 +1,12 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/factory-destructure/lib/auth.ts",
+      "name": "File: lib/auth.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/factory-destructure/lib/schema.ts",
+      "name": "File: lib/schema.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },

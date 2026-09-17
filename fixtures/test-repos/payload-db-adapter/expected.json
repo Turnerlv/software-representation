@@ -1,7 +1,7 @@
 {
   "boundaries": [
     { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" },
-    { "name": "File: ../../fixtures/test-repos/payload-db-adapter/index.ts", "entityType": "FILE", "patternId": "generic.boundary" }
+    { "name": "File: index.ts", "entityType": "FILE", "patternId": "generic.boundary" }
   ],
   "contracts": [
     { "name": "Exported Function: customOperation", "entityType": "EXPORTED_FUNCTION", "patternId": "contract.exported-function" }

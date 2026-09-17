@@ -7,7 +7,7 @@ import { extractExpressRoute, extractExpressRouteParameter, extractExpressConten
 import { extractEventEmitterContract, extractSocketOnAnyContract } from './eventEmitterVisitor.js';
 import { extractCommonjsExport } from './commonjsExportVisitor.js';
 import { extractDefinePropertyContract } from './definePropertyVisitor.js';
-import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport, extractNextjsRouteConfig, extractNextjsMetadataExport } from '../adapters/nextjsAdapter.js';
+import { NextjsFileRole, extractNextjsRouteHandlerContracts, extractNextjsMiddlewareExport, extractNextjsRouteConfig, extractNextjsMetadataExport, extractNextjsServerActions } from '../adapters/nextjsAdapter.js';
 import { extractDirectiveContract, extractServerOnlyGuard } from './directiveVisitor.js';
 import { extractFactoryExport } from './factoryExportVisitor.js';
 import { extractPayloadContracts, extractPayloadTypeRefContracts } from '../adapters/payloadAdapter.js';
@@ -87,6 +87,9 @@ export function visitContract(
   return null;
     }
     if (!isRouteMethod) {
+      const serverAction = extractNextjsServerActions(node, sourceFile, getEvidence, nextId);
+      if (serverAction) return serverAction;
+
       return {
         id: nextId(),
         name: `Exported Function: ${node.name.text}`,

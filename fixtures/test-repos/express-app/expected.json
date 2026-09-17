@@ -26,22 +26,22 @@
       "patternId": "boundary.commonjs-export"
     },
     {
-      "name": "File: ../../fixtures/test-repos/express-app/app.js",
+      "name": "File: app.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/express-app/inheritance.js",
+      "name": "File: inheritance.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/express-app/routes/api.js",
+      "name": "File: routes/api.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/express-app/routes/users.js",
+      "name": "File: routes/users.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },

@@ -328,3 +328,13 @@ test('analyzeTarget extracts monorepo workspace packages as BOUNDARY and resolve
   assert.ok(!externalA, 'Should not generate generic EXTERNAL_PACKAGE for workspace imports');
 });
 
+test('analyzeTarget extracts Next.js Server Actions and JSX Composition', () => {
+  const fixtureDir = path.join(process.cwd(), '..', '..', 'fixtures', 'test-repos', 'nextjs-components');
+  const graph = analyzeTarget(fixtureDir);
+
+  const serverAction = graph.nodes.find(n => n.name === 'Server Action: updateUser' && n.entityType === 'SERVER_ACTION');
+  assert.ok(serverAction, 'Expected to extract Server Action: updateUser');
+
+  const jsxRender = graph.edges.find(e => e.name === 'Renders: <UserProfile />' && e.entityType === 'RENDERS');
+  assert.ok(jsxRender, 'Expected to extract Renders: <UserProfile />');
+});

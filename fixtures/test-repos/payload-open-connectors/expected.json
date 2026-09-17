@@ -1,7 +1,7 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/payload-open-connectors/index.ts",
+      "name": "File: index.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     }
