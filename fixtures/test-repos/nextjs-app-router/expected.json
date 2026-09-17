@@ -1,32 +1,32 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/api/products/route.ts",
+      "name": "File: app/api/products/route.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/dashboard/page.tsx",
+      "name": "File: app/dashboard/page.tsx",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/app/layout.tsx",
+      "name": "File: app/layout.tsx",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/lib/actions.ts",
+      "name": "File: lib/actions.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/lib/config.ts",
+      "name": "File: lib/config.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/nextjs-app-router/middleware.ts",
+      "name": "File: middleware.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
@@ -58,9 +58,9 @@
       "patternId": "contract.nextjs-use-server-directive"
     },
     {
-      "name": "Exported Function: deleteProduct",
-      "entityType": "EXPORTED_FUNCTION",
-      "patternId": "contract.exported-function"
+      "name": "Server Action: deleteProduct",
+      "entityType": "SERVER_ACTION",
+      "patternId": "contract.server-action"
     },
     {
       "name": "Exported Function: getSecretConfig",

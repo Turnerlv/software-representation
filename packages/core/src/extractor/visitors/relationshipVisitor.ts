@@ -620,5 +620,74 @@ export function visitRelationship(
     };
   }
 
+  // React JSX Composition
+  if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {
+    const tagNameNode = ts.isJsxElement(node) ? node.openingElement.tagName : node.tagName;
+    
+    if (ts.isIdentifier(tagNameNode)) {
+      const tagName = tagNameNode.text;
+      
+      // CRITICAL FILTER: Only process Capitalized tag names (ignore div, span, etc)
+      if (/^[A-Z]/.test(tagName)) {
+        // Find matching import
+        let matchingImport: ts.ImportDeclaration | null = null;
+        for (const statement of sourceFile.statements) {
+          if (ts.isImportDeclaration(statement)) {
+            const importClause = statement.importClause;
+            if (importClause) {
+              if (importClause.name && importClause.name.text === tagName) {
+                matchingImport = statement;
+                break;
+              }
+              if (importClause.namedBindings) {
+                if (ts.isNamedImports(importClause.namedBindings)) {
+                  if (importClause.namedBindings.elements.some(e => e.name.text === tagName)) {
+                    matchingImport = statement;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        const callEvidence = { ...getEvidence(node), evidenceRole: 'syntax-call' as const };
+        const evidences: EvidenceRecord[] = [callEvidence];
+
+        let targetId: string | undefined = undefined;
+
+        if (matchingImport && ts.isStringLiteral(matchingImport.moduleSpecifier)) {
+          const importLiteral = matchingImport.moduleSpecifier.text;
+          const importStart = matchingImport.getStart(sourceFile);
+          const { line: importLine } = sourceFile.getLineAndCharacterOfPosition(importStart);
+          
+          evidences.push({
+            filePath: callEvidence.filePath,
+            lineNumber: importLine + 1,
+            snippet: matchingImport.getText(sourceFile).slice(0, 80).replace(/\s+/g, ' ').trim(),
+            evidenceRole: 'import-match'
+          });
+
+          const resolvedPath = resolveModulePath(importLiteral, sourceFile.fileName, repoRoot, workspaceRegistry);
+          if (resolvedPath) {
+            targetId = stableEntityId(resolvedPath, 'BOUNDARY', `File: ${resolvedPath}`);
+            return {
+              id: nextId(),
+              name: `Renders: <${tagName} />`,
+              type: 'RELATIONSHIP',
+              entityType: 'RENDERS',
+              patternId: 'relationship.jsx-element',
+              sourceId,
+              targetId,
+              status: 'DETERMINISTIC',
+              confidence: 'HIGH',
+              evidence: evidences,
+            };
+          }
+        }
+      }
+    }
+  }
+
   return null;
 }

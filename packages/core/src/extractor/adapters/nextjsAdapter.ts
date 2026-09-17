@@ -382,3 +382,54 @@ export function extractNextjsMetadataExport(
 
   return null;
 }
+
+/**
+ * Extracts Next.js Server Actions as a CONTRACT.
+ */
+export function extractNextjsServerActions(
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  getEvidence: (node: ts.Node) => EvidenceRecord,
+  nextId: () => string
+): StructuralEntity | null {
+  if (ts.isFunctionDeclaration(node) && node.name && node.modifiers?.some((m) => m.kind === ts.SyntaxKind.ExportKeyword)) {
+    let isServerAction = false;
+
+    // Check file-level 'use server' directive
+    if (sourceFile.statements.length > 0) {
+      const firstStmt = sourceFile.statements[0];
+      if (
+        ts.isExpressionStatement(firstStmt) &&
+        ts.isStringLiteral(firstStmt.expression) &&
+        firstStmt.expression.text === 'use server'
+      ) {
+        isServerAction = true;
+      }
+    }
+
+    // Check function-level 'use server' directive
+    if (!isServerAction && node.body && ts.isBlock(node.body) && node.body.statements.length > 0) {
+      const firstStmt = node.body.statements[0];
+      if (
+        ts.isExpressionStatement(firstStmt) &&
+        ts.isStringLiteral(firstStmt.expression) &&
+        firstStmt.expression.text === 'use server'
+      ) {
+        isServerAction = true;
+      }
+    }
+
+    if (isServerAction) {
+      return {
+        id: nextId(),
+        name: `Server Action: ${node.name.text}`,
+        type: 'CONTRACT',
+        entityType: 'SERVER_ACTION',
+        patternId: 'contract.server-action',
+        evidence: getEvidence(node),
+      };
+    }
+  }
+
+  return null;
+}
