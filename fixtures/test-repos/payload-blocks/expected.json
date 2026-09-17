@@ -1,6 +1,6 @@
 {
   "boundaries": [
-    { "name": "File: ../../fixtures/test-repos/payload-blocks/index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
+    { "name": "File: index.ts", "entityType": "FILE", "patternId": "generic.boundary" },
     { "name": "Package: payload", "entityType": "EXTERNAL_PACKAGE", "patternId": "boundary.external-import" }
   ],
   "contracts": [

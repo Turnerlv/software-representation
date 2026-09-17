@@ -1,12 +1,12 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/method-calls/userController.ts",
+      "name": "File: userController.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/method-calls/userService.ts",
+      "name": "File: userService.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     }

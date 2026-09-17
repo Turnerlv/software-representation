@@ -1,12 +1,12 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/function-calls/index.ts",
+      "name": "File: index.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     },
     {
-      "name": "File: ../../fixtures/test-repos/function-calls/utils.ts",
+      "name": "File: utils.ts",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     }

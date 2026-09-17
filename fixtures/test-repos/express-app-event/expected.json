@@ -1,7 +1,7 @@
 {
   "boundaries": [
     {
-      "name": "File: ../../fixtures/test-repos/express-app-event/index.js",
+      "name": "File: index.js",
       "entityType": "FILE",
       "patternId": "generic.boundary"
     }
