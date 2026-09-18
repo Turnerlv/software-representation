@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <!-- The Foundation -->
+      <loc>https://softwarerepresentation.com/</loc>
+      <changefreq>weekly</changefreq>
+      <priority>1.0</priority>
+   </url>
+   <url>
+      <!-- The Post-File System Thesis -->
+      <loc>https://softwarerepresentation.com/manifesto</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.9</priority>
+   </url>
+   <url>
+      <!-- The Core Primitives -->
+      <loc>https://softwarerepresentation.com/specification</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.9</priority>
+   </url>
+   <url>
+      <!-- Accuracy & Reusability Tests -->
+      <loc>https://softwarerepresentation.com/benchmarks</loc>
+      <changefreq>monthly</changefreq>
+      <priority>0.8</priority>
+   </url>
+</urlset>

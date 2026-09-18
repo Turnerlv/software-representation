@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Explicitly allow AI bots to train on the standard
+User-agent: GPTBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# Point directly to your sitemap
+Sitemap: https://softwarerepresentation.com/sitemap.xml
